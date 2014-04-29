@@ -1,0 +1,97 @@
+<div class="dijitDialog appConfirmDialog" role="dialog" aria-labelledby="${id}_title">
+    <div data-dojo-attach-point="titleBar" class="dijitDialogTitleBar">
+        <span data-dojo-attach-point="titleNode" class="dijitDialogTitle" id="${id}_title" role="heading" level="1"></span>
+        <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: onCancel" title="${buttonCancel}" role="button" tabindex="0">
+            <span data-dojo-attach-point="closeText" class="closeText" title="${buttonCancel}">x</span>
+        </span>
+    </div>
+    <div class="dijitDialogPaneContent">
+        <div data-dojo-attach-point="containerNode">
+            <div data-dojo-attach-point="seepForm" data-dojo-type="dijit/form/Form" enctype="multipart/form-data" action="Seep/UploadFile.php" method="POST">
+                <script type="dojo/method" event="onSubmit">
+                    if (!this.validate()) {
+                        console.log(typeof this.uploadNode);
+                        return false;
+                    } else {
+                        console.log("onSubmit true");
+                        return true;
+                    }
+                </script>
+                <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1" class="nameBox">
+                        <div class="subHead">Contact:</div>
+                        <div>Name:</div>
+                        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:4, customClass:'labelsAndValues'">
+                            <div data-dojo-type="dijit/form/Select" name="honorific" value="1" class="honor">
+                                <span value="1">-- --</span>
+                                <span value="2">Mr.</span>
+                                <span value="3">Ms.</span>
+                                <span value="4">Mrs.</span>
+                                <span value="5">Dr.</span>
+                            </div>
+                            <div data-dojo-type="dijit/form/TextBox" title="First:" name="firstname" value="" class="name"></div>
+                            <div data-dojo-type="dijit/form/TextBox" title="Middle:" name="middlename" value="" class="name"></div>
+                            <div data-dojo-type="dijit/form/ValidationTextBox" missingMessage="Ooops! You forgot your last name!" required="true" title="Last*:" name="lastname" id="lastname" value="" class="name"></div>
+                        </div>
+                        <div data-dojo-type="dijit/form/ValidationTextBox" required="true" title="Email*:" name="email" id="email" value="" validator="dojox.validate.isEmailAddress"></div>
+                    </div>
+                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1" class="nameBox">
+                        <div>
+                            <span class="subHead">Location:</span>
+                            <span>(Coordinates in
+                                <a href="http://transition.fcc.gov/mb/audio/bickel/DDDMMSS-decimal.html" target="_blank">decimal degrees</a>)
+                            </span>
+                        </div>
+                        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:3, customClass:'labelsAndValues'">
+                            <div data-dojo-type="dijit/form/Select" name="device" title="Device:" value="1">
+                                <span value="1">Google</span>
+                                <span value="2">Garmin</span>
+                                <span value="3">Topo Map</span>
+                                <span value="3">Other</span>
+                            </div>
+                            <div data-dojo-type="dijit/form/ValidationTextBox" missingMessage="Ooops! You forgot the coordinates!" required="true" title="Lat*:" name="latitude" value="" class="coords" id="latitude"></div>
+                            <div data-dojo-type="dijit/form/ValidationTextBox" missingMessage="Ooops! You forgot the coordinates!" required="true" title="Long*:" name="longitude" value="" class="coords" id="logitude"></div>
+                        </div>
+                    </div>
+                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1" class="nameBox">
+                        <div class="subHead">Info:</div>
+                        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, customClass:'labelsAndValues'">
+                            <div data-dojo-type="dijit/form/Select" name="condition" title="Condition:" value="1">
+                                <span value="1">Good</span>
+                                <span value="2">Bad</span>
+                            </div>
+                            <div data-dojo-type="dijit/form/Select" name="flow" title="Water Flow:" value="1">
+                                <span value="1">None</span>
+                                <span value="2">Drip</span>
+                                <span value="3">Torrent</span>
+                            </div>
+                        </div>
+                        <div data-dojo-type="dijit/form/Textarea" title="Description:" name="description" value="" class="des"></div>
+                        <div data-dojo-type="dijit/form/DateTextBox" required="true" title="Date Found*:" name="found" value="" class="date" id="date"></div>
+                        <div class="browseButton" name="uploadedfile" multiple="true" type="file" data-dojo-type="dojox/form/Uploader" data-dojo-props="label: 'Select Some Images ( .jpg )'" id="uploader" data-dojo-attach-point="uploadNode">
+                            <script type="dojo/method" event="onChange">
+                                fileList = this.getFileList();
+
+                                for (n = 0; n < fileList.length; n++) {
+                                    if (this.getFileType(this.getFileList()[n].name) != 'JPG') {
+                                        alert('A file is not .jpg file!');
+                                        break;
+                                    }
+                                }
+                            </script>
+                            <script type="dojo/method" event="onComplete">
+                                console.log(CustomEvent);
+                            </script>
+                        </div>
+                        <div id="files" data-dojo-type="dojox/form/uploader/FileList" data-dojo-props="uploaderId: 'uploader'">
+                        </div>
+                        <div data-dojo-type="dijit/form/TextBox" name="hash" value=${signature} class="hidden"></div>
+                    </div>
+                </div>
+                <div class="appDialogPaneButtons">
+                    <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="seepSubmit" type="submit" role="button" value="Submit">Submit</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

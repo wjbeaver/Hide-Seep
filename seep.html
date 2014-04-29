@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Seep Form Demo</title>
+    <link rel="stylesheet" href="dojo/1.9.3/dijit/themes/claro/claro.css" />
+    <link rel="stylesheet" href="dojo/1.9.3/dojox/form/resources/UploaderFileList.css" />
+    <link rel="stylesheet" href="Seep/formSeepApp/theme/formSeep.css" media="screen">
+    <script>
+        // Configure application.
+        appConfig = {
+            // Get base url from current url.
+            baseUrl: location.href.substring(0, location.href.lastIndexOf("/") + 1) + '/Seep/'
+        };
+
+        var dojoConfig = (function() {
+            return {
+                async: true,
+                isDebug: true
+            };
+        })();
+    </script>
+    <!-- load dojo and md5 -->
+    <script src="dojo/1.9.3/dojo/dojo.js"></script>
+    <script src="Seep/md5.js"></script>
+    <script type="text/javascript">
+        // Load application.
+        require({
+            packages: [{
+                name: 'formSeepApp',
+                location: appConfig.baseUrl + '/formSeepApp/'
+            }]
+        }, [
+            "formSeepApp"
+        ]);
+    </script>
+</head>
+
+<body class="claro">
+    <h1>Seep Form Demo</h1>
+    <div id="seepContainer" class="appDialogPaneButtons">
+        <span>Press here to send us coordinates, images, and other information about the spring:</span>
+        <button id="btnStart" data-dojo-type="dijit/form/Button" type="button" role="button">Open Form</button><span id="loadstatus"> - load</span>
+
+</body>
+
+</html>
