@@ -53,9 +53,9 @@ define([
      * Button click action.
      */
     app.onButtonClick = function () {
-       dom.byId('loadstatus').innerHTML = " - loading ...";
-       app.seepForm({
-             onSuccess: function (response) {
+        dom.byId('loadstatus').innerHTML = "(loading ...)";
+        app.seepForm({
+            onSuccess: function (response) {
                 console.log(response.message);
                 this.onExecute(); // Hide dialog.
                 app.alert('Success!');
@@ -70,7 +70,7 @@ define([
                 }
             }
         });
-       dom.byId('loadstatus').innerHTML = " - loaded";
+        dom.byId('loadstatus').innerHTML = "(loaded)";
     };
 
     return app;

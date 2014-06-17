@@ -1,0 +1,93 @@
+arcgis:
+
+un: SSI_project
+pw: Pyrgulopsis
+
+https://springs.maps.arcgis.com/home/webmap/viewer.html?webmap=3022a82d40244af9ba2c1db1ebfdf362
+
+un: wjbeaver
+pw: myiris81
+
+server:
+
+un: wjbeaver
+pw: Beaver1!
+
+data:
+wbeaver
+myiris81?
+springsdata.org
+
+seepApp.html token
+
+v6MVBksJh0ZCO56RGe_r8ZNcyqUaBAISuw-q6NqZ6GivPOL2svts2nvHAV0xPs6Dyrw2QnyA-2w8tvIBjcD086myPnz4FipFINIoSweAfp0.
+
+springs data:
+
+https://arcgis.springsdata.org/arcgis/rest/services/DLCC/DLCC_Springs/MapServer/0
+
+https://arcgis.springsdata.org/arcgis/rest/services/SkyIsland/SkyIslandPublicSprings/MapServer/0
+
+OBJECTID ( type: esriFieldTypeOID , alias: OBJECTID )
+
+NAME ( type: esriFieldTypeString , alias: Name , length: 75 )
+
+SSI_ID ( type: esriFieldTypeDouble , alias: SSI_ID )
+
+ShortName ( type: esriFieldTypeString , alias: Short Name , length: 50 )
+
+ElevM ( type: esriFieldTypeInteger , alias: Elevation M )
+
+State ( type: esriFieldTypeString , alias: State , length: 5 , Coded Values: [AL: Alabama] , [AK: Alaska] , [AZ: Arizona] , ...47 more... )
+
+Hyperlink ( type: esriFieldTypeString , alias: Hyperlink , length: 200 )
+
+DataSource ( type: esriFieldTypeString , alias: Data Source , length: 15 , Coded Values: [AZDWR: Arizona Dept. Water Resources GWSI db] , [CFF: Cartographic Feature File] , [Unknown: Unknown] , ...14 more... )
+    
+County ( type: esriFieldTypeString , alias: County , length: 50 , Coded Values: [Alameda CA: Alameda] , [Alpine CA: Alpine] , [Amador CA: Amador] , ...403 more... )
+    
+LandUnit ( type: esriFieldTypeString , alias: Land Unit , length: 15 , Coded Values: [BLM: BLM] , [Private: Private] , [State: State] , ...10 more... )
+    
+LandDetail ( type: esriFieldTypeString , alias: Land Unit Detail , length: 20 , Coded Values: [AcomaIR: Acoma Indian Reservation] , [ACIR: Agua Caliente Indian Reservation] , [AFP44: Air Force Plant No. 44] , ...300 more... )
+    
+HUC ( type: esriFieldTypeDouble , alias: HUC 8 , Coded Values: [15050305: Aguirre Valley. Arizona.] , [13040202: Alamito. Texas] , [13010002: Alamosa-Trinchera. New Mexico] , ...587 more... )
+    
+Inventory ( type: esriFieldTypeSmallInteger , alias: Inventory )
+
+Survey ( type: esriFieldTypeDouble , alias: Survey Status , Coded Values: [1: Potential spring; not verified] , [2: Spring reported; not verified] , [3: Spring reported dry or ephemeral; not verified] )
+    
+created_user ( type: esriFieldTypeString , alias: created_user , length: 75 )
+    
+created_date ( type: esriFieldTypeDate , alias: created_date , length: 36 )
+    
+last_edited_user ( type: esriFieldTypeString , alias: last_edited_user , length: 75 )
+    
+last_edited_date ( type: esriFieldTypeDate , alias: last_edited_date , length: 36 )
+    
+Latitude ( type: esriFieldTypeDouble , alias: Latitude )
+    
+Longitude ( type: esriFieldTypeDouble , alias: Longitude )
+    
+PublicInfo ( type: esriFieldTypeSmallInteger , alias: Appears in Public Source? , Coded Values: [1: Yes] , [0: No] )
+    
+Sensitivity ( type: esriFieldTypeString , alias: Sensitivity , length: 20 , Coded Values: [None: Not sensitive] , [Location: Location is sensitive] , [Survey Data: Data from surveys are sensitive] , ...1 more... )
+    
+NearestSpringM ( type: esriFieldTypeDouble , alias: Nearest Spring M )
+    
+OtherDB_ID ( type: esriFieldTypeString , alias: OtherDB_ID , length: 100 )
+    
+Source_Descr ( type: esriFieldTypeString , alias: Source Description , length: 200 )
+    
+Alias ( type: esriFieldTypeString , alias: Alias , length: 50 )
+    
+LCC ( type: esriFieldTypeString , alias: LCC , length: 15 )
+    
+Shape ( type: esriFieldTypeGeometry , alias: Shape )
+    
+Project ( type: esriFieldTypeString , alias: Project , length: 30 )
+    
+QuadName ( type: esriFieldTypeString , alias: Quad Name , length: 100 )
+    
+LandDetail1 ( type: esriFieldTypeString , alias: Land Unit Detail , length: 100 )
+    
+SSI_SiteID ( type: esriFieldTypeInteger , alias: SSI_SiteID )

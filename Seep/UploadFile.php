@@ -193,7 +193,7 @@ if ( isset($_FILES[$fieldName]) || isset($_FILES['uploadedfileFlash'])) {
             }
 
         } elseif (strlen($_FILES['uploadedfile'.$cnt]['name'])) {
- 	        $htmldata[$cnt] = array("ERROR" => "File could not be moved: ".$_FILES['uploadedfile'.$cnt]['name']);
+ 	        $htmldata[$cnt] = array("Message" => "File could not be moved: ".$_FILES['uploadedfile'.$cnt]['name']);
         }
 
         $cnt++;
@@ -264,12 +264,13 @@ if ( isset($_FILES[$fieldName]) || isset($_FILES['uploadedfileFlash'])) {
 
             $htmldata[$cnt] = $_post;
         } elseif(strlen($_FILES['uploadedfiles']['name'][$i])) {
-            $htmldata[$cnt] = array("ERROR" => "File could not be moved: ".$_FILES['uploadedfiles']['name'][$i]);
+            $htmldata[$cnt] = array("Message" => "File could not be moved: ".$_FILES['uploadedfiles']['name'][$i]);
         }
 
         $cnt++;
     }
 
+    $htmldata['Message'] = "Submit Successful";
     $data = $json->encode($htmldata);
     trace($data);
     print $data;
@@ -306,7 +307,7 @@ if ( isset($_FILES[$fieldName]) || isset($_FILES['uploadedfileFlash'])) {
     $htmldata['uploadType'] = $uploadType;
     $htmldata['size'] = filesize($file);
     $htmldata['additionalParams'] = $postdata;
-
+    $htmldata['Message'] = "Submit Successful";
     $data = $json->encode($htmldata);
     trace($data);
     print $data;
@@ -324,7 +325,7 @@ if ( isset($_FILES[$fieldName]) || isset($_FILES['uploadedfileFlash'])) {
 }else{
     trace("IMROPER DATA SENT... $_FILES:");
     trace($_FILES);
-    $htmldata = array("ERROR" => "Improper data sent - no files found");
+    $htmldata = array("Message" => "Submit Successful - No Images Sent");
 }
 
 //HTML gets a json array back:
@@ -332,5 +333,5 @@ $data = $json->encode($htmldata);
 trace("Json Data Returned:");
 trace($data);
 print $data;
-return $data;
+//return $data;
 ?>

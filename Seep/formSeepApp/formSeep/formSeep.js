@@ -46,40 +46,34 @@ define([
         postCreate: function () {
             //make sure any parent widget's postCreate functions get called.
             this.inherited(arguments);
-            console.log(typeof this.seepForm);
+
+            this.uploadNode.on("complete", function (data) {
+                alert(data.Message);
+            });
+            this.uploadNode.on("error", function (evt) {
+                alert(evt);
+            });
+            this.uploadNode.on("change", function () {
+                fileList = this.getFileList();
+                console.log("Change");
+
+                for (n = 0; n < fileList.length; n++) {
+                    if (this.getFileType(this.getFileList()[n].name) != 'JPG') {
+                        alert('A file in the list is not a ".jpg" file!');
+                        this.reset();
+                        break;
+                    }
+                }
+            });
+            this.uploadNode.on("begin", lang.hitch(this, function () {
+                if (!this.seepForm.validate()) {
+                    console.log("onSubmit false");
+                    this.uploadNode.cancel();
+                    // this.uploadNode.reset();
+                } else {
+                    console.log("onSubmit true");
+                }
+            }));
         },
-
-        onChange: function (data) {
-            console.log("onChange");
-        },
-
-        onSuccess: function (result) {
-            console.log("onSuccess");
-        },
-
-        onError: function (evt) {
-            console.log("onError");
-        },
-
-        onSubmit: function () {
-            var widget = this;
-            console.log("onSubmit");
-            if (validate()) {
-                this.submit();
-            } else {
-                response.status = "Validation Error";
-                response.message = "<h4>Form contains invalid data.  Please correct first</h4>";
-                widget.onFailure(response);
-            }
-        },
-
-        onSuccess: function (response) {
-
-        },
-
-        onFailure: function (response) {
-
-        }
-
     });
 });

@@ -1,12 +1,19 @@
-<!DOCTYPE HTML>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 
 <head>
-    <meta charset="utf-8">
-    <title>Seep Form Demo</title>
-    <link rel="stylesheet" href="dojo/1.9.3/dijit/themes/claro/claro.css" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <!--The viewport meta tag is used to improve the presentation and behavior of the samples
+    on iOS devices-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>Hide & Seep</title>
+
+    <link rel="stylesheet" href="http://js.arcgis.com/3.9/js/dojo/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="http://js.arcgis.com/3.9/js/esri/css/esri.css">
     <link rel="stylesheet" href="dojo/1.9.3/dojox/form/resources/UploaderFileList.css" />
     <link rel="stylesheet" href="Seep/formSeepApp/theme/formSeep.css" media="screen">
+    <link rel="stylesheet" href="http://js.arcgis.com/3.9/js/esri/css/esri.css">
+    <link rel="stylesheet" href="Seep/formSeepApp/theme/formSeep.css">
     <script>
         // Configure application.
         appConfig = {
@@ -21,8 +28,306 @@
             };
         })();
     </script>
-    <!-- load dojo and md5 -->
-    <script src="dojo/1.9.3/dojo/dojo.js"></script>
+    <style>
+        html,
+        body {
+            height: 90%;
+            width: 98%;
+            margin: 1%;
+        }
+        #dijit_layout_ContentPane_1 {
+            padding-left: 20px;
+        }
+        #dojox_layout_TableContainer_0 {
+            width: 30%;
+        }
+        #dojox_layout_TableContainer_2,
+        #dojox_layout_TableContainer_4 {
+            width: 60%
+        }
+        #rightPane {
+            width: 20%;
+        }
+        #legendPane {
+            border: solid #97DCF2 1px;
+        }
+    </style>
+
+    <script src="http://js.arcgis.com/3.9/"></script>
+    <script>
+        var map;
+
+         // addNew
+         // bring up the form editor
+         // add a point to newfoundFeatureLayer
+         // add to the collection
+
+        require([
+            "esri/map",
+            "esri/dijit/Scalebar",
+            "esri/layers/FeatureLayer",
+            "esri/dijit/PopupTemplate",
+            "esri/geometry/Point",
+            "esri/graphic",
+            "dojo/on",
+            "esri/dijit/Legend",
+            "dojo/_base/array",
+            "dojo/parser",
+            "dojo/dom",
+            "dojo/_base/lang",
+            "dijit/registry",
+            "dijit/layout/BorderContainer",
+            "dijit/layout/ContentPane",
+            "dijit/layout/AccordionContainer",
+            "dojo/domReady!"
+        ], function(Map,
+            Scalebar,
+            FeatureLayer,
+            PopupTemplate,
+            Point,
+            Graphic,
+            on,
+            Legend,
+            arrayUtils,
+            parser,
+            dom,
+            lang,
+            registry) {
+            parser.parse();
+
+            map = new Map("map", {
+                basemap: "topo",
+                center: [-111.93, 34.17],
+                zoom: 7
+            });
+
+            //hide the popup if its outside the map's extent
+            map.on("mouse-drag", function(evt) {
+                if (map.infoWindow.isShowing) {
+                    var loc = map.infoWindow.getSelectedFeature().geometry;
+                    if (!map.extent.contains(loc)) {
+                        map.infoWindow.hide();
+                    }
+                }
+            });
+
+            //create a feature collection for anotated springs
+            var annotatedFeatureCollection = {
+                "layerDefinition": null,
+                "featureSet": {
+                    "features": [],
+                    "geometryType": "esriGeometryPoint"
+                }
+            };
+            annotatedFeatureCollection.layerDefinition = {
+                "geometryType": "esriGeometryPoint",
+                "objectIdField": "ObjectID",
+                "name": 'Annotated Spring',
+                "drawingInfo": {
+                    "renderer": {
+                        "type": "simple",
+                        "symbol": {
+                            "type": "esriPMS",
+                            "url": "images/spring.png",
+                            "contentType": "image/png",
+                            "width": 15,
+                            "height": 15
+                        }
+                    }
+                },
+                "fields": [{
+                    "name": "ObjectID",
+                    "alias": "ObjectID",
+                    "type": "esriFieldTypeOID"
+                }, {
+                    "name": "upload_id",
+                    "alias": "UploadID",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "honorific",
+                    "alias": "Honorific",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "firstName",
+                    "alias": "First",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "middleName",
+                    "alias": "Middle",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "lastName",
+                    "alias": "Last",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "device",
+                    "alias": "Device",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "latitude",
+                    "alias": "Latitude",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "logitude",
+                    "alias": "Longitude",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "condition",
+                    "alias": "Condition",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "flow",
+                    "alias": "Flow",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "description",
+                    "alias": "Description",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "dateFound",
+                    "alias": "Date Found",
+                    "type": "esriFieldTypeString"
+                }]
+            };
+
+            //create a feature collection for newfound springs
+            var newfoundFeatureCollection = {
+                "layerDefinition": null,
+                "featureSet": {
+                    "features": [],
+                    "geometryType": "esriGeometryPoint"
+                }
+            };
+            newfoundFeatureCollection.layerDefinition = {
+                "geometryType": "esriGeometryPoint",
+                "objectIdField": "ObjectID",
+                "name": 'New Spring',
+                "drawingInfo": {
+                    "renderer": {
+                        "type": "simple",
+                        "symbol": {
+                            "type": "esriPMS",
+                            "url": "images/newspring.png",
+                            "contentType": "image/png",
+                            "width": 15,
+                            "height": 15
+                        }
+                    }
+                },
+                "fields": [{
+                    "name": "ObjectID",
+                    "alias": "ObjectID",
+                    "type": "esriFieldTypeOID"
+                }, {
+                    "name": "upload_id",
+                    "alias": "UploadID",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "honorific",
+                    "alias": "Honorific",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "firstName",
+                    "alias": "First",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "middleName",
+                    "alias": "Middle",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "lastName",
+                    "alias": "Last",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "device",
+                    "alias": "Device",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "latitude",
+                    "alias": "Latitude",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "logitude",
+                    "alias": "Longitude",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "condition",
+                    "alias": "Condition",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "flow",
+                    "alias": "Flow",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "description",
+                    "alias": "Description",
+                    "type": "esriFieldTypeString"
+                }, {
+                    "name": "dateFound",
+                    "alias": "Date Found",
+                    "type": "esriFieldTypeString"
+                }]
+            };
+
+            //define a popup template
+            var popupTemplate = new PopupTemplate({
+                title: "{title}",
+                description: "{description}"
+            });
+
+            //create feature layers based on the feature collections
+            newfoundFeatureLayer = new FeatureLayer(newfoundFeatureCollection, {
+                id: 'newfoundLayer',
+                infoTemplate: popupTemplate
+            });
+
+            annotatedFeatureLayer = new FeatureLayer(annotatedFeatureCollection, {
+                id: 'annotatedLayer',
+                infoTemplate: popupTemplate
+            });
+
+            //associate the features with the popup on click
+            newfoundFeatureLayer.on("click", function(evt) {
+                map.infoWindow.setFeatures([evt.graphic]);
+            });
+
+            annotatedFeatureLayer.on("click", function(evt) {
+                map.infoWindow.setFeatures([evt.graphic]);
+            });
+
+            //add the legend
+            map.on("layers-add-result", function(evt) {
+                var layerInfo = arrayUtils.map(evt.layers, function(layer, index) {
+                    return {
+                        layer: layer.layer,
+                        title: layer.layer.name
+                    };
+                });
+                if (layerInfo.length > 0) {
+                    var legendDijit = new Legend({
+                        map: map,
+                        layerInfos: layerInfo
+                    }, "legendDiv");
+                    legendDijit.startup();
+                }
+            });
+
+            map.addLayers([newfoundFeatureLayer, annotatedFeatureLayer]);
+
+            // scalebar
+            var scalebar = new Scalebar({
+                map: map,
+                // "dual" displays both miles and kilmometers
+                // "english" is the default, which displays miles
+                // use "metric" for kilometers
+                scalebarUnit: "english"
+            });
+
+            // north arrow
+            dojo.byId("north").innerHTML = "<img id='img' src='images/north-arrow.gif' />";
+
+        });
+    </script>
     <script src="Seep/md5.js"></script>
     <script type="text/javascript">
         // Load application.
@@ -38,11 +343,85 @@
 </head>
 
 <body class="claro">
-    <h1>Seep Form Demo</h1>
+    <!--[if IE 7]>
+<style>
+  html, body {
+    margin: 0;
+  }
+</style>
+<![endif]-->
+    <h2>Hide & Seep</h2>
     <div id="seepContainer" class="appDialogPaneButtons">
-        <span>Press here to send us coordinates, images, and other information about the spring:</span>
-        <button id="btnStart" data-dojo-type="dijit/form/Button" type="button" role="button">Open Form</button><span id="loadstatus"> - load</span>
+        <span>Send us coordinates, images, and other information about a new or existing spring. If you already have the coordinates add them here:</span>
+        <button id="btnStart" data-dojo-type="dijit/form/Button" type="button" role="button">Open Form</button>
+        <span id="loadstatus">(load)</span>
+        <span>. Or use the map below:</span>
 
+    </div>
+    <div id="content" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline', gutters:true" style="width: 100%; height: 100%; margin: 0;">
+
+        <div id="rightPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'">
+
+            <div data-dojo-type="dijit/layout/AccordionContainer">
+                <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title:'About'">
+                    about
+                </div>
+                <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title:'Tools'">
+                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+                        <div data-dojo-type="dijit/form/RadioButton" title="Off" checked value="off" name="tool" class="radio" id="off">
+                            <script type="dojo/on" data-dojo-event="click" data-dojo-args="e">
+                                map.setMapCursor("default");
+                                console.log("Off");
+                            </script>
+                        </div>
+                    </div>
+                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+                        <h4>New Spring</h4>
+                    </div>
+                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2">
+                        <div data-dojo-type="dijit/form/RadioButton" title="Add" name="tool" value="addnew" class="radio" id="addFound">
+                            <script type="dojo/on" data-dojo-event="click" data-dojo-args="e">
+                                map.setMapCursor("crosshair");
+                                console.log("addNew");
+                            </script>
+
+                        </div>
+                        <div data-dojo-type="dijit/form/RadioButton" title="&nbsp;&nbsp;&nbsp;Remove" name="tool" value="removenew" class="radio" id="removeFound">
+                            <script type="dojo/on" data-dojo-event="click" data-dojo-args="e">
+                                map.setMapCursor("pointer");
+                                console.log("removeNew");
+                            </script>
+                        </div>
+                    </div>
+                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+                        <h4>Existing Spring</h4>
+                    </div>
+                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2" class=radio_container>
+                        <div data-dojo-type="dijit/form/RadioButton" title="Add" name="tool" value="addann" class="radio" id="addAnnotate">
+                            <script type="dojo/on" data-dojo-event="click" data-dojo-args="e">
+                                map.setMapCursor("crosshair");
+                                console.log("addAnnotate");
+                            </script>
+
+                        </div>
+                        <div data-dojo-type="dijit/form/RadioButton" title="&nbsp;&nbsp;&nbsp;Remove" name="tool" value="removeann" class="radio" id="removeAnnotate">
+                            <script type="dojo/on" data-dojo-event="click" data-dojo-args="e">
+                                map.setMapCursor("pointer");
+                                console.log("removeAnnotate");
+                            </script>
+
+                        </div>
+                    </div>
+                </div>
+                <div data-dojo-type="dijit/layout/ContentPane" id="legendPane" data-dojo-props="title:'Legend', selected:true">
+                    <div id="legendDiv"></div>
+                </div>
+            </div>
+        </div>
+        <div id="map" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'" style="overflow:hidden;">
+            <span id="north" style="position:absolute; right:150px; top:5px; color:#000; z-index:50;"></span>
+        </div>
+    </div>
 </body>
 
 </html>
