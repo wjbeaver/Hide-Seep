@@ -1,0 +1,26 @@
+<div class="dijitDialog appConfirmDialog" role="dialog" aria-labelledby="${id}_title">
+    <div data-dojo-attach-point="titleBar" class="dijitDialogTitleBar">
+        <span data-dojo-attach-point="titleNode" class="dijitDialogTitle" id="${id}_title" role="heading" level="1"></span>
+        <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: onCancel" title="${buttonCancel}" role="button" tabindex="0">
+            <span data-dojo-attach-point="closeText" class="closeText" title="${buttonCancel}">x</span>
+        </span>
+    </div>
+    <div class="dijitDialogPaneContent">
+        <div data-dojo-attach-point="containerNode">
+            <div data-dojo-attach-point="seepFormUpload" data-dojo-type="dijit/form/Form" enctype="multipart/form-data" action="Seep_1.2/UploadFile.php" method="POST" id="sForm_images">
+                <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1" class="nameBox">
+                        <div class="browseButton" name="uploadedfile" multiple="true" type="file" data-dojo-type="dojox/form/Uploader" data-dojo-props="label: 'Select Some Images ( .jpg )'" id="uploader" data-dojo-attach-point="uploadNode">
+                        </div>
+                        <div id="files" data-dojo-type="dojox/form/uploader/FileList" data-dojo-props="uploaderId: 'uploader'">
+                        </div>
+                        <div data-dojo-type="dijit/form/TextBox" name="hash" value=${signature} class="hidden"></div>
+                    </div>
+                </div>
+                <div class="appDialogPaneButtons">
+                    <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="seepSubmit" type="submit" role="button" value="Submit">Submit</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

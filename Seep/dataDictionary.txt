@@ -1,0 +1,150 @@
+Object Class - Name
+    name:   NameID_PK
+    alias:  Name ID
+    type:   esriFieldTypeString
+
+    name:   Honorific
+    alias:  Honorific
+    type:   esriFieldTypeString
+    Domain: ""
+            "Mr."
+            "Mrs."
+            "Ms."
+            "Dr."
+
+    name:   FirstName
+    alias:  First
+    type:   esriFieldTypeString
+
+    name:   MiddleName
+    alias:  Middle
+    type:   esriFieldTypeString
+
+    name:   LastName
+    alias:  Last
+    type:   esriFieldTypeString
+
+Object Class - Contact
+    name:   ContactID_PK
+    alias:  Contact ID
+    type:   esriFieldTypeString
+
+    name:   Email
+    alias:  Email Address
+    type:   esriFieldTypeString
+
+Feature Class - AnnotatedSpring
+    name:   UploadID_PK
+    alias:  Upload ID
+    type:   esriFieldTypeString
+    comment:use hash of datetime stamp
+
+    name:   SpringID_FK
+    alias:  Spring ID
+    type:   esriFieldTypeString
+    comment:id of spring across all data, new found spring this would be null
+
+    name:   Type
+    alias:  Spring Type
+    type:   esriFieldTypeString
+    subtypes:   "New"
+                "Existing"
+                "Unknown"
+
+    name:   Device
+    alias:  Coordinate Source
+    type:   esriFieldTypeString
+    comment:defaults "App" if picked from map
+    Domain: "Google"
+            "Garmin"
+            "Other"
+            "Unknown"
+            "App"
+
+    name:   Condition
+    alias:  Condition
+    type:   esriFieldTypeString
+    Domain: "Condition 1"
+            "Condition 2"
+            "Unknown"
+
+    name:   Flow
+    alias:  Flow
+    type:   esriFieldTypeString
+    Domain: "Flow 1"
+            "Flow 2"
+            "Unknown"
+
+    name:   Comment
+    alias:  Comment
+    type:   esriFieldTypeString
+
+    name:   DateFound
+    alias:  Date Found
+    type:   esriFieldTypeDate
+
+Feature Class - seepImageFeature
+    name:   ImageID_PK
+    alias:  Image ID
+    type:   esriFieldTypeString
+
+    name:   SpringID_FK
+    alias:  Spring ID
+    type:   esriFieldTypeString
+    comment:ID of existing spring or null
+
+    name:   UploadID_FK
+    alias:  Upload ID
+    type:   esriFieldTypeString
+    comment:relational index of upload
+
+    name:   DateTaken
+    alias:  Date taken
+    type:   esriFieldTypeDate
+    comment:date from EXIF metadata or null
+
+    name:   TimeTaken
+    alias:  Time taken
+    type:   esriFieldTypeString
+    comment:time from EXIF metadata or null
+
+    name:   Timestamp
+    alias:  Time Stamp
+    type:   esriFieldTypeInteger
+
+    name:   DSTOffset
+    alias:  Daylight Savings Time Offset
+    type:   esriFieldTypeInteger
+    comment:from Google Time Zone API
+
+    name:   UTCOffset
+    alias:  Coordinated Universal Time Offset
+    type:   esriFieldTypeInteger
+    comment:from Google Time Zone API
+
+    name:   TimeZoneID_FK
+    alias:  Time Zone ID
+    type:   esriFieldTypeString
+    comment:from Google Time Zone API
+
+    name:   TimeZoneName
+    alias:  Time Zone Name
+    type:   esriFieldTypeString
+    comment:from Google Time Zone API
+
+    name:   PhotographerID_FK
+    alias:  Photographer
+    type:   esriFieldTypeString
+
+    name:   Image
+    alias:  File location
+    type:   esriFieldTypeRaster
+    comment: url to image
+
+    name:   Title
+    alias:  Title
+    type:   esriFieldTypeString
+
+    name:   Description
+    alias:  Description
+    type:   esriFieldTypeString

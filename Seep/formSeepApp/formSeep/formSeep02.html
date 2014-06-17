@@ -1,0 +1,34 @@
+<div class="dijitDialog appConfirmDialog" role="dialog" aria-labelledby="${id}_title">
+    <div data-dojo-attach-point="titleBar" class="dijitDialogTitleBar">
+        <span data-dojo-attach-point="titleNode" class="dijitDialogTitle" id="${id}_title" role="heading" level="1"></span>
+        <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" title="${buttonCancel}" role="button" tabindex="0">
+        </span>
+    </div>
+    <div class="dijitDialogPaneContent">
+        <div data-dojo-attach-point="containerNode">
+            <div data-dojo-attach-point="seepFormImage" data-dojo-type="dijit/form/Form" id="sForm_image">
+                <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1" class="nameBox">
+                        <div>
+                            <img class="image" src="" width="200" height="300" data-dojo-attach-point="imageNode">
+                        </div>
+                        <div data-dojo-type="dijit/form/TextBox" name="hash" value=${signature} data-dojo-attach-point="signatureNode" class="hidden"></div>
+                        <div data-dojo-type="dijit/form/TextBox" name="date_taken" value="" data-dojo-attach-point="date_takenNode" class="hidden"></div>
+                        <div data-dojo-type="dijit/form/TextBox" name="time_taken" value="" data-dojo-attach-point="time_takenNode" class="hidden"></div>
+                        <div data-dojo-type="dijit/form/TextBox" name="timeZoneName" value="" data-dojo-attach-point="timeZoneNameNode" class="hidden"></div>
+                        <div data-dojo-type="dijit/form/TextBox" name="timeZoneID" value="" data-dojo-attach-point="timeZoneIDNode" class="hidden"></div>
+                        <div data-dojo-type="dijit/form/TextBox" name="DSToffset" value="" data-dojo-attach-point="DSToffsetNode" class="hidden"></div>
+                        <div data-dojo-type="dijit/form/TextBox" name="UTCoffset" value="" data-dojo-attach-point="UTCoffsetNode" class="hidden"></div>
+                        <div data-dojo-type="dijit/form/TextBox" name="latitude" value="" data-dojo-attach-point="latitudeNode" class="hidden"></div>
+                        <div data-dojo-type="dijit/form/TextBox" name="longitude" value="" data-dojo-attach-point="longitudeNode" class="hidden"></div>
+                        <div data-dojo-type="dijit/form/TextBox" title="Title:" name="title" value="" data-dojo-attach-point="titleNode" class="title" id="title"></div>
+                        <div data-dojo-type="dijit/form/Textarea" title="Description:" data-dojo-attach-point="descriptionNode" name="description" value="" class="des"></div>
+                    </div>
+                </div>
+                <div class="appDialogPaneButtons">
+                    <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="seepSubmitImage" type="button" role="button">Add Image Info</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -50,7 +50,7 @@ trace("---------------------------------------------------------");
 // NOTE: Folders must have write permissions
 //
 $upload_path = "data/temp/"; // where image will be uploaded, relative to this file
-$download_path = "Seep/data/temp/"; // same folder as above, but relative to the HTML file
+$download_path = "Seep_1.2/data/temp/"; // same folder as above, but relative to the HTML file
 
 //
 // NOTE: maintain this path for JSON services
@@ -75,6 +75,8 @@ foreach ($_POST as $nm => $val) {
 }
 
 trace($postdata, true);
+
+$hash = $postdata["hash"];
 
 foreach ($_FILES as $nm => $val) {
     trace(" file: ".$nm ."=" . $val);
@@ -157,13 +159,16 @@ if ( isset($_FILES[$fieldName]) || isset($_FILES['uploadedfileFlash'])) {
     $_post = $htmldata;
     $htmldata = array();
 
+    $n=1;
+
     while(isset($_FILES['uploadedfile'.$cnt])){
         trace("IFrame multiple POST");
-        $moved = move_uploaded_file($_FILES['uploadedfile'.$cnt]['tmp_name'], $upload_path . $_FILES['uploadedfile'.$cnt]['name']);
-        trace("moved:" . $moved ." ". $_FILES['uploadedfile'.$cnt]['name']);
+        $moveName = $hash."_".$n.".jpg";
+        $moved = move_uploaded_file($_FILES['uploadedfile'.$cnt]['tmp_name'], $upload_path . moveName);
+        trace("moved:" . $moved ." ". $moveName);
 
         if ($moved) {
-            $name = $_FILES['uploadedfile'.$cnt]['name'];
+            $name = moveName;
             $file = $upload_path . $name;
             $type = getImageType($file);
 
@@ -226,13 +231,22 @@ if ( isset($_FILES[$fieldName]) || isset($_FILES['uploadedfileFlash'])) {
     //
 
     //print_r($_FILES['uploadedfiles']);
+    $dir = scandir($upload_path);
+    $n=1;
+    for ($s=2;$s<count($dir);$s++) {
+        $temp = explode("_", $dir[$s]);
+        if ($temp[0]==$hash) {
+            $n++;
+        }
+    }
 
     for($i=0;$i<$len;$i++){
-        $moved = move_uploaded_file($_FILES['uploadedfiles']['tmp_name'][$i], $upload_path . $_FILES['uploadedfiles']['name'][$i]);
+        $moveName = $hash."_".$n.".jpg";
+        $moved = move_uploaded_file($_FILES['uploadedfiles']['tmp_name'][$i], $upload_path . $moveName);
         trace("moved:" . $moved ." ". $_FILES['uploadedfiles']['name'][$i]);
 
         if ($moved) {
-            $name = $_FILES['uploadedfiles']['name'][$i];
+            $name = $moveName;
             $file = $upload_path . $name;
             $type = getImageType($file);
 
@@ -259,10 +273,16 @@ if ( isset($_FILES[$fieldName]) || isset($_FILES['uploadedfileFlash'])) {
             $_post['height'] = $height;
             $_post['type'] = $type;
             $_post['size'] = filesize($file);
+            $_post['date_taken'] = '';
+            $_post['time_taken'] = '';
+            $_post['latitude'] = '';
+            $_post['logitude'] = '';
+
             //$_post['additionalParams'] = $postdata;
             //trace($_post, true);
 
             $htmldata[$cnt] = $_post;
+            $n++;
         } elseif(strlen($_FILES['uploadedfiles']['name'][$i])) {
             $htmldata[$cnt] = array("Message" => "File could not be moved: ".$_FILES['uploadedfiles']['name'][$i]);
         }
