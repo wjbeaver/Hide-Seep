@@ -1,0 +1,12 @@
+prefix=
+exec_prefix=
+libdir=${pcfiledir}
+includedir=/var/www/overtexplorations.com/httpdocs/Seep/includes/panojs3/imgcnv/libsrc/ffmpeg/ffmpeg
+
+Name: libswscale
+Description: FFmpeg image rescaling library
+Version: 0.10.0
+Requires: libavutil = 50.9.0
+Conflicts:
+Libs: ${libdir}/libswscale.a 
+Cflags: -I${includedir}

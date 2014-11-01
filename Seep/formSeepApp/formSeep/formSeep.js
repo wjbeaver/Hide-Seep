@@ -25,16 +25,34 @@ define([
 ], function (declare, lang, dojo, Dialog, _WidgetsInTemplateMixin, template, hash, date, stamp, validate, dom, on) {
     return declare('formSeep.templates.formSeep', [Dialog, _WidgetsInTemplateMixin], {
 
-        title: 'Find Spring',
-        style: 'width:500px',
+        title: 'Find Springs',
+        style: 'width:auto',
         templateString: template,
-        //        current: 'xx',
-        signature: "xx",
 
-        constructor: function (options) {
+        setID: function () {
+        	// get nodes
+        	indx = layers[0].objects.length-1;
+        	
+        	layers[0].objects[indx].attributes[0].node = this.UPLOADIDNode;
+         	layers[0].objects[indx].coordinates.latNode = this.latitudeNode;
+        	layers[0].objects[indx].coordinates.longNode = this.longitudeNode;
+        	layers[0].objects[indx].attributes[2].node = this.deviceNode;
+        	
+        	// set ID
+        	layers[0].objects[indx].attributes[0].node.set("value", layers[0].objects[indx].attributes[0].value);
+
+        },
+        
+        cleanup: function() {
+                indx = layers[0].objects.length-1;
+        	
+        	layers[0].objects[indx] = null;
+        	
+        	this.hide();
+        },
+
+       constructor: function (options) {
             lang.mixin(this, options);
-
-            this.signature = options.sig;
         },
 
         postCreate: function () {
@@ -47,17 +65,19 @@ define([
                 } else {
                     console.log("onSubmit true");
 
-                    // get all the values
-                    var coords = {
-                        signature: this.signatureNode.value,
-                        device: this.deviceNode.value,
-                        latitude: this.latitudeNode.value,
-                        longitude: this.longitudeNode.value
-                    }
-
-                    // send to map
-                    // map.addSpringFromCoords(coords);
+                    // collect attributes and open main form
+                    indx = layers[0].objects.length-1;
+        	
+                    layers[0].objects[indx].coordinates.latitude = layers[0].objects[indx].coordinates.latNode.get("value");
+                    layers[0].objects[indx].coordinates.longitude = layers[0].objects[indx].coordinates.longNode.get("value");
+                    layers[0].objects[indx].attributes[2].valueLabel = layers[0].objects[indx].attributes[2].node.get("label");
+                    layers[0].objects[indx].attributes[2].value = layers[0].objects[indx].attributes[2].node.get("value");
+                    
+                    dialog_seepMain.setID();
+                    
                     this.hide();
+                    
+                    dialog_seepMain.show();
                 }
             }));
         },

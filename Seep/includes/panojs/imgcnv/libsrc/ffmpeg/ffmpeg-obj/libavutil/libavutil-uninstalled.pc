@@ -1,0 +1,12 @@
+prefix=
+exec_prefix=
+libdir=${pcfiledir}
+includedir=/var/www/overtexplorations.com/httpdocs/Seep/includes/panojs3/imgcnv/libsrc/ffmpeg/ffmpeg
+
+Name: libavutil
+Description: FFmpeg utility library
+Version: 50.9.0
+Requires: 
+Conflicts:
+Libs: ${libdir}/libavutil.a 
+Cflags: -I${includedir}

@@ -1,11 +1,74 @@
-        var map;
-        var editorWidget;
+var map;
+var addSpringFromCoords;
+var editorWidget;
+
+var generateUUID = function () {
+	var d = Date.now();
+	var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+		var r = (d + Math.random() * 16) % 16 | 0;
+                d = Math.floor(d / 16);
+                return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
+         });
+        
+        return uuid;
+};
+        
+// Panojs
+//PanoJS.MSG_BEYOND_MIN_ZOOM = null;
+//PanoJS.MSG_BEYOND_MAX_ZOOM = null;
+var viewer = null;
+
+var createViewer = function ( viewer, dom_id, url, prefix, w, h ) {
+	if (viewer) return;
+  
+	var MY_URL      = url;
+	var MY_PREFIX   = prefix;
+	var MY_TILESIZE = 256;
+	var MY_WIDTH    = w;
+	var MY_HEIGHT   = h;
+	var myPyramid = new ImgcnvPyramid( MY_WIDTH, MY_HEIGHT, MY_TILESIZE);
+    
+	var myProvider = new PanoJS.TileUrlProvider('','','');
+        
+	myProvider.assembleUrl = function(xIndex, yIndex, zoom) {
+        	return MY_URL + '/' + MY_PREFIX + myPyramid.tile_filename( zoom, xIndex, yIndex );
+        }    
+    
+        viewer = new PanoJS(dom_id, {
+        	tileUrlProvider : myProvider,
+        	initialZoom	: 0,
+        	tileSize        : myPyramid.tilesize,
+        	tileExtension	: "jpg",
+        	maxZoom         : myPyramid.getMaxLevel(),
+        	imageWidth      : myPyramid.width,
+        	imageHeight     : myPyramid.height,
+        	blankTile       : '/panojs/images/blank.gif',
+        	loadingTile     : '/panojs/images/progress.gif'
+        });
+
+        Ext.EventManager.addListener( window, 'resize', callback(viewer, viewer.resize) );
+        viewer.init();
+};
+
+var imagePan = function () {
+	dialog_image.imagePan();
+};
+
+        //console.log(location.href.substring(0, location.href.lastIndexOf("/") + 1));
 
          // addNew
          // bring up the form editor
          // add a point to newfoundFeatureLayer
          // add to the collection
 
+/*         "esri/config",
+
+        "dojo/_base/event", 
+        "dojo/parser", 
+        "dijit/registry",
+
+        "dijit/form/Button"
+ */
         require([
             "esri/map",
             "esri/dijit/Scalebar",
@@ -13,490 +76,399 @@
             "esri/dijit/PopupTemplate",
             "esri/geometry/Point",
             "esri/graphic",
+            "esri/renderers/SimpleRenderer",
+            "esri/renderers/UniqueValueRenderer",
             "dojo/on",
+            "dojo",
             "esri/dijit/Legend",
             "dojo/_base/array",
+            "dojo/_base/event", 
             "dojo/parser",
             "dojo/dom",
+            'dojo/dom-style',
             "dojo/_base/lang",
             "dijit/registry",
-            "esri/dijit/editing/Editor",
             "esri/layers/CodedValueDomain",
             "esri/tasks/GeometryService",
             "esri/toolbars/edit",
+            "esri/toolbars/draw",
             "esri/dijit/editing/TemplatePicker",
             "esri/layers/FeatureType",
-            "esri/graphic",
             "esri/symbols/SimpleMarkerSymbol",
             "esri/Color",
             "esri/InfoTemplate",
+            "esri/dijit/Popup",
+            "esri/urlUtils",
             "dijit/layout/BorderContainer",
             "dijit/layout/ContentPane",
             "dijit/layout/AccordionContainer",
+            "dojox/layout/FloatingPane",
+            "dojox/layout/Dock",
+            "dijit/form/Button",
             "dojo/domReady!"
-        ], function (Map,
-            Scalebar,
-            FeatureLayer,
-            PopupTemplate,
-            Point,
-            Graphic,
-            on,
-            Legend,
-            arrayUtils,
-            parser,
-            dom,
-            lang,
-            registry,
-            Editor,
-            CodedValueDomain,
-            GeometryService,
-            Edit,
-            TemplatePicker,
-            FeatureType,
-            Graphic,
-            SimpleMarkerSymbol,
-            Color,
-            InfoTemplate) {
-            parser.parse();
+        ],
+            function (Map,
+                Scalebar,
+                FeatureLayer,
+                PopupTemplate,
+                Point,
+                Graphic,
+                simpleRenderer,
+                uniqueValueRenderer,
+                on,
+                dojo,
+                Legend,
+                arrayUtils,
+                event,
+                parser,
+                dom,
+                domStyle,
+                lang,
+                registry,
+//                Editor,
+                CodedValueDomain,
+                GeometryService,
+                Edit,
+                Draw,
+                TemplatePicker,
+                FeatureType,
+                SimpleMarkerSymbol,
+                Color,
+                InfoTemplate,
+//                FeatureTemplate,
+                Popup,
+                urlUtils) {
+                parser.parse();
 
-            map = new Map("map", {
-                basemap: "topo",
-                center: [-111.93, 34.17],
-                zoom: 7
-            });
-
-            map.on("layers-add-result", function (evt) {
-                // add the legend
-                var layerInfo = arrayUtils.map(evt.layers, function (layer, index) {
-                    return {
-                        layer: layer.layer,
-                        title: layer.layer.name
-                    };
+                
+                map = new Map("map", {
+                    basemap: "topo",
+                    center: [-111.93, 34.17],
+                    zoom: 7
+                });
+                
+                map.on("zoom-end", function (evt) {
+                		if (evt.level>=11) {
+                			domStyle.set(dom.byId("zoomedIn"), "display", "block");
+                		} else {
+                			domStyle.set(dom.byId("zoomedIn"), "display", "none");
+                		}
                 });
 
-                if (layerInfo.length > 0) {
-                    var legendDijit = new Legend({
-                        map: map,
-                        layerInfos: layerInfo
-                    }, "legendDiv");
-                    legendDijit.startup();
-                }
+                map.on("layers-add-result", function (evt) {
+                    // add the legend, first filter out the layers not needed
+                    var filteredLayerInfo = arrayUtils.filter(evt.layers, function (layer, index) {
+                        return layer.layer.name;
+                    });
 
-                // add the templatePicker
-                var templateLayers = arrayUtils.map(evt.layers, function (result) {
-                    return result.layer;
-                });
+                    var layerInfo = arrayUtils.map(filteredLayerInfo, function (layer, index) {
 
-                console.log("template layers", templateLayers);
-
-                var templatePicker = new TemplatePicker({
-                    featureLayers: templateLayers,
-                    grouping: true,
-                    rows: "auto",
-                    columns: 3
-                }, "templatePickerDiv");
-
-                templatePicker.startup();
-
-                // add the editor
-                var featureLayerInfos = arrayUtils.map(evt.layers, function (layer) {
-                    return {
-                        "featureLayer": layer.layer
-                    };
-                });
-
-                console.log("feature Layer Infos", featureLayerInfos);
-
-                var settings = {
-                    map: map,
-                    geometryService: new GeometryService("http://sampleserver3.arcgisonline.com/arcgis/rest/services/Geometry/GeometryServer"),
-                    createOptions: null,
-                    layerInfos: featureLayerInfos,
-                    toolbarVisible: true
-                };
-
-                var params = {
-                    settings: settings
-                };
-
-                editorWidget = new Editor(params, 'editorDiv');
-
-                editorWidget.startup();
-            });
-
-            //////////////////////////////////////// Tables
-
-            // create an object collection for contacts
-            var seepContactObjectCollection = {
-                "layerDefinition": null,
-                "featureSet": {
-                    "features": []
-                }
-            };
-            seepContactObjectCollection.layerDefinition = {
-                "objectIdField": "ObjectID",
-                "name": 'Contact',
-                "fields": [{
-                    "name": "ObjectID",
-                    "alias": "ObjectID",
-                    "type": "esriFieldTypeOID"
-                }, {
-                    "name": "CONTACTID_PK",
-                    "alias": "Contact ID",
-                    "type": "esriFieldTypeString",
-                    "editable": false
-                }, {
-                    "name": "Email",
-                    "alias": "Email",
-                    "type": "esriFieldTypeString",
-                    "editable": true
-                }],
-                "relationships": []
-            };
-
-            // create an object collection for names
-            var seepNameObjectCollection = {
-                "layerDefinition": null,
-                "featureSet": {
-                    "features": []
-                }
-            };
-            seepNameObjectCollection.layerDefinition = {
-                "objectIdField": "ObjectID",
-                "name": 'Name',
-                "fields": [{
-                    "name": "ObjectID",
-                    "alias": "ObjectID",
-                    "type": "esriFieldTypeOID"
-                }, {
-                    "name": "NAMEID_PK",
-                    "alias": "Name ID",
-                    "type": "esriFieldTypeString",
-                    "editable": false
-                }, {
-                    "name": "Honorific",
-                    "alias": "Honorific",
-                    "type": "esriFieldTypeString",
-                    "editable": true,
-                    "domain": new CodedValueDomain({
-                        codedValues: ["", "Mr.", "Mrs.", "Ms.", "Dr."],
-                        name: "HonorificDomain",
-                        type: "CodedValueDomain"
-                    })
-                 }, {
-                    "name": "FirstName",
-                    "alias": "First",
-                    "type": "esriFieldTypeString",
-                    "editable": true
-                }, {
-                    "name": "MiddleName",
-                    "alias": "Middle",
-                    "type": "esriFieldTypeString",
-                    "editable": true
-                }, {
-                    "name": "LastName",
-                    "alias": "Last",
-                    "type": "esriFieldTypeString",
-                    "editable": true
-                }],
-                "relationships": []
-            };
-
-            /////////////////// Feature Classes
-
-            // create a feature collection for related images
-            var seepImagesFeatureCollection = {
-                "layerDefinition": null,
-                "featureSet": {
-                    "features": [],
-                    "geometryType": "esriGeometryPoint",
-                    "objectIdField": "ObjectID"
-                }
-            };
-            seepImagesFeatureCollection.layerDefinition = {
-                "geometryType": "esriGeometryPoint",
-                "objectIdField": "ObjectID",
-                "name": 'Images',
-                "drawingInfo": {
-                    "renderer": {
-                        "type": "simple",
-                        "symbol": {
-                            "type": "esriPMS",
-                            "url": "images/spring.png",
-                            "contentType": "image/png",
-                            "width": 15,
-                            "height": 15
+                        if (layer.layer.name == "DLCC Springs") {
+                            return {
+                                layer: layer.layer,
+                                title: "Published Springs"
+                            };
+                        } else if (layer.layer.name == "springsLCC.DBO.DLCC_Boundary") {
+                            return {
+                                layer: layer.layer,
+                                title: "Published Springs Boundary"
+                            };
+                        } else if (layer.layer.name == "HideAndSeep.DBO.Images" && layer.layer.id==2) {
+                            return {
+                                layer: layer.layer,
+                                title: "Hide & Seep Photos"
+                            };
+                        } else if (layer.layer.name == "HideAndSeep.DBO.AnnotatedSprings" && layer.layer.id==1) {
+                            return {
+                                layer: layer.layer,
+                                title: "Hide & Seep Springs"
+                            };
+                        } else {
+                            return {
+                                layer: null
+                            };
                         }
+                    });
+
+                    if (layerInfo.length > 0) {
+                        var legendDijit = new Legend({
+                            map: map,
+                            layerInfos: layerInfo
+                        }, "legendDiv");
+                        legendDijit.startup();
                     }
-                },
-                "fields": [{
-                    "name": "ObjectID",
-                    "alias": "ObjectID",
-                    "type": "esriFieldTypeOID"
-                }, {
-                    "name": "IMAGEID_PK",
-                    "alias": "Image ID",
-                    "type": "esriFieldTypeString",
-                    "editable": false
-               }, {
-                    "name": "UPLOADID_FK",
-                    "alias": "Upload ID",
-                    "type": "esriFieldTypeString",
-                    "editable": false
-                }, {
-                    "name": "DateTaken",
-                    "alias": "Date taken",
-                    "type": "esriFieldTypeDate",
-                    "editable": false
-                 }, {
-                    "name": "TimeTaken",
-                    "alias": "Time taken",
-                    "type": "esriFieldTypeSpring",
-                    "editable": false
-               }, {
-                    "name": "Timestamp",
-                    "alias": "Timestamp",
-                    "type": "esriFieldTypeInteger",
-                    "editable": false
-                }, {
-                    "name": "DSTOffset",
-                    "alias": "Daylight Savings Time Offset",
-                    "type": "esriFieldTypeInteger",
-                    "editable": false
-                }, {
-                    "name": "UTCOffset",
-                    "alias": "UTC Offset",
-                    "type": "esriFieldTypeInteger",
-                    "editable": false
-                }, {
-                    "name": "TimeZoneID",
-                    "alias": "Time Zone ID",
-                    "type": "esriFieldTypeString",
-                    "editable": false
-               }, {
-                    "name": "TimeZoneName",
-                    "alias": "Time Zone Name",
-                    "type": "esriFieldTypeString",
-                    "editable": false
-                }, {
-                    "name": "Image",
-                    "alias": "File location",
-                    "type": "esriFieldTypeRaster",
-                    "editable": false
-                }, {
-                    "name": "PhotographerID_FK",
-                    "alias": "Photographer Name",
-                    "type": "esriFieldTypeString",
-                    "editable": true
-                }, {
-                    "name": "Title",
-                    "alias": "Title",
-                    "type": "esriFieldTypeString",
-                    "editable": true
-                }, {
-                    "name": "Description",
-                    "alias": "Description",
-                    "type": "esriFieldTypeString",
-                    "editable": true
-                }],
-                "relationships": []
-            };
 
-            // layer deinitions constrain what is seen
-            // featureset
-            //create a feature collection for picked springs
+                    // create editor
+                    var currentLayer = null;
 
-            // domains
-            var deviceDomain = new CodedValueDomain({
-                codedValues: ["Google", "Garmin", "Other", "App"],
-                name: "deviceDomain",
-                type: "CodedValueDomain"
-            });
+                     var filteredTemplateLayers = arrayUtils.filter(evt.layers, function (layer, index) {
+                        if (layer.layer.id=="5") {
+                        	return layer.layer;
+                        }
+                    });
 
-            var conditionDomain = new CodedValueDomain({
-                codedValues: ["Condition1", "Condition2", "Unknown"],
-                name: "conditionDomain",
-                type: "CodedValueDomain"
-            });
+                    var templateLayers = arrayUtils.map(filteredTemplateLayers, function (layer, index) {
+                    	layer.layer.name = "Hide & Seep Springs";
+                        return layer.layer;
+                    });
+                   
+                   console.log(templateLayers);
 
-            var flowDomain = new CodedValueDomain({
-                codedValues: ["Flow1", "Flow2", "Unknown"],
-                name: "flowDomain",
-                type: "CodedValueDomain"
-            });
+                   var editToolbar = new Edit(map);
+                   editToolbar.on("deactivate", function(evt) {
+                   		   currentLayer.applyEdits(null, [evt.graphic], null);
+                   });
+                   
+                   arrayUtils.forEach(templateLayers, function(layer) {
+                   		   var editingEnabled = false;
+                   		   layer.on("dbl-click", function(evt) {
+                   		   		   event.stop(evt);
+                   		   		   if (editingEnabled === false) {
+                   		   		   	   editingEnabled = true;
+                   		   		   	   editToolbar.activate(Edit.EDIT_VERTICES , evt.graphic);
+                   		   		   } else {
+                   		   		   	   currentLayer = this;
+                   		   		   	   editToolbar.deactivate();
+                   		   		   	   editingEnabled = false;
+                   		   		   }
+                   		   });
+                   		   
+                   		   layer.on("click", function(evt) {
+                   		   		   event.stop(evt);
+                   		   		   if (evt.ctrlKey === true || evt.metaKey === true) {  //delete feature if ctrl key is depressed
+                   		   		   	   layer.applyEdits(null,null,[evt.graphic]);
+                   		   		   	   currentLayer = this;
+                   		   		   	   editToolbar.deactivate();
+                   		   		   	   editingEnabled=false;
+                   		   		   }
+                   		   });
+                   });
+                   
+                   var templatePicker = new TemplatePicker({
+                   		   featureLayers: templateLayers,
+                   		   rows: "auto",
+                   		   columns: 3,
+                   		   grouping: true,
+                   		   style: "height: auto; overflow: auto;"
+                   }, "templatePickerDiv");
+                   
+                   templatePicker.startup();
+                   
+                   var drawToolbar = new Draw(map);
+                   
+                   var selectedTemplate;
+                   templatePicker.on("selection-change", function() {
+                   		   if( templatePicker.getSelected() ) {
+                   		   	   selectedTemplate = templatePicker.getSelected();
+                   		   }
+                   		   switch (selectedTemplate.featureLayer.geometryType) {
+                   		   case "esriGeometryPoint":
+                   		   	   drawToolbar.activate(Draw.POINT);
+                   		   	   break;
+                    		   }
+                   });
+                   
+                   drawToolbar.on("draw-end", function(evt) {
+                   		   drawToolbar.deactivate();
+                   		   editToolbar.deactivate();
+                   		   var newAttributes = lang.mixin({}, selectedTemplate.template.prototype.attributes);
+                   		   
+                   		   layers[0] = addSeepObject(layers[0]);
+    	
+                   		   indx = layers[0].objects.length-1;
+    	
+                   		   layers[0].objects[indx].attributes[0].value = generateUUID();
+    	
+                   		   dialog_seepMain.seepSelected(evt.geometry, newAttributes, selectedTemplate.featureLayer);
+                   		   
+                   		   dialog_seepMain.show();                   		   
+                   });
+                   
+                  domStyle.set(dom.byId("zoomedIn"), "display", "none");
+                  
+                   on(dom.byId('btnZoom'), 'click', function () {
+                   		   	map.setZoom(11);
+ //                  		   	domStyle.set(dom.byId("zoomedIn"), "display", "block");
+                   });
+                   
+                   domStyle.set(dom.byId("loading"), "display", "none");
 
-            var locationDomain = new CodedValueDomain({
-                codedValues: ["Yes", "No", "Don't Know"],
-                name: "locationDomain",
-                type: "CodedValueDomain"
-            });
+                 });
+                
+                /* ----------------------------------------------------------------------------- */
+                
+                //load feature layers
+                seepBoundaryMapLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/DLCC/DLCC_Boundary/MapServer/0", {
+                    id: '3',
+                    visible: true,
+                    infoTemplate: new InfoTemplate("Boundary", "Desert Landscape Conservation Cooperative Springs Distribution"),
+                    outFields: ["area_names"]
+                });
 
-            // create geometries
-            var sms1 = new SimpleMarkerSymbol().setStyle(
-                SimpleMarkerSymbol.STYLE_CIRCLE).setColor(
-                new Color([0, 255, 0]));
+                // get the springs
+                seepExistingSpringsLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/DLCC/DLCC_Springs/MapServer/0", {
+                    id: '4',
+                    visible: true,
+                    infoTemplate: new InfoTemplate("${NAME}", "<b>Elevation</b>: ${ElevM} m.<br>" +
+                        "<b>Location</b>: ${County}<br><b>Land Unit</b>: ${LandUnit}<br>" +
+                        "<b>Land Detail</b>: ${LandDetail}<br><b>Latitude</b>: ${Latitude}<br><b>Longitude</b>: ${Longitude}"),
+                    outFields: [
+                    "NAME", "ElevM", "County", "LandUnit", "LandDetail", "Latitude", "Longitude"
+                ]
+                });
 
-            var sms2 = new SimpleMarkerSymbol().setStyle(
-                SimpleMarkerSymbol.STYLE_DIAMOND).setColor(
-                new Color([0, 0, 255]));
+                urlUtils.addProxyRule({
+                    urlPrefix: "arcgis.springsdata.org/arcgis/rest/services/Global/HideAndSeepWB",
+                    proxyUrl: "http://overtexplorations.com/proxy/proxy.php"
+                });
 
-            var sms3 = new SimpleMarkerSymbol().setStyle(
-                SimpleMarkerSymbol.STYLE_X).setColor(
-                new Color([0, 0, 0]));
+                seepMapLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideAndSeepWB/MapServer/1", {
+                    id: '1',
+                    visible: true
+                });
+ 
+                 seepImagesMapLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideAndSeepWB/MapServer/0", {
+                    id: '2',
+                    visible: true
+                });
+                 
+                seepFeatureLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideAndSeepWB/FeatureServer/1", {
+                    id: '5',
+                    mode: FeatureLayer.MODE_SNAPSHOT,
+                    editable: true,
+                    visible: true,
+                    outFields: [ "*" ]
+                });
+                
+                seepImagesFeatureLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideAndSeepWB/FeatureServer/0", {
+                    id: '6',
+                    mode: FeatureLayer.MODE_SNAPSHOT,
+                    editable: true,
+                    visible: true,
+                    outFields: [ "*" ]
+                });
+ 
+                var layerScales = [
+                    {
+                        min: 288895.2884,
+                        max: 0,
+                        level: 11
+                    }, // Existing Springs and annotated
+                    {
+                        min: 4513.98888,
+                        max: 0,
+                        level: 17
+                    }, // Images
+                    {
+                        min: 36978596.91,
+                        max: 288896,
+                        level: 4
+                    } // Boundary
+                ];
 
-            var seepFeatureCollection = {
-                "layerDefinition": null,
-                "featureSet": {
-                    "features": [],
-                    "geometryType": "esriGeometryPoint",
-                    "objectIdField": "ObjectID",
-                    "displayFieldName": "TYPE",
-                    "typeTield": "TYPE",
-                    "types": [
-                        new FeatureType({
-                            "id": 10,
-                            "name": "New",
-                            "domains": {
-                                "Device": deviceDomain,
-                                "Condition": conditionDomain,
-                                "FLow": flowDomain
-                            }
-                        }),
-                        new FeatureType({
-                            "id": 20,
-                            "name": "Existing",
-                            "domains": {
-                                "Device": deviceDomain,
-                                "Condition": conditionDomain,
-                                "FLow": flowDomain,
-                                "Location": locationDomain
-                            }
-                        }),
-                        new FeatureType({
-                            "id": 30,
-                            "name": "Unknown",
-                            "domains": {
-                                "Device": deviceDomain,
-                                "Condition": conditionDomain,
-                                "FLow": flowDomain
-                            }
-                        })
-                    ]
-                }
-            };
-            seepFeatureCollection.layerDefinition = {
-                "geometryType": "esriGeometryPoint",
-                "objectIdField": "ObjectID",
-                "name": 'Annotated Springs',
-                "drawingInfo": {
-                    "renderer": {
-                        "type": "uniqueValue",
-                        "field1": "TYPE",
-                        "uniqueValueInfos": [
-                            {
-                                "value": "10",
-                                "symbol": sms1,
-                                "label": "New"
-                            },
-                            {
-                                "value": "20",
-                                "symbol": sms2,
-                                "label": "Existing"
-                            },
-                            {
-                                "value": "30",
-                                "symbol": sms3,
-                                "label": "Unknown"
-                            }
-                        ]
-                    }
-                },
-                "fields": [{
-                    "name": "ObjectID",
-                    "alias": "ObjectID",
-                    "type": "esriFieldTypeOID"
-                }, {
-                    "name": "UPLOADID_PK",
-                    "alias": "Upload ID",
-                    "type": "esriFieldTypeString",
-                    "editable": false
-                }, {
-                    "name": "SPRINGID_FK",
-                    "alias": "Spring ID",
-                    "type": "esriFieldTypeString",
-                    "editable": false
-               }, {
-                    "name": "TYPE",
-                    "alias": "Spring Type",
-                    "type": "esriFieldTypeLONG",
-                    "editable": true
-                }, {
-                    "name": "Device",
-                    "alias": "Device",
-                    "type": "esriFieldTypeString",
-                    "editable": true
-              }, {
-                    "name": "Condition",
-                    "alias": "Condition",
-                    "type": "esriFieldTypeString",
-                    "editable": true
-                }, {
-                    "name": "Flow",
-                    "alias": "Flow",
-                    "type": "esriFieldTypeString",
-                    "editable": true
-                }, {
-                    "name": "Location",
-                    "alias": "Is spring located where shown on the map?",
-                    "type": "esriFieldTypeString",
-                    "editable": true
-               }, {
-                    "name": "Comment",
-                    "alias": "Comment",
-                    "type": "esriFieldTypeString",
-                    "editable": true
-               }, {
-                    "name": "DateFound",
-                    "alias": "Date Found",
-                    "type": "esriFieldTypeDate",
-                    "editable": true
-                }],
-                "relationships": [],
-                "capabilities": "Editing"
-            };
+                /////////////////////////////// boundary ////////////////////////
+                
+                seepBoundaryMapLayer.setMaxScale(layerScales[2].max);
+                seepBoundaryMapLayer.setMinScale(layerScales[2].min);
 
-            //create feature layers based on the feature collections
-            seepFeatureLayer = new FeatureLayer(seepFeatureCollection, {
-                id: '1',
-                editable: true
-            });
+                /////////////////////////////// Existing Springs ////////////////////
+                
+                seepExistingSpringsLayer.setMaxScale(layerScales[0].max);
+                seepExistingSpringsLayer.setMinScale(layerScales[0].min);
 
-            seepImagesFeatureLayer = new FeatureLayer(seepImagesFeatureCollection, {
-                id: '2'
-            });
+                /////////////////////////////// Seep images ///////////////////////
+                
+                seepImagesFeatureLayer.setMaxScale(layerScales[1].max);
+                seepImagesFeatureLayer.setMinScale(layerScales[1].min);
 
-            seepNameObjectLayer = new FeatureLayer(seepNameObjectCollection, {
-                id: '3',
-                visible: false
-            });
+                seepImagesMapLayer.setMaxScale(layerScales[1].max);
+                seepImagesMapLayer.setMinScale(layerScales[1].min);
+ 
+                /////////////////////////////// Seep ////////////////////////////////
+                
+                seepMapLayer.setMaxScale(layerScales[0].max);
+                seepMapLayer.setMinScale(layerScales[0].min);
 
-            seepContactObjectLayer = new FeatureLayer(seepContactObjectCollection, {
-                id: '4',
-                visible: false
-            });
+                seepFeatureLayer.setMaxScale(layerScales[0].max);
+                seepFeatureLayer.setMinScale(layerScales[0].min);
+            	
+            	var createSymbol = function(path, color){
+            		var markerSymbol = new SimpleMarkerSymbol();
+            		markerSymbol.setPath(path);
+            		markerSymbol.setColor(new Color(color));
+            		markerSymbol.setOutline(null);
+            		return markerSymbol;
+            	};
+                
+                var iconPaths = [ { name: "unknown", color: "#7B8C1E", path: "M16,1.466C7.973,1.466,1.466,7.973,1.466,16c0,8.027,6.507,14.534,14.534,14.534c8.027,0,14.534-6.507,14.534-14.534C30.534,7.973,24.027,1.466,16,1.466z M17.328,24.371h-2.707v-2.596h2.707V24.371zM17.328,19.003v0.858h-2.707v-1.057c0-3.19,3.63-3.696,3.63-5.963c0-1.034-0.924-1.826-2.134-1.826c-1.254,0-2.354,0.924-2.354,0.924l-1.541-1.915c0,0,1.519-1.584,4.137-1.584c2.487,0,4.796,1.54,4.796,4.136C21.156,16.208,17.328,16.627,17.328,19.003z"},
+                	{ name: "existing", color: "#A3B443", path: "M22.727,18.242L4.792,27.208l8.966-8.966l-4.483-4.484l17.933-8.966l-8.966,8.966L22.727,18.242z"},
+                	{ name: "new", color: "#EDF8AB", path: "M24.485,2c0,8-18,4-18,20c0,6,2,8,2,8h2c0,0-3-2-3-8c0-4,9-8,9-8s-7.981,4.328-7.981,8.436C21.239,24.431,28.288,9.606,24.485,2z"},
+                	{ name: "photo", color: "#A29B40", path: "M15.318,7.677c0.071-0.029,0.148-0.046,0.229-0.046h11.949c-2.533-3.915-6.938-6.506-11.949-6.506c-5.017,0-9.428,2.598-11.959,6.522l4.291,7.431C8.018,11.041,11.274,7.796,15.318,7.677zM28.196,8.84h-8.579c2.165,1.357,3.605,3.763,3.605,6.506c0,1.321-0.334,2.564-0.921,3.649c-0.012,0.071-0.035,0.142-0.073,0.209l-5.973,10.347c7.526-0.368,13.514-6.587,13.514-14.205C29.77,13.002,29.201,10.791,28.196,8.84zM15.547,23.022c-2.761,0-5.181-1.458-6.533-3.646c-0.058-0.046-0.109-0.103-0.149-0.171L2.89,8.855c-1,1.946-1.565,4.153-1.565,6.492c0,7.624,5.999,13.846,13.534,14.205l4.287-7.425C18.073,22.698,16.848,23.022,15.547,23.022zM9.08,15.347c0,1.788,0.723,3.401,1.894,4.573c1.172,1.172,2.785,1.895,4.573,1.895c1.788,0,3.401-0.723,4.573-1.895s1.895-2.785,1.895-4.573c0-1.788-0.723-3.4-1.895-4.573c-1.172-1.171-2.785-1.894-4.573-1.894c-1.788,0-3.401,0.723-4.573,1.894C9.803,11.946,9.081,13.559,9.08,15.347z"},
+                	{ name: "video", color: "#A27B40", path: "M27.188,4.875v1.094h-4.5V4.875H8.062v1.094h-4.5V4.875h-1v21.25h1v-1.094h4.5v1.094h14.625v-1.094h4.5v1.094h1.25V4.875H27.188zM8.062,23.719h-4.5v-3.125h4.5V23.719zM8.062,19.281h-4.5v-3.125h4.5V19.281zM8.062,14.844h-4.5v-3.125h4.5V14.844zM8.062,10.406h-4.5V7.281h4.5V10.406zM11.247,20.59V9.754l9.382,5.418L11.247,20.59zM27.188,23.719h-4.5v-3.125h4.5V23.719zM27.188,19.281h-4.5v-3.125h4.5V19.281zM27.188,14.844h-4.5v-3.125h4.5V14.844zM27.188,10.406h-4.5V7.281h4.5V10.406z"},
+                	{ name: "arrow", color: "#000000", path: "M8.5454545,55.090909C31.090909,11.454545,31.272727,3.6363637,31.272727,3.6363637,36.07112,20.391033,41.302739,36.712034,50.909091,54.909091,37.171372,38.60001,36.666666,37.393939,30,30.727272,22.727272,37.636363,22.478498,39.491067,8.5454545,55.090909z"}
+                ];
+                
+                var uniqueRenderer = new uniqueValueRenderer(null, "TYPE");
+                
+                arrayUtils.forEach(iconPaths, function(iconPath) {
+                	var symbol = createSymbol(iconPath.path, iconPath.color);
+                	
+                	symbol.size = 30;
+                	
+                	var renderer = null;
+                	
+                	switch (iconPath.name) {
+                		case "photo":
+                			renderer = new simpleRenderer(symbol);
+                			seepImagesMapLayer.setRenderer(renderer);
+                			seepImagesFeatureLayer.setRenderer(renderer);
+                			break;
+                		case "arrow":
+                			// do nothing yet
+                			break;
+                		case "video":
+                			// do nothing yet
+                			break;
+                		// seep features
+                		case "unknown":
+                			uniqueRenderer.addValue({
+                					value: 0,
+                					symbol: symbol,
+                					label: "Unknown"
+                			});
+                			break
+                		case "existing":
+                 			uniqueRenderer.addValue({
+                					value: 1,
+                					symbol: symbol,
+                					label: "Existing"
+                			});
+                			break
+                		case "new":
+                			uniqueRenderer.addValue({
+                					value: 2,
+                					symbol: symbol,
+                					label: "New"
+                			});
+                			break
+                	}
+            	});
+            	
+            	seepMapLayer.setRenderer(uniqueRenderer);
+            	seepFeatureLayer.setRenderer(uniqueRenderer);
 
-            map.addLayers([seepFeatureLayer, seepImagesFeatureLayer]);
+                map.addLayers([seepFeatureLayer, seepBoundaryMapLayer, seepExistingSpringsLayer, seepMapLayer, seepImagesMapLayer, seepImagesFeatureLayer]);
 
-            // scalebar
-            var scalebar = new Scalebar({
-                map: map,
-                // "dual" displays both miles and kilmometers
-                // "english" is the default, which displays miles
-                // use "metric" for kilometers
-                scalebarUnit: "english"
-            });
+                // scalebar
+                var scalebar = new Scalebar({
+                    map: map,
+                    // "dual" displays both miles and kilmometers
+                    // "english" is the default, which displays miles
+                    // use "metric" for kilometers
+                    scalebarUnit: "english"
+                });
 
-            // north arrow
-            dojo.byId("north").innerHTML = "<img id='img' src='images/north-arrow.gif' />";
-
-        });
+                // north arrow
+                dojo.byId("north").innerHTML = "<img id='img' src='images/north-arrow.gif' />";
+                 
+});

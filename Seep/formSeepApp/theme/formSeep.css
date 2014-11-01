@@ -1,65 +1,202 @@
 @CHARSET "UTF-8";
 
 .appConfirmDialog {
-    min-width:275px;
+	min-width:275px;
 }
 .appConfirmDialog .appDialogPaneButtons {
-    text-align:center;
+	text-align:center;
 }
 
 .appConfirmDialog .dijitDialogPaneContent {
-    text-align:left;
-    background: #eee;
+	text-align:left;
+	background-color: #FFFEF5;
+	color: #5F5400;
+}
+
+#radio1 {
+	display:block;
+}
+
+#radio2 {
+	display:none;
+}
+
+#radio3 {
+	display:none;
 }
 
 .honor {
-    width: 60px;
+	width: 60px;
 }
 
 .name {
-    width: 150px;
+	width: 150px;
 }
 
 .coords {
-   width: 100px;
+	width: 100px;
 }
 
 .hidden {
-    display: none;
+	display: none;
 }
 
 .des {
-    width: 400px;
+	width: 400px;
 }
 
 .nameBox {
-    background-color: #eee;
-    padding: 5px;
-    margin-bottom: 6px;
+	background-color: #FFFEF5;
+	padding: 5px;
+	margin-bottom: 6px;
+	white-space: nowrap;
+	width: 100%;
 }
 
 .labelsAndValues-labelCell {
-    text-align: right;
-  padding-left: 10px;
+	text-align: right;
+	padding-left: 10px;
 }
 
 .dojoxUploaderFileListHeader th {
-     background-color: #ccc;
+	background-color: #FFFEF5;
 }
 
 .dojoxUploaderFileList {
-    width: 80%;
+	width: auto;
+	margin-right: 5px;
 }
 
 .labelsAndValues-valueCell {
-  padding-left: 5px;
+	padding-left: 5px;
+}
+
+.claro .dijitDialogUnderlay {
+	background: #000000;
 }
 
 #loadstatus {
-    color: red;
+	color: red;
 }
 
 .subHead {
-    font-weight: bold;
-    margin-bottom: 6px;
+	font-weight: bold;
+	margin-bottom: 6px;
+}
+
+.viewerFrame {
+	width: 480px;
+	height: 360px;
+	background-color: #606564;
+}
+.drawing-block {
+	vertical-align: top;
+	display: inline-block;
+	margin-left: 10px;
+}
+#drawing-mode {
+	margin-bottom: 10px;
+	vertical-align: top;
+}
+#drawing-mode-options {
+	display: none;
+	vertical-align: top;
+	margin-bottom: 10px;
+	margin-top: 10px;
+	background: #f5f2f0;
+	padding: 10px;
+}
+#c {
+	border:1px solid #aaa;
+	width: 480px;
+	height: 360px;
+}
+.canvas-container { 
+	border: 1px dotted #ccc; 
+	display: none;
+	vertical-align: top; 
+	z-index: 1500;
+	position: absolute !important;
+	top: 11px;
+	left: 9px;
+	-webkit-tap-highlight-color: rgba(0,0,0,0); 
+}
+.btn {
+	font-size: 11px;
+	margin-left: 15px; 
+	display: block;
+}
+#colorPicked {
+	width: 40px;
+	height: 30px;
+	background-color:#000000;
+	border:1px solid black;
+	display: inline-block;
+}
+.option-label {
+	width: 40%;
+}
+#hslider {
+	width: 50%;
+	display:inline-block;
+}
+.btn-drop {
+	font-size: 11px;
+	margin-left: 15px; 
+	display:inline-block;
+}
+.textarea {
+	width: 300px;
+	resize: vertical;
+}
+#instructions {
+	display: block;
+}
+#widget_firstName {
+	width:100px;
+}
+#widget_middleName {
+	width: 50px !important;
+}
+#widget_lastName {
+	width: 100px !important;
+}
+#widget_firstNamePhotographer {
+	width:100px;
+}
+#widget_middleNamePhotographer {
+	width: 50px !important;
+}
+#widget_lastNamePhotographer {
+	width: 100px !important;
+}
+#listContainerDiscoverer {
+	border:1px solid #aaa;
+	padding: 3px;
+}
+#listContainerPhotographer {
+	border:1px solid #aaa;
+	width: 70%;
+	padding: 3px;
+}
+#widget_dateMain {
+	width: 120px;
+}
+.dateBox {
+	width: 120px;
+}
+.buttons {
+	text-align: center;
+}
+.dynaList {
+	vertical-align: top;
+}
+#locationAccuracy {
+	display: none;
+}
+#radioList .tableContainer-labelCell {
+	width: 200px !important;
+}
+#radioChoice1 .tableContainer-labelCell {
+	width: 10px !important;
 }

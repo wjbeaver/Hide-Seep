@@ -1,0 +1,22 @@
+<div class="dijitDialog appConfirmDialog" role="dialog" aria-labelledby="${id}_title">
+    <div data-dojo-attach-point="titleBar" class="dijitDialogTitleBar">
+        <span data-dojo-attach-point="titleNode" class="dijitDialogTitle" id="${id}_title" role="heading" level="1"></span>
+        <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: onCancel" title="${buttonCancel}" role="button" tabindex="0">
+            <span data-dojo-attach-point="closeText" class="closeText" title="${buttonCancel}">x</span>
+        </span>
+    </div>
+    <div class="dijitDialogPaneContent">
+        <div data-dojo-attach-point="containerNode">
+            <div data-dojo-attach-point="adminForm" data-dojo-type="dijit/form/Form" id="aForm" action="/Seep/adminLog.php" method="POST">
+                <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+                   <div data-dojo-type="dijit/form/TextBox" title="User Name:" name="username" value="" data-dojo-attach-point="usernameNode" class="username" id="usrn"></div>
+                     <div data-dojo-type="dijit/form/TextBox" title="Password:" data-dojo-attach-point="passwordNode" type="password" name="password" value="" class="psw"></div>
+               </div>
+                <div class="appDialogPaneButtons">
+                    <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="adminSubmit" type="button" role="submit" class="submit">Submit</div>
+                     <div data-dojo-attach-point="loginResultNode" class="status"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

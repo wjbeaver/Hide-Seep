@@ -288,7 +288,7 @@ class Proxy {
 
         $configError = array(
                 "error" => array("code" => 412,
-                        "details" => array("Detected malformed 'mustMatch' property in the configuration file. The server does not meet one of the preconditions that the requester put on the request."),
+                        "details" => array("Detected malformed 'mustMatch' property in the configuration file. The server does not meet one of the preconditions that the requester put on the request. ".$this->proxyConfig['mustmatch']),
                         "message" => "Proxy failed due to configuration error."
                 ));
 
@@ -394,15 +394,15 @@ class Proxy {
         if((boolean)$this->headers){
 
             foreach($this->headers as $key => $value) {
-                
+
                 if ($this->contains($value, "Transfer-Encoding: chunked")) { //See issue #75
-               
+
                     continue;
-                
+
                 }
-                
+
                 header($value); //Sets the header
-            
+
             }
 
         }else{
@@ -483,23 +483,23 @@ class Proxy {
         }
 
     }
-    
+
     public function decodeCharacterEncoding()
     {
     	$hasHttpEncoding = $this->startsWith($_SERVER['QUERY_STRING'], 'http%3a%2f%2f');
-    	
+
     	$hasHttpsEncoding = $this->startsWith($_SERVER['QUERY_STRING'], 'https%3a%2f%2f');
-    	
+
     	if($hasHttpEncoding || $hasHttpsEncoding){
-    		
+
     		$_SERVER['QUERY_STRING'] = urldecode($_SERVER['QUERY_STRING']); //Remove encoding from GET requests
-    		
+
     		foreach($_POST as $k => $v) {
-    			
+
     			$_POST[$k] = urldecode($v);  //Remove encoding for each POST value
-    			
+
     		}
-    		
+
     	}
     }
 
@@ -797,7 +797,7 @@ class Proxy {
         curl_setopt($this->ch, CURLOPT_SSL_VERIFYHOST , false);
 
         curl_setopt($this->ch, CURLOPT_HEADER, true);
-        
+
         curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
 
     }
@@ -1134,16 +1134,16 @@ class Proxy {
     public function getTokenEndpoint()
     {
         if (stripos($this->resource['url'], "/rest/") !== false){
-            
+
             $position = stripos($this->resource['url'], "/rest/");
-            
+
             $infoUrl = substr($this->resource['url'],0,$position) . "/rest/info";
-        
+
         } else if (stripos($this->resource['url'], "/sharing/") !== false){
 
             $position = stripos($this->resource['url'], "/sharing/");
-            
-            $infoUrl = substr($this->resource['url'],0,$position) . "/sharing/rest/info";    
+
+            $infoUrl = substr($this->resource['url'],0,$position) . "/sharing/rest/info";
 
         }else{
 
@@ -2388,9 +2388,9 @@ class XmlParser
                         "message" => "$message"
                     ));
 
-            die(json_encode($configError));     
+            die(json_encode($configError));
         }
-        
+
         $xml = implode("\n", $data);
 
         return $this->parse($xml);
@@ -2453,9 +2453,9 @@ class XmlParser
 
 $proxyConfig = new ProxyConfig();
 
-$proxyConfig->useXML();
+//$proxyConfig->useXML();
 
-//$proxyConfig->useJSON();
+$proxyConfig->useJSON();
 
 $proxyLog = new ProxyLog($proxyConfig);
 

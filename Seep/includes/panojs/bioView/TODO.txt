@@ -1,0 +1,6 @@
+XXX 1) support float and signed images
+XXX 2) show proper sliders for 5D images
+XXX 3) enable and check rendering threads
+XXX Channel fusion: r+g=Yellow, r+b=Purple, b+g=Cyan
+Add image cache
+Preemtive caching

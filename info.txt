@@ -1,3 +1,20 @@
+Seep Admin
+un: seepAdmin
+pw: mySeep23+
+
+select AddGeometryColumn('public', 'track_lines', 'geom', 3857, 'LINESTRING', 2)
+select AddGeometryColumn('public', 'track_poin’ts, 'geom', 3857, ‘POINT’, 2)
+
+demo gmail
+billbeaversdemo@gmail.com
+demo4You=
+
+demo sa
+demo
+billsdemo
+billbeaversdemo@gmail.com
+demo4You=
+
 arcgis:
 
 un: SSI_project
@@ -5,10 +22,24 @@ pw: Pyrgulopsis
 
 https://springs.maps.arcgis.com/home/webmap/viewer.html?webmap=3022a82d40244af9ba2c1db1ebfdf362
 
+Jeri:
+
+(928) 774-5211 ext 231 off
+(928) 699-4501 cell
+
+Marguerite
+
 un: wjbeaver
 pw: myiris81
 
 server:
+
+CREATE OR REPLACE FUNCTION R_test_require(fname text)
+RETURNS boolean AS
+$BODY$
+    return(require(fname,character.only=T))
+$BODY$
+LANGUAGE 'plr';
 
 un: wjbeaver
 pw: Beaver1!

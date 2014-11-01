@@ -1,0 +1,22 @@
+/********************************************************************************
+  CSS designed for <http://www.bioimage.ucsb.edu/>
+  Designer: Dmitry Fedorov <www.dimin.net>
+  Copyright (R) 2006 Vision Research Lab, ECE, UCSB
+********************************************************************************/
+
+
+/********************************************************************************
+  layout classes
+********************************************************************************/
+
+.header {
+	height: 1px;
+	background-image: none;
+	border-top-color: #333333;
+	border-top-style: solid;
+	border-top-width: 1px;
+}
+
+.footer {
+  background-color: #FFFFFF;
+}

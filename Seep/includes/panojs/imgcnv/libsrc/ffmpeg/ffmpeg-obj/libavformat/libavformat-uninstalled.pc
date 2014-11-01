@@ -1,0 +1,12 @@
+prefix=
+exec_prefix=
+libdir=${pcfiledir}
+includedir=/var/www/overtexplorations.com/httpdocs/Seep/includes/panojs3/imgcnv/libsrc/ffmpeg/ffmpeg
+
+Name: libavformat
+Description: FFmpeg container format library
+Version: 52.54.0
+Requires: libavcodec = 52.55.0
+Conflicts:
+Libs: ${libdir}/libavformat.a   -lz -lbz2 -lm
+Cflags: -I${includedir}

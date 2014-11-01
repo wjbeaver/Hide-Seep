@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="imagetoolbar" content="no" />
+    
+    <link rel="stylesheet" href="/Seep/includes/panojs/styles/panojs.css">	
+    
+    <script type="text/javascript" src="/Seep/includes/panojs/extjs/ext-core.js"></script>    
+    
+    <script type="text/javascript" src="/Seep/includes/panojs/panojs/utils.js"></script>    
+    <script type="text/javascript" src="/Seep/includes/panojs/panojs/PanoJS.js"></script>
+    <script type="text/javascript" src="/Seep/includes/panojs/panojs/controls.js"></script>
+    <script type="text/javascript" src="/Seep/includes/panojs/panojs/pyramid_imgcnv.js"></script>
+    <script type="text/javascript" src="/Seep/includes/panojs/panojs/control_thumbnail.js"></script>
+    <script type="text/javascript" src="/Seep/includes/panojs/panojs/control_info.js"></script>
+    <script type="text/javascript" src="/Seep/includes/panojs/panojs/control_svg.js"></script>
+
+<style type="text/css">
+
+body {
+  font-family: Tahoma,Verdana;
+  margin: 0;
+  padding: 0;
+  color: #f9f9f9;
+  background-color: #606564;
+  font-size: 0.7em;
+}
+
+</style> 
+                
+<script type="text/javascript">
+// <![CDATA[
+
+var xOffset = 0;
+var yoffset = 0;
+
+PanoJS.MSG_BEYOND_MIN_ZOOM = null;
+PanoJS.MSG_BEYOND_MAX_ZOOM = null;
+var viewer1 = null;
+
+var pageParameters = Ext.urlDecode(window.location.search.substring(1));
+
+var url = "/Seep/data/images/" + pageParameters.UPLOADID + "/tiles_" + pageParameters.IMAGEID;
+
+function createViewer( viewer, dom_id, url, prefix, w, h ) {
+    if (viewer) return;
+  
+    var MY_URL      = url;
+    var MY_PREFIX   = prefix;
+    var MY_TILESIZE = 256;
+    var MY_WIDTH    = w;
+    var MY_HEIGHT   = h;
+    var myPyramid = new ImgcnvPyramid( MY_WIDTH, MY_HEIGHT, MY_TILESIZE);
+    
+    var myProvider = new PanoJS.TileUrlProvider('','','');
+    myProvider.assembleUrl = function(xIndex, yIndex, zoom) {
+        return MY_URL + '/' + MY_PREFIX + myPyramid.tile_filename( zoom, xIndex, yIndex );
+    }    
+    
+    viewer = new PanoJS(dom_id, {
+        tileUrlProvider : myProvider,
+        tileSize        : myPyramid.tilesize,
+        maxZoom         : myPyramid.getMaxLevel(),
+        imageWidth      : myPyramid.width,
+        imageHeight     : myPyramid.height,
+        blankTile       : '/Seep/includes/panojs/images/blank.gif',
+        loadingTile     : '/Seep/includes/panojs/images/progress.gif'
+    });
+
+    Ext.EventManager.addListener( window, 'resize', callback(viewer, viewer.resize) );
+    viewer.init();
+};
+
+
+function initViewer() {
+  createViewer( viewer1, 'viewer1', url,'tiles_', pageParameters.width,  pageParameters.height );
+}
+  
+Ext.onReady(initViewer);
+
+// ]]>
+</script>
+
+</head>
+<body>
+    
+  <div style="width: 480px; height: 360px;"> 
+      <div id="viewer1" class="viewer" style="width: 100%; height: 100%;" ></div>
+  </div>
+    
+</body>
+</html>

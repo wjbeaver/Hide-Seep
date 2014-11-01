@@ -1,0 +1,12 @@
+prefix=
+exec_prefix=
+libdir=${pcfiledir}
+includedir=/var/www/overtexplorations.com/httpdocs/Seep/includes/panojs3/imgcnv/libsrc/ffmpeg/ffmpeg
+
+Name: libavdevice
+Description: FFmpeg device handling library
+Version: 52.2.0
+Requires: libavformat = 52.54.0
+Conflicts:
+Libs: ${libdir}/libavdevice.a   -lz -lbz2 -lm
+Cflags: -I${includedir}

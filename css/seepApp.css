@@ -1,0 +1,147 @@
+html,
+body {
+	height: 98%;
+	width: 98%;
+	margin: 1%;
+	background-color: #606564;
+	font-family: Tahoma,Verdana;
+}
+
+a:link {
+	font-weight: bold;
+	color: #8C944C;
+	text-decoration: none;
+}
+
+a:visited {
+	color: #8C944C;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: none;
+	color: #90A400;
+}
+
+a:active {
+	text-decoration: none;
+}
+
+.login {
+	width:100px;
+}
+
+#login {
+	margin-top: 20px;
+	display:block;
+}
+
+#logout {
+	margin-top: 20px;
+	display:none;
+}
+
+.appDialogPaneButtons {
+	text-align: center;
+	margin-top: 10px;
+}
+
+#loading {
+	position: absolute;
+	top: 0;
+	left: 0;
+	opacity: 0.9;
+	width: 100%;
+	height: 100%;
+	display: block;
+	background-color: #495a55;		
+	z-index: 150;
+}
+
+#loading h1 {
+	text-align: center;
+	position: relative;
+	top: 50%;
+	margin-top: -0.5em;
+	color: #f9f9f9;
+}
+
+.status {
+	color: red;
+	text-align: center;
+	font-size: 11px;
+}
+
+#map {
+	height: 100% !important;
+	border-radius: 5px;
+	border: solid #5F5400 1px;
+}
+
+#floatingPane {
+	border-radius: 5px;
+	position: absolute;
+	top: 50px;
+	right: 95px;
+	width: 20%;
+	height: 75%;
+	z-index: 100;
+	padding: 2px;
+	background-color: #5F5400;
+}
+
+#legendPane {
+	border: solid #5F5400 1px;
+}
+
+#topPane {
+	border-radius: 5px;
+	background-color: #C0C4E6;
+	color: #080E42;
+	height: 12%;
+}
+
+#centerPane {
+	border-radius: 5px;
+	background-color: #606564;
+	border: 0px;
+}
+
+#bottomPane {
+	border-radius: 5px;
+	height: 3%;
+	margin-left: 50px;
+	margin-right: 50%;
+	background-color: #DEB9E4;
+	color: #36013F;
+}
+
+.accordian {
+	font-size: .85em;
+        /*           background-color: #FFFEF5;           color: #5F5400; */
+}
+
+.dojoxDock {
+	left: 90% !important;
+	top: 140px !important;
+	width: 70px !important;
+	border: 0px;
+	z-index: 100;
+}
+
+.dojoxDockNode {
+	width: 100%;
+	background: #C0C4E6;
+}
+
+.dijitAccordionContainer-dijitContentPane {
+        /*   background-color: #FFFEF5 !important; */
+}
+
+.dojoxFloatingPaneTitle {
+	background: #ACADB2;
+	color: #36013F;
+}
+#zoomedIn {
+	display: block;
+}

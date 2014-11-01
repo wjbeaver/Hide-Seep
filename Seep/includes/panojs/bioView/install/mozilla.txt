@@ -1,0 +1,13 @@
+Register protocol with Mozilla:
+
+Linux and Mac
+
+* Type about:config into the address bar and press Enter.
+* Right-click -> New -> Boolean -> Name: network.protocol-handler.external.bioview -> Value -> true
+* Right-click -> New -> String -> Name: network.protocol-handler.app.bioview -> Value -> /path/bin/bioView3D (Replacing /path/bin/wv with the correct path)
+* Ensure network.protocol-handler.expose-all is set to true. 
+
+<http://kb.mozillazine.org/Register_protocol>
+    
+string network.protocol-handler.app.bioview /path/bin/wv
+Boolean network.protocol-handler.external.bioview true

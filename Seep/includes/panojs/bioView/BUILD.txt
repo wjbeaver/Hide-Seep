@@ -1,0 +1,78 @@
+bioView
+
+http://www.bioimage.ucsb.edu/bioview.html
+
+This software uses Trolltech Qt library and therefore make sure to have 
+one installed on your system first. The Qt library is free for Open Source 
+development and can be downloaded here: 
+  http://www.trolltech.com/
+  http://www.trolltech.com/products/qt/downloads
+
+The Qt version used is: 4.2, note that qt4 is significantly different from qt3
+and therefore will not build on systems with only qt3 installed.
+
+There are some other libraries used besides Qt: libtiff, libjpeg, libpng, zlib
+These libraries are needed to show image previews. Their code is located in /libs
+the reason why we distribute the sources is historical, fist of all, we had modified 
+libtiff that would overcome problems reading many proprietary formats based on it.
+Second, we have opted to distribute statically linked image libraries in order to 
+avoid any possible trouble with future updated versions.
+
+The Qt project file is used to create bioView, it is file is called "wv.pro"
+In order to generate the makefile for your system use "qmake" utility distributed with
+Qt library. Some changes in xdma.pro might have to take place, since the autoconf is 
+not used you have to make sure the required libraries are linked and configured properly.
+
+Platform specific compilation notes: 
+  1) Windows
+  2) Mac
+  3) Linux
+
+  
+-------------------------------------------
+1) Windows
+-------------------------------------------
+
+Visual Studio:
+If the Visual C++ 2003 is used then the solution and project files can be found in the root directory.
+If any newer VC is used (2005 or above) the solution will be automatically updated. There are image 
+libraries prebuild with VC2003 in /libs, if other version of VC are used they might have to be rebuild.
+
+Other compilers:
+In order to use other compilers the qmake utility should be used in order to generate the appropriate 
+makefile. For windows the available modes are: win32-borland, win32-icc, win32-g++, win32-msvc
+The qmake can also generate Visual Studio compatible project files.
+
+-------------------------------------------
+1) Mac
+-------------------------------------------
+
+The qmake utility should be used in order to generate the appropriate makefile using "wv.pro" 
+project file. The xcode project can also be generated.
+The syntax of make can be found here: http://doc.trolltech.com/4.1/qmake-running.html
+
+If dynamically linked Qt is used, make sure to verify the bioView binary file is pointing to the right 
+location of .dylib (or other) files. We suggest to place the needed libraries in 
+xdma.app/Contents/Frameworks/ and then use the install_name_tool to point it to the right location.
+There are two scripts in the root of xdma source that do just that: macx_update_bin, macx_update_lib.
+
+e.g.: 
+qmake wv.pro 
+make
+./macx_update_lib
+./macx_update_bin
+
+-------------------------------------------
+1) Linux
+-------------------------------------------
+
+The qmake utility should be used in order to generate the appropriate makefile using "wv.pro" 
+project file. The syntax of make can be found here: http://doc.trolltech.com/4.1/qmake-running.html
+
+e.g.: 
+qmake wv.pro 
+make
+
+KDevelop - at the moment, you're on your own, use the supplied xdma.pro file in order to create
+the KDevelop project.
+

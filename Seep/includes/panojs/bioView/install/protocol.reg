@@ -1,0 +1,12 @@
+REGEDIT4
+
+[HKEY_CLASSES_ROOT\bioview]
+@="URL:bioview Protocol"
+"URL Protocol"=""
+
+[HKEY_CLASSES_ROOT\bioview\shell]
+
+[HKEY_CLASSES_ROOT\bioview\shell\open]
+
+[HKEY_CLASSES_ROOT\bioview\shell\open\command]
+@="\"E:\\dima\\develop\\qt4\\bioView\\msvc2008\\release\\wv.exe\" \"%1\"" 

@@ -1,0 +1,29 @@
+= Version Change Log =
+
+== 1.1.18 ==
+
+ * UI improvements: sliders for 5D images
+ * Rendering improvements: support for displaying up to 6 channels simultaneously (Red, Green, Blue, Yellow, Magenta, Cyan)
+ * Rendering improvements: full support for float and signed images
+ * Rendering improvements: rendering is now threaded by the number of available CPU cores
+ * Secure connection support for uploads (HTTPS)
+ * Full support for Windows 64bit
+ * Full support for intel MacOSX
+ * Update libbioimage with all formats to the latest 1.44, OIB 2.0, BigTIFF, OME-TIFF, float point images, 8-64 bit images
+
+== 1.1.16 ==
+
+ * improved rendering of metadata
+ * improved bisque interaction
+
+Updated libbioimage with following improvements: 
+
+ * Heavily improved metadata system: extraction of many more tags for all formats, code clean-up, new command line options
+ * Added full support for OME-TIFF file format
+ * Heavily improved parsing for STK, LSM, Fluoview
+ * Several improvements and fixes for OIB format, mostly fixed loading of mosaics, greatly improved speed for large files
+ * Support for 1 and 4 bit images, they will be converted to 8 bit images
+
+== 1.1.15 ==
+
+ * Start of changelog

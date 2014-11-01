@@ -1,0 +1,63 @@
+/*****************************************************************************
+  Olympus Image Binary (OIB) format support
+  Copyright (c) 2008, Center for Bio Image Informatics, UCSB
+  
+  Author: Dima V. Fedorov <mailto:dima@dimin.net> <http://www.dimin.net/>
+
+  History:
+    2008-06-04 14:26:14 - First creation
+    2008-09-15 19:04:47 - Fix for older files with unordered streams
+    2008-11-06 13:36:43 - Parse preferred channel mapping
+            
+  Ver : 3
+*****************************************************************************/
+
+#ifndef D_OLE_FORMAT_H
+#define D_OLE_FORMAT_H
+
+#include <dim_img_format_interface.h>
+#include <dim_img_format_utils.h>
+
+#include <cstdio>
+#include <vector>
+#include <string>
+#include <map>
+
+#include <tag_map.h>
+
+#include <pole.h>
+#include "oib.h"
+#include "zvi.h"
+
+// DLL EXPORT FUNCTION
+extern "C" {
+TDimFormatHeader* oleGetFormatHeader(void);
+}
+
+namespace ole {
+
+enum FORMAT {
+  FORMAT_UNKNOWN = 0,
+  FORMAT_OIB     = 1,
+  FORMAT_ZVI     = 2
+}; 
+
+#define BIM_OLE_MAGIC_SIZE 8
+const unsigned char magic[BIM_OLE_MAGIC_SIZE]  = { 0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1 };
+
+class Params {
+public:
+  Params(): storage(NULL), ole_format(FORMAT_UNKNOWN) { i = initTDimImageInfo(); }
+  ~Params() { if (storage) delete storage; }
+  
+  TDimImageInfo i;
+  POLE::Storage *storage;
+  FORMAT ole_format; 
+
+  oib::Params oib_params;
+  zvi::Directory zvi_dir;
+};
+ 
+} // namespace ole
+
+#endif // D_OLE_FORMAT_H

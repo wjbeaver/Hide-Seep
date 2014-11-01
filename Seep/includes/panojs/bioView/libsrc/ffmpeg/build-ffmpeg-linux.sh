@@ -1,0 +1,39 @@
+#!/bin/bash
+
+chmod a+x ./ffmpeg/configure
+chmod a+x ./ffmpeg/version.sh
+chmod a+x ./ffmpeg/doc/texi2pod.pl
+
+chmod a+x ./ffmpeg/configure
+mkdir -p ffmpeg-obj
+cd ffmpeg-obj
+../ffmpeg/configure \
+	--enable-static --disable-shared \
+	--prefix=$PWD/../ffmpeg-out \
+	--enable-gpl --enable-swscale \
+	--disable-ffserver --disable-ffplay --disable-network --disable-ffmpeg --disable-devices
+
+#--enable-swscaler  may 9 2008 - does not take this option anymore
+
+make all install
+
+#rm -R ../include
+mkdir -p ../include
+mkdir -p ../include/ffmpeg
+cp -R ./include/ffmpeg ../include/ffmpeg
+
+cd ..
+mkdir -p ../../libs
+mkdir -p ../../libs/linux
+
+rm -f ../../libs/linux/libavcodec.a
+rm -f ../../libs/linux/libavformat.a
+rm -f ../../libs/linux/libavutil.a
+rm -f ../../libs/linux/libswscale.a
+
+cp ./ffmpeg-out/lib/libavcodec.a ../../libs/linux/libavcodec.a
+cp ./ffmpeg-out/lib/libavformat.a ../../libs/linux/libavformat.a
+cp ./ffmpeg-out/lib/libavutil.a ../../libs/linux/libavutil.a
+cp ./ffmpeg-out/lib/libswscale.a ../../libs/linux/libswscale.a
+
+

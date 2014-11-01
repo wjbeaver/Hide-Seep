@@ -8,12 +8,15 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
     <title>Hide & Seep</title>
 
-    <link rel="stylesheet" href="http://js.arcgis.com/3.9/js/dojo/dijit/themes/claro/claro.css">
-    <link rel="stylesheet" href="http://js.arcgis.com/3.9/js/esri/css/esri.css">
+    <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/dojo/dijit/themes/claro/claro.css">
+    <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/esri/css/esri.css">
     <link rel="stylesheet" href="dojo/1.9.3/dojox/form/resources/UploaderFileList.css" />
-    <link rel="stylesheet" href="Seep/formSeepApp/theme/formSeep.css" media="screen">
-    <link rel="stylesheet" href="http://js.arcgis.com/3.9/js/esri/css/esri.css">
+    <link rel="stylesheet" href="dojo/1.9.3/dojox/layout/resources/FloatingPane.css" />
+    <link rel="stylesheet" href="dojo/1.9.3/dojox/layout/resources/ResizeHandle.css" />
+    <link rel="stylesheet" href="dojo/1.9.3/dojox/widget/ColorPicker/ColorPicker.css" />
+     <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/esri/css/esri.css">
     <link rel="stylesheet" href="Seep/formSeepApp/theme/formSeep.css">
+    <link rel="stylesheet" href="css/seepApp.css">
     <script>
         // Configure application.
         appConfig = {
@@ -28,25 +31,8 @@
             };
         })();
     </script>
-    <style>
-        html,
-        body {
-            height: 90%;
-            width: 98%;
-            margin: 1%;
-        }
-        #rightPane {
-            width: 20%;
-        }
-        #legendPane {
-            border: solid #97DCF2 1px;
-        }
-    </style>
 
     <script src="http://js.arcgis.com/3.9/"></script>
-    <script src="Seep/mapMaker.js">
-        >
-    </script>
     <script src="Seep/md5.js"></script>
     <script type="text/javascript">
         // Load application.
@@ -59,6 +45,10 @@
             "formSeepApp"
         ]);
     </script>
+    <script src="Seep/mapMaker.js"></script>
+    <script src="/Seep/includes/fabric/dist/fabric.min.js"></script>
+    <script src="http://crypto-js.googlecode.com/svn/tags/3.0.2/build/rollups/md5.js"></script>
+
 </head>
 
 <body class="claro">
@@ -69,33 +59,63 @@
   }
 </style>
 <![endif]-->
-    <h2>Hide & Seep</h2>
-    <div id="seepContainer" class="appDialogPaneButtons">
-        <span>Send us coordinates, images, and other information about a new or existing spring. If you already have the coordinates add them here:</span>
-        <button id="btnStart" data-dojo-type="dijit/form/Button" type="button" role="button">Coordinates</button>
-        <span id="loadstatus">(load)</span>
-        <span>. Or use the map below:</span>
-
-    </div>
+	<div id="loading">
+		<h1>Loading... <img src="/images/gear.gif"></h1>
+	</div>
     <div id="content" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline', gutters:true" style="width: 100%; height: 100%; margin: 0;">
-
-        <div id="rightPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'">
-
-            <div data-dojo-type="dijit/layout/AccordionContainer">
-                <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title:'About'">
-                    about
-                </div>
-                <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title:'Tools'">
-                    <div id="templatePickerDiv"></div>
-                    <div id="editorDiv"></div>
-                </div>
-                <div data-dojo-type="dijit/layout/ContentPane" id="legendPane" data-dojo-props="title:'Legend', selected:true">
-                    <div id="legendDiv"></div>
+        <div id="centerPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'" style="overflow:hidden;">
+            <div data-dojo-type="dojox/layout/FloatingPane" id="floatingPane" title="Menu" style="width:300px;" data-dojo-props="resizable:true, dockable:true, title:'Menu', closable:false">
+                <div data-dojo-type="dijit/layout/AccordionContainer" id="AC">
+                    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title:'Hide & Seep', selected:true" id="AC1">
+                        <div class="accordian">
+                            <span>Send us coordinates, images, and other information about a new or existing spring. If you already have the coordinates add them here:</span>
+                            <button style="margin-left:10px;" id="btnStart" data-dojo-type="dijit/form/Button" type="button" role="button">Coordinates</button>
+                            <p>Or use the map:<br><button id="btnZoom" data-dojo-type="dijit/form/Button" type="button" role="button">Zoom</button> in to see published springs and annotate new/existing springs.</p>
+                            <div id="zoomedIn">
+                            	<p>To add a spring select a type below and add to the map. Select again to turn off.</p>
+                            	<div id="templatePickerDiv"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div data-dojo-type="dijit/layout/ContentPane" id="legendPane" data-dojo-props="title:'Legend'">
+                        <div class="accordian">
+                            <div id="legendDiv"></div>
+                        </div>
+                    </div>
+                    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title:'About'">
+                        <div class="accordian">
+                            <div style="font-weight:bold; margin-left:20px;">Developed by Bill Beaver and Jeri Ledbetter</div>
+                            <div style="font-style:italic; margin-left:5px;">Springs Stewardship Institute
+                                <span>&#0169;</span>
+                                <script>
+                                    document.write(new Date().getFullYear())
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                    <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title:'Login'">
+                        <div data-dojo-attach-point="loginNode" class="accordian" id="login">
+			                <div data-dojo-attach-point="contactForm" data-dojo-type="dijit/form/Form" id="loginForm" action="/Seep/adminLog.php" method="POST">
+				                <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+                                    <div data-dojo-type="dijit/form/TextBox" title="User Name:" name="username" value="" data-dojo-attach-point="usernameNode" id="adminUserName" class="login"></div>
+                                    <div data-dojo-type="dijit/form/TextBox" type="password" title="Password:" data-dojo-attach-point="passwordNode" name="password" value="" id="adminPassword" class="login"></div>
+                               </div>
+				                <div class="appDialogPaneButtons">
+                                    <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="loginSubmitNode" id="adminSubmit" type="button" role="submit" class="submit">Log in</div>
+                                     <div data-dojo-attach-point="loginResultNode" id="loginResult" class="status"></div>
+                                </div>
+			                </div>
+                        </div>
+                        <div data-dojo-attach-point="logoutNode" class="accordian" id="logout">
+				<div class="appDialogPaneButtons">
+				     <div data-dojo-attach-point="logoutNameNode" class="status">Welcome Admin!</div>
+				    <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="logoutButtonNode" id="logoutButton" type="button" role="button" class="submit">Log out</div>
+				</div>
+			</div>
+		    </div>
                 </div>
             </div>
-        </div>
-        <div id="map" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'" style="overflow:hidden;">
-            <span id="north" style="position:absolute; right:150px; top:5px; color:#000; z-index:50;"></span>
+            <div id="map"></div>
+            <span id="north" style="position:absolute; right:150px; top:10px; color:#000; z-index:50;"></span>
         </div>
     </div>
-</body>

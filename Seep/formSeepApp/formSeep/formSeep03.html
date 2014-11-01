@@ -1,0 +1,46 @@
+<div class="dijitDialog appConfirmDialog" role="dialog" aria-labelledby="${id}_title">
+    <div data-dojo-attach-point="titleBar" class="dijitDialogTitleBar">
+        <span data-dojo-attach-point="titleNode" class="dijitDialogTitle" id="${id}_title" role="heading" level="1"></span>
+        <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: onCancel" title="${buttonCancel}" role="button" tabindex="0">
+            <span data-dojo-attach-point="closeText" class="closeText" title="${buttonCancel}">x</span>
+        </span>
+    </div>
+    <div class="dijitDialogPaneContent">
+ 	<div id="bd-wrapper" ng-controller="CanvasControls">
+    		<iframe data-dojo-attach-point="viewerFrameNode" id="viewerFrame" class="viewerFrame" src=""></iframe>
+		<div class="drawing-block">
+			<div id="instructions" data-dojo-attach-point="instructionsNode">For best results zoom to full screen and minimize the reference window.</div>
+			<div id="drawing-mode" data-dojo-type="dijit/form/Button" data-dojo-attach-point="annotationModeNode" type="button" role="button">Enter annotation mode</div>
+	
+			<div id="drawing-mode-options" data-dojo-attach-point="annotationNode">
+				<div id="clear-canvas" class="btn" data-dojo-type="dijit/form/Button" data-dojo-attach-point="clearNode" type="button" role="button">Clear</div>
+				<br>
+				
+				<span class="option-label">Line width: </span><span class="info" data-dojo-attach-point="lineValueNode">5</span>
+				<input id="hslider" type="range" value="5" data-dojo-type="dijit/form/HorizontalSlider" data-dojo-props=
+				"minimum: 1,
+				maximum: 50,
+				showButtons: false,
+				discreteValues: 50" id="drawing-line-width" data-dojo-attach-point="lineNode">
+				<br><br>
+	
+				<span class="option-label">Line Color: </span>
+				<div id="colorPicked" data-dojo-attach-point="colorDropletNode">&nbsp;&nbsp;&nbsp;</div>
+				<div data-dojo-type="dijit/form/DropDownButton" class="btn-drop">
+					<span>Picker</span>
+					<div data-dojo-type="dojox/widget/ColorPicker" value="#000000" data-dojo-attach-point="colorPickerNode"></div>
+				</div>
+				<br>
+				
+				<span class="option-label">Comment:</span>
+				<div data-dojo-type="dijit/form/Textarea" title="Comment: " data-dojo-attach-point="commentNode" name="comment" value="" id="drawing-comment" class="textarea" rows="2" wrap="hard"></div>
+				<br><br>
+				
+				<div id="annotate" class="btn" data-dojo-type="dijit/form/Button" data-dojo-attach-point="annotateImageNode" type="button" role="button">Annotate Image</div>
+				<p id="annotate-result" class="status" data-dojo-attach-point="annotateResultNode"></p>
+			</div>
+		</div>
+	</div>
+ 	<canvas id="c" data-dojo-attach-point="canvasNode"></canvas>
+     </div>
+</div>

@@ -1,0 +1,30 @@
+<div class="dijitDialog appConfirmDialog" role="dialog" aria-labelledby="${id}_title">
+    <div data-dojo-attach-point="titleBar" class="dijitDialogTitleBar">
+        <span data-dojo-attach-point="titleNode" class="dijitDialogTitle" id="${id}_title" role="heading" level="1"></span>
+        <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: onCancel" title="${buttonCancel}" role="button" tabindex="0">
+            <span data-dojo-attach-point="closeText" class="closeText" title="${buttonCancel}">x</span>
+        </span>
+    </div>
+    <div class="dijitDialogPaneContent">
+        <div data-dojo-attach-point="containerNode">
+            <div data-dojo-attach-point="trackUploadFormNode" data-dojo-type="dijit/form/Form" id="tForm" enctype="multipart/form-data" action="Seep/uploadTrack.php" method="POST">
+            	<div data-dojo-type="dijit/layout/TabContainer" style= "height:250px">
+            		<div data-dojo-type="dijit/layout/ContentPane" title="Form" data-dojo-props="selected:true">
+				 <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
+				    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false" class="nameBox">
+					<div class="browseButton" name="uploadedfile" multiple="true" type="file" data-dojo-type="dojox/form/Uploader" data-dojo-props="label:'Select Some GPX files ( .GPX )'" id="uploaderTrack" data-dojo-attach-point="uploadNode"></div>
+					<div id="filesTrack" data-dojo-type="dojox/form/uploader/FileList" data-dojo-props="uploaderId: 'uploaderTrack'"></div>
+				    </div>
+				</div>
+				<div class="appDialogPaneButtons">
+				    <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="trackUploadSubmitNode" type="submit" role="button" value="Submit">Submit</div>
+				</div>
+				<div data-dojo-attach-point="trackLoadStatusNode" class="status"></div>
+           		</div>
+            		<div data-dojo-type="dijit/layout/ContentPane" title="Instructions">
+            			Track
+            		</div>
+            	</div>
+        </div>
+    </div>
+</div>

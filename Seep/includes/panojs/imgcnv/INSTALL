@@ -1,0 +1,10 @@
+Welcome to imgcnv.  A utlity for reading and converting 
+biological image formats.
+
+
+
+1.  To install just execute,
+
+    $ make install
+
+2.  Sit back

@@ -10,6 +10,7 @@
 // standard PHP build.
 //
 require("includes/cLOG.php");
+require("includes/UUID.php");
 
 function findTempDirectory()
   {
@@ -42,6 +43,130 @@ function getImageType($filename) {
     return strtolower(substr(strrchr($filename,"."),1));
 }
 
+include 'includes/WideImage/lib/WideImage.php';
+#include 'includes/maptiler.php';
+
+function readGPSinfoEXIF($exif, &$exif_data) {
+// how different is each device?
+    if (!$exif || $exif['GPS']['GPSLatitude'] == '') {
+        return "| no GPS";
+    } else {
+        $lat_ref = $exif['GPS']['GPSLatitudeRef'];
+        $lat = $exif['GPS']['GPSLatitude'];
+        list($num, $dec) = explode('/', $lat[0]);
+        $lat_s = $num / $dec;
+        list($num, $dec) = explode('/', $lat[1]);
+        $lat_m = $num / $dec;
+        list($num, $dec) = explode('/', $lat[2]);
+        $lat_v = $num / $dec;
+
+        $lon_ref = $exif['GPS']['GPSLongitudeRef'];
+        $lon = $exif['GPS']['GPSLongitude'];
+        list($num, $dec) = explode('/', $lon[0]);
+        $lon_s = $num / $dec;
+        list($num, $dec) = explode('/', $lon[1]);
+        $lon_m = $num / $dec;
+        list($num, $dec) = explode('/', $lon[2]);
+        $lon_v = $num / $dec;
+
+        $lat_int = ($lat_s + $lat_m / 60.0 + $lat_v / 3600.0);
+        // check orientaiton of latitude and prefix with (-) if S
+        $lat_int = ($lat_ref == "S") ? '-' . $lat_int : $lat_int;
+
+        $lon_int = ($lon_s + $lon_m / 60.0 + $lon_v / 3600.0);
+        // check orientation of longitude and prefix with (-) if W
+        $lon_int = ($lon_ref == "W") ? '-' . $lon_int : $lon_int;
+        
+        $data = explode("/", $exif['GPS']['GPSAltitude']);
+        
+        $altitude = (int) $data[0] / (int) $data[1];
+        
+        if (!$exif['GPS']['GPSAltitudeRef']) {
+        	$altitude = -1*$altitude;
+        }
+        
+        $data = explode("/", $exif['GPS']['GPSImgDirection']);
+  
+        $heading = (int) $data[0] / (int) $data[1];
+
+        if ($exif['GPS']['GPSImgDirectionRef']!="T") {
+        	$heading = $heading-9.77; // might need to calculate this, don't know if any cameras use it
+        }
+        
+        $gps_int = array("latitude"=>$lat_int, "longitude"=>$lon_int,
+         "gpsAltitude"=>$altitude,
+         "gpsHeading"=>$heading);
+
+        $exif_data = array_merge($exif_data, $gps_int);
+        return "| GPS";
+    }
+}
+
+function tileImage($upload_path, $hash, $imageNumber, &$exif_data) {
+    $message = "";
+
+    for ($n=0;$n<$imageNumber;$n++) {
+
+        // sized path
+        $uploadSized_path = $upload_path."/sized_".$hash[$n];
+        mkdir($uploadSized_path, 0775);
+        $uploadSized_path = $uploadSized_path."/";
+
+        // size 3 images ?? what if smaller, don't size up
+        $width=100;
+        $height=75;
+        WideImage::load($upload_path.$hash[$n].".jpg")->resize($width, $height)->saveToFile($uploadSized_path.$hash[$n]."_thumb.jpg");
+
+        $width=200;
+        $height=150;
+        WideImage::load($upload_path.$hash[$n].".jpg")->resize($width, $height)->saveToFile($uploadSized_path.$hash[$n]."_small.jpg");
+
+        $width=400;
+        $height=300;
+        WideImage::load($upload_path.$hash[$n].".jpg")->resize($width, $height)->saveToFile($uploadSized_path.$hash[$n]."_medium.jpg");
+
+        $width=1280;
+        $height=960;
+        WideImage::load($upload_path.$hash[$n].".jpg")->resize($width, $height)->saveToFile($uploadSized_path.$hash[$n]."_large.jpg");
+
+        // tile image
+        $uploadTile_path = $upload_path."/tiles_".$hash[$n];
+        mkdir($uploadTile_path, 0775);
+        $uploadTile_path = $uploadTile_path."/";
+        
+        $map_tiler = "imgcnv -i ".$upload_path.$hash[$n].".jpg"." -o ".$uploadTile_path."tiles.jpg -t jpeg -tile 256 -verbose";
+        
+        //execute
+        $return_var = 0;
+        system($map_tiler, &$return_var);
+        $message += "imgcnv".$return_var."|".$map_tiler;
+        
+        // exif data
+        $exif = exif_read_data($upload_path.$hash[$n].".jpg", 'EXIF');
+
+        if (!$exif) {
+            $message += "| No header data found ";
+        } else {
+            $exif = exif_read_data($upload_path.$hash[$n].".jpg", 0, true);
+
+            $exif_data[$n]["FileName"] = $exif["FILE"]["FileName"];
+            
+            $timestamp = $exif["FILE"]["FileDateTime"];
+            $exif_data[$n]["FileDate"] = date('m-d-Y', $timestamp);
+            $exif_data[$n]["FileTime"] = date('H:i:s', $timestamp);
+            
+            $data = explode(" ", $exif["EXIF"]["DateTimeOriginal"]);
+            
+            $exif_data[$n]["Date"] = implode("/", explode(":", $data[0]));
+            $exif_data[$n]["Time"] = $data[1];
+            
+            $message += readGPSinfoEXIF($exif, $exif_data[$n]);
+        }
+    }
+
+    return $message;
+}
+
 trace("---------------------------------------------------------");
 
 //
@@ -49,8 +174,9 @@ trace("---------------------------------------------------------");
 // EDIT ME: According to your local directory structure.
 // NOTE: Folders must have write permissions
 //
-$upload_path = "data/temp/"; // where image will be uploaded, relative to this file
-$download_path = "Seep_1.2/data/temp/"; // same folder as above, but relative to the HTML file
+$upload_path = "data/images/"; // where image will be uploaded, relative to this file
+$download_path = "Seep/data/images/"; // same folder as above, but relative to the HTML file
+$exif = array();
 
 //
 // NOTE: maintain this path for JSON services
@@ -67,6 +193,8 @@ $json = new Services_JSON();
 $postdata = array();
 $htmldata = array();
 $data = "";
+$imageHash = array();
+
 trace("POSTDATA: " . count($_FILES) . " FILES");
 
 foreach ($_POST as $nm => $val) {
@@ -76,13 +204,18 @@ foreach ($_POST as $nm => $val) {
 
 trace($postdata, true);
 
-$hash = $postdata["hash"];
+$hash = $postdata["UPLOADIDImageUpload"];
+
+$upload_path = $upload_path."/".$hash;
+mkdir($upload_path, 0775);
+
+$upload_path = $upload_path."/";
 
 foreach ($_FILES as $nm => $val) {
     trace(" file: ".$nm ."=" . $val);
 }
 
-foreach ($_GET as $nm => $val) {
+foreach ($_GET as $nm=> $val) {
     trace($nm ."=" . $val);
 }
 
@@ -142,8 +275,16 @@ if ( isset($_FILES[$fieldName]) || isset($_FILES['uploadedfileFlash'])) {
         trace("returnFlashdata:\n=======================");
         trace($data);
         trace("=======================");
+
+        // process image
+        trace(tileImage($upload_path, $imageHash, 1, $exif));
+
+        // get values later
+        // $data .= 'exif='.$exif;
+
         // echo sends data to Flash:
         echo($data);
+
         // return is just to stop the script:
         return;
     }
@@ -163,7 +304,8 @@ if ( isset($_FILES[$fieldName]) || isset($_FILES['uploadedfileFlash'])) {
 
     while(isset($_FILES['uploadedfile'.$cnt])){
         trace("IFrame multiple POST");
-        $moveName = $hash."_".$n.".jpg";
+        $imageHash[$cnt] = UUID::v4();
+        $moveName = $imageHash[$cnt].".jpg";
         $moved = move_uploaded_file($_FILES['uploadedfile'.$cnt]['tmp_name'], $upload_path . moveName);
         trace("moved:" . $moved ." ". $moveName);
 
@@ -210,6 +352,11 @@ if ( isset($_FILES[$fieldName]) || isset($_FILES['uploadedfileFlash'])) {
         trace($value, true);
     }
 
+    // process image
+    trace(tileImage($upload_path, $imageHash, $cnt, $exif));
+
+    $htmldata['exif'] = $exif;
+
 } elseif ( isset($_POST['uploadedfiles']) ) {
   trace("HTML5 multi file input... CAN'T ACCESS THIS OBJECT! (POST[uploadedfiles])");
   trace(count($_POST['uploadedfiles'])." ");
@@ -241,7 +388,8 @@ if ( isset($_FILES[$fieldName]) || isset($_FILES['uploadedfileFlash'])) {
     }
 
     for($i=0;$i<$len;$i++){
-        $moveName = $hash."_".$n.".jpg";
+        $imageHash[$i] = UUID::v4();
+        $moveName = $imageHash[$i].".jpg";
         $moved = move_uploaded_file($_FILES['uploadedfiles']['tmp_name'][$i], $upload_path . $moveName);
         trace("moved:" . $moved ." ". $_FILES['uploadedfiles']['name'][$i]);
 
@@ -273,10 +421,6 @@ if ( isset($_FILES[$fieldName]) || isset($_FILES['uploadedfileFlash'])) {
             $_post['height'] = $height;
             $_post['type'] = $type;
             $_post['size'] = filesize($file);
-            $_post['date_taken'] = '';
-            $_post['time_taken'] = '';
-            $_post['latitude'] = '';
-            $_post['logitude'] = '';
 
             //$_post['additionalParams'] = $postdata;
             //trace($_post, true);
@@ -291,8 +435,15 @@ if ( isset($_FILES[$fieldName]) || isset($_FILES['uploadedfileFlash'])) {
     }
 
     $htmldata['Message'] = "Submit Successful";
+
+    // process image
+    trace(tileImage($upload_path, $imageHash, $cnt, $exif));
+
+    $htmldata['exif'] = $exif;
+
     $data = $json->encode($htmldata);
     trace($data);
+
     print $data;
     return $data;
 
@@ -328,8 +479,15 @@ if ( isset($_FILES[$fieldName]) || isset($_FILES['uploadedfileFlash'])) {
     $htmldata['size'] = filesize($file);
     $htmldata['additionalParams'] = $postdata;
     $htmldata['Message'] = "Submit Successful";
+
+    // process image
+    trace(tileImage($upload_path, $imageHash, 1, $exif));
+
+    $htmldata['exif'] = $exif;
+
     $data = $json->encode($htmldata);
     trace($data);
+
     print $data;
     return $data;
 } elseif (isset($_GET['rmFiles'])) {
@@ -352,6 +510,6 @@ if ( isset($_FILES[$fieldName]) || isset($_FILES['uploadedfileFlash'])) {
 $data = $json->encode($htmldata);
 trace("Json Data Returned:");
 trace($data);
-print $data;
+echo $data;
 //return $data;
 ?>

@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <title>Scientists Digital Notebook</title>
+	<link href="styles/bioimagecd.css" rel="stylesheet" type="text/css" />
+	<link href="styles/bioimagecd_print.css" rel="stylesheet" media="print" type="text/css" />
+</head>
+<body>
+
+<div class="header">
+<img src="images/bioView_full.png" width="356" height="356" />
+<h1>bioView - remote </h1>
+<h2> remote controller for Large image viewer for Large screens</h2>
+</div>
+
+<div class="pagebody">
+  <p>bioView is a cross-platform application intended for biologists to visualize EM, Confocal, etc. imagery. It runs on Windows, MacOS X and Linux. It also provides  access from the remote controller that simplifies usage of the very large screens e.g. 8000x4800 pixels composed by many monitors. </p>
+  <h3>Contents</h3>
+  <ul>
+    <li><a href="#QUICKSTART">Quick Start:</a> for desktop use</li>
+    <li><a href="#ARCH">Architecture:</a> Wall - Remote</li>
+    <li><a href="#HOWTO">How to use with image walls</a></li>
+  </ul>
+  <h3><a name="QUICKSTART" id="QUICKSTART"></a>Quick Start</h3>
+  <p><img src="images/bioview_remote_window.png" alt="main window" width="600" height="488" />
+  </p>
+  <p> On the controls window you can: </p>
+  <ol>
+  <li>Hide/show or reassign image channels to monitor color channels. Images that contain such metadata will present channel names.</li>
+
+  <li>Enable live image enhancement, these operations are done on the fly, without actual changes of the images and do not depend on image size, thus very large image can be equalized instantaneously. Current enhancements are: histogram stretching and equalization. </li>
+
+  <li>Navigate over the image and change current zoom.</li>
+
+  <li>Change current page, which might be either time or Z.</li>
+
+  <li>Visualize embedded meta-data.</li>
+  </ol>
+	
+	
+<h3><a name="ARCH" id="ARCH"></a>Architecture: Wall - Remote</h3>
+<p>bioView can receive external control clients, it uses  TCP/IP connection and listens on the port specified in wv.ini file, the default is 9229. Upon connection client will receive preview of currently open image and enable controls. </p>
+  <img src="images/bioview_architecture.png" alt="template configuration" width="778" height="464" /></div>
+<div class="footer">
+<a href="http://www.bioimage.ucsb.edu/">Center For Bio-Image Informatics</a>, 2007.
+</div>
+
+</body>
+</html>

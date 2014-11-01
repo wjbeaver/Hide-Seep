@@ -1,0 +1,7 @@
+#include "formats_api/bim_metatags.h"
+#include "formats_api/dim_img_format_interface.h"
+#include "formats_api/dim_histogram.h"
+#include "formats_api/dim_image.h"
+#include "formats_api/dim_image_pyramid.h"
+#include "formats_api/dim_image_stack.h"
+#include "formats_api/bim_image_5d.h"

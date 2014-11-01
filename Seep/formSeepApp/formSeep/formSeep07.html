@@ -1,0 +1,42 @@
+<div class="dijitDialog appConfirmDialog" role="dialog" aria-labelledby="${id}_title">
+    <div data-dojo-attach-point="titleBar" class="dijitDialogTitleBar">
+        <span data-dojo-attach-point="titleNode" class="dijitDialogTitle" id="${id}_title" role="heading" level="1"></span>
+        <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: onCancel" title="${buttonCancel}" role="button" tabindex="0">
+            <span data-dojo-attach-point="closeText" class="closeText" title="${buttonCancel}">x</span>
+        </span>
+    </div>
+    <div class="dijitDialogPaneContent">
+        <div data-dojo-attach-point="containerNode">
+            <div data-dojo-attach-point="trackFormNode" data-dojo-type="dijit/form/Form" id="trForm">
+                <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2">
+                	<div data-dojo-type="dijit/form/TextBox" title="Title:" id="trackTitle" name="trackTitle" value="" data-dojo-attach-point="trackTitleNode"></div>
+			<div data-dojo-type="dijit/form/Select" title="Type:" name="trackType" value="1" data-dojo-attach-point="trackTypeNode" id="trackType">
+				<span value="1">Trail</span>					
+				<span value="2">Walk Around</span>					
+				<span value="3">Other</span>									
+			</div>
+               </div>
+               <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, showLabels:false">
+               		<div>
+               			<span>Date: </span><span id="trackDate"></span>
+               		</div>
+               		<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
+               			<div>
+               				<span>Timezone: </span><span id="trackTimezone"></span>
+               			</div>
+                		<div>
+               				<span>UTC: </span><span id="trackUTC"></span>
+               			</div>
+              		</div>
+              </div>
+               <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
+			<div data-dojo-type="dijit/form/Textarea" title="Description:" data-dojo-attach-point="trackDescribeNode" name="trackDescribe" value="" class="textarea"></div>               
+               </div>
+               <div class="appDialogPaneButtons">
+               		<div data-dojo-type="dijit/form/Button" data-dojo-attach-point="trackSubmitNode" type="submit" role="button" value="Submit">Submit</div>
+               </div>
+	       <div data-dojo-attach-point="trackStatusNode" class="status"></div>
+            </div>
+        </div>
+    </div>
+</div>

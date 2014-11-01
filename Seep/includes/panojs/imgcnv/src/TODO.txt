@@ -1,0 +1,18 @@
+XXX 1) Nanoscope
+XXX 2) Update fluoview
+XXX 3) update library code, merge with bioview
+XXX 4) generate XML output with image metadata and parameters
+
+XXX 5) read/write videos
+XXX 6) sample input pages: sample 5 - reads every 5th page...
+XXX 7) project axis by: max(It) and min(It)
+XXX 8) read encoder parameters: tiff compression, jpeg quality, video encoding params
+XXX 9) stack interpolation in Z
+XXX 10) stack enhancement - per frame and full stack
+XXX 11) negative image
+
+XXX 12) keep all metadata and transform it correctly if possible on channel remaps and resizes
+
+XXX 13) add channels
+XXX 14) fuse - for channel mapping combining channels
+XXX 15) 3D interpolation

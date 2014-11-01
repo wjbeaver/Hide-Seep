@@ -1,34 +1,34 @@
 <div class="dijitDialog appConfirmDialog" role="dialog" aria-labelledby="${id}_title">
     <div data-dojo-attach-point="titleBar" class="dijitDialogTitleBar">
         <span data-dojo-attach-point="titleNode" class="dijitDialogTitle" id="${id}_title" role="heading" level="1"></span>
-        <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: onCancel" title="${buttonCancel}" role="button" tabindex="0">
+        <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: cleanup" title="${buttonCancel}" role="button" tabindex="0">
             <span data-dojo-attach-point="closeText" class="closeText" title="${buttonCancel}">x</span>
         </span>
     </div>
     <div class="dijitDialogPaneContent">
         <div data-dojo-attach-point="containerNode">
             <div data-dojo-attach-point="seepForm" data-dojo-type="dijit/form/Form" id="sForm">
-                <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
-                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1" class="nameBox">
+                <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
+                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false" class="nameBox">
                         <div>
                             <span class="subHead">Location:</span>
                             <span>(Coordinates in
                                 <a href="http://transition.fcc.gov/mb/audio/bickel/DDDMMSS-decimal.html" target="_blank">decimal degrees</a>)
                             </span>
                         </div>
-                        <div data-dojo-type="dijit/form/TextBox" name="hash" value=${signature} class="hidden" data-dojo-attach-point="signatureNode"></div>
+                        <div data-dojo-type="dijit/form/TextBox" name="UPLOADID" id="UPLOADID" value="" class="hidden" data-dojo-attach-point="UPLOADIDNode"></div>
 
                         <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:3, customClass:'labelsAndValues'">
-                            <div data-dojo-type="dijit/form/Select" name="device" title="Device:" value="1" data-dojo-attach-point="deviceNode">
-                                <span value="Google" selected="selected">Google</span>
-                                <span value="Garmin">Garmin</span>
-                                <span value="Topo Map">Topo Map</span>
+                            <div data-dojo-type="dijit/form/Select" name="Coordinates from?" title="From:" value="WebMap" data-dojo-attach-point="deviceNode">
+                                <span value="WebMap">Web Map</span>
+                                <span value="GPSDevice">GPS Device</span>
+                                <span value="TopoMap">Topo Map</span>
                                 <span value="Other">Other</span>
                             </div>
-                            <div data-dojo-type="dijit/form/ValidationTextBox" missingMessage="Ooops! You forgot the latitude!" required="true" title="Lat*:" name="latitude" value="" class="coords" id="latitude" data-dojo-attach-point="latitudeNode" data-dojo-props="validator:dojox.validate.isInRange,
+                            <div data-dojo-type="dijit/form/ValidationTextBox" missingMessage="Ooops! You forgot the latitude!" required="true" title="Latitude:" name="latitude" value="" class="coords" id="latitude" data-dojo-attach-point="latitudeNode" data-dojo-props="validator:dojox.validate.isInRange,
         constraints:{ min:-90, max:90 },
         invalidMessage:'This is not within the range!'"></div>
-                            <div data-dojo-type="dijit/form/ValidationTextBox" missingMessage="Ooops! You forgot the logitude!" required="true" title="Long*:" name="longitude" value="" class="coords" id="logitude" data-dojo-attach-point="longitudeNode" data-dojo-props="validator:dojox.validate.isInRange,
+                            <div data-dojo-type="dijit/form/ValidationTextBox" missingMessage="Ooops! You forgot the longitude!" required="true" title="Longitude:" name="longitude" value="" class="coords" id="logitude" data-dojo-attach-point="longitudeNode" data-dojo-props="validator:dojox.validate.isInRange,
         constraints:{ min:-180, max:180 },
         invalidMessage:'This is not within the range!'"></div>
                         </div>

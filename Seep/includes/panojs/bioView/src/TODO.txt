@@ -1,0 +1,54 @@
+XDMA 
+
+[0.0.3]
+
+XXX 1) MAC - error reading BMP
+XXX 2) Show scale bars etc...
+XXX 3) client - show progress bar
+XXX 4) error sending thumb to the client
+XXX 5) server full screen mode
+XXX 6) server sending wrong thumbs in scale > 1
+XXX 7) command line options
+XXX 8) correct positions on right monitors on restoring widgets
+XXX 13) strange repainting while resizing widget in QScrollArea
+XXX 14) add zoom via mouse
+XXX 15) arrage controls window positioning in windows
+XXX 10) clean up the code, move painting code to DImageViewRGB and qscrollarea to a widget
+XXX 15) screen buffer
+XXX 17) parallel execution on paint events
+XXX 16) Full virtual screen
+XXX 23) server - move window by arrow keys
+XXX 19) client - connect from command line
+XXX 21) client - move window by arrow keys
+XXX client - move mssg collapse
+XXX all info to client
+XXX serv - do not send black thumb
+XXX serv - send client area if connected with image
+XXX 18) commmand list and collapse of overlapping paint commands
+XXX serv - paint - brakes
+XXX QImaging 12 bit tiff support + metadata
+XXX update all image libraries used
+XXX fluoview channel assignment: check
+XXX Mutex for loading only one instance 02/08/2007 17:14
+XXX load file name from command line
+XXX large cursors
+XXX improve full screen
+XXX serv - not reading tcp while processing paint events...
+XXX send cursor positions from client to wall
+XXX bug: not loading images when loaded second time
+XXX remote close wall
+XXX remote show metadata
+XXX remote show scale bar
+
+invert image
+contrast/brightness
+manual stretch?
+fix 2% stretch in MT images
+Zeiss ZVI support
+
+
+[0.1.0]
+play list
+thumbnail in preview dialog
+9) memory caching for large images
+20) pyramid generation - threads?
