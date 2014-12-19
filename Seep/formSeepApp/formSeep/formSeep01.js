@@ -34,11 +34,10 @@ define([
         },
         
         setID: function () {
-            
+        
         	// set values and nodes
-        	indx = layers[0].objects.length-1;
-    		var attributes = layers[0].objects[indx].attributes;
-    		var coordinates = layers[0].objects[indx].coordinates;
+    		var attributes = layers[0].objects[0].attributes;
+    		var coordinates = layers[0].objects[0].coordinates;
     		
          	this.UPLOADIDImageUploadNode.set("value", attributes[0].value);
           	this.latitudeImageUploadNode.set("value", coordinates.latitude);
@@ -84,8 +83,8 @@ define([
             
             this.uploadNode.on("complete", lang.hitch(this, function (response) {
 
+                this.imageLoadStatus.innerHTML = "";
                 if (response.Message == "Submit Successful") {
-                    this.imageLoadStatus.innerHTML = "";
                     this.hide();
 
                     // send to dialog.image

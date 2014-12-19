@@ -1,22 +1,22 @@
 <div class="dijitDialog appConfirmDialog" role="dialog" aria-labelledby="${id}_title">
     <div data-dojo-attach-point="titleBar" class="dijitDialogTitleBar">
         <span data-dojo-attach-point="titleNode" class="dijitDialogTitle" id="${id}_title" role="heading" level="1"></span>
-        <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: onCancel" title="${buttonCancel}" role="button" tabindex="0">
+        <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: cleanup" title="${buttonCancel}" role="button" tabindex="0">
             <span data-dojo-attach-point="closeText" class="closeText" title="${buttonCancel}">x</span>
         </span>
     </div>
     <div class="dijitDialogPaneContent">
         <div data-dojo-attach-point="containerNode">
             <div data-dojo-attach-point="videoForm" data-dojo-type="dijit/form/Form" id="vForm">
-            	<div data-dojo-type="dijit/layout/TabContainer" style= "height:425px">
-            		<div data-dojo-type="dijit/layout/ContentPane" title="Form" data-dojo-props="selected:true">
+            	<div data-dojo-type="dijit/layout/TabContainer" style="height:560px">
+            		<div data-dojo-type="dijit/layout/ContentPane" title="Form" data-dojo-props="selected:true" class="tabClass">
             			<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
  					<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2">
 						<div data-dojo-type="dijit/form/TextBox" title="Title:" id="videoTitle" name="videoTitle" value="" data-dojo-attach-point="videoTitleNode"></div>
            					<div id="videoDate" data-dojo-type="dijit/form/DateTextBox" value="" class="dateBox" title="Date:" data-dojo-props="" data-dojo-attach-point="videoDateNode"></div>
 					</div>
            				<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2">
-						<div data-dojo-type="dijit/form/TextBox" title="Url:" id="videoUrl" name="videoUrl" value="" data-dojo-attach-point="vidoeUrlNode"></div>
+						<div data-dojo-type="dijit/form/TextBox" title="Url:" name="videoUrl" value="" data-dojo-attach-point="videoUrlNode"></div>
 						<div data-dojo-type="dijit/form/Select" title="Type:" name="videoType" value="1" data-dojo-attach-point="videoTypeNode" id="videoType">
 							<span value="1">Pan Around</span>					
 							<span value="2">Walk Around</span>					
@@ -29,23 +29,22 @@
 							<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1" id="radioList">
 								<div type="radio" data-dojo-type="dijit/form/RadioButton" name="coordinateType" title= "Use Coordinates of Springs" id="coordType1" data-dojo-attach-point="coordType1Node" value="1" checked="checked"></div>
 								<div type="radio" data-dojo-type="dijit/form/RadioButton" name="coordinateType" title= "Input Coordinates" id="coordType2" data-dojo-attach-point="coordType2Node" value="2"></div>
-								<div type="radio" data-dojo-type="dijit/form/RadioButton" name="coordinateType" title= "Match to Track or Waypoints" id="coordType3" data-dojo-attach-point="coordType3Node" value="3"></div>
 							</div>
 							<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false" id="radio1">
 								<div>
-									<p>Latitude: <span></span> Longitude: <span></span></p>
+									<p>Latitude: <span data-dojo-attach-point="coordsLatVideoViewNode">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><br> Longitude: <span data-dojo-attach-point="coordsLongVideoViewNode">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
 								</div>
 							</div>
 							<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2" id="radio2">
-								<div data-dojo-type="dijit/form/TextBox" title="Latitude:" id="videoLatitude" name="videoLatitude" value="" data-dojo-attach-point="vidoeLatitudeNode" class="coords"></div>
-								<div data-dojo-type="dijit/form/TextBox" title="Longitude:" id="videoLongitude" name="videoLongitude" value="" data-dojo-attach-point="vidoeLongitudeNode" class="coords"></div>
+								<div data-dojo-type="dijit/form/TextBox" title="Latitude:" name="videoLatitudeInput" value="" data-dojo-attach-point="vidoeLatitudeInputNode" class="coords"></div>
+								<div data-dojo-type="dijit/form/TextBox" title="Longitude:" name="videoLongitudeInput" value="" data-dojo-attach-point="vidoeLongitudeInputNode" class="coords"></div>
 							</div>
 							<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, showLabels:false" id="radio3">
-								<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
-									<div data-dojo-type="dijit/form/Select" data-dojo-attach-point="videoTrackListNode" id="videoTrackList" class="dynaList"></div>
+								<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, orientation:'vert'">
+									<div data-dojo-type="dijit/form/Select" data-dojo-attach-point="videoTrackListNode" title="Tracks:" class="dynaList"></div>
 								</div>
 								<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false", class="buttons">
-									<div data-dojo-type="dijit/form/Button" data-dojo-attach-point="getVideoTrackNode" type="button" role="button">Add Track/WayPoints for Video</div>
+									<div data-dojo-type="dijit/form/Button" data-dojo-attach-point="getVideoTrackNode" type="button" role="button">Match Video to Track</div>
 								</div>
 							</div>
 						</div>
@@ -54,11 +53,8 @@
 							<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false" style="text-align:center">
 								<div data-dojo-type="dijit/form/Button" data-dojo-attach-point="getVideoUTCNode" type="button" role="button">Get UTC</div>
 							</div>
-							<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
-								<div>
-									<p>Time Zone: <span></span></p>
-									<p>UTC: <span></span></p>
-								</div>
+							<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
+								<div data-dojo-type="UTCcall" data-dojo-attach-point="videoUTCNode"></div>
 							</div>
 						</div>
 					</div>
@@ -66,23 +62,19 @@
 						<div data-dojo-type="dijit/form/Textarea" title="Description:" data-dojo-attach-point="videoDescribeNode" name="videoDescribe" value="" class="textarea"></div>
 					</div>
 					<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, showLabels:false">
-						<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, showLabels:false">
-							<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false" id="videoListBox">
-								<div data-dojo-type="dijit/form/Select" data-dojo-attach-point="videoListNode" id="videoList" class="dynaList"></div>
-							</div>
-							<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false", class="buttons">
-								<div data-dojo-type="dijit/form/Button" data-dojo-attach-point="addVideoNode" type="button" role="button">+</div>
-								<div data-dojo-type="dijit/form/Button" data-dojo-attach-point="removeVideoNode" type="button" role="button">-</div>
-							</div>
-						</div>
+				        <div data-dojo-type="namer" data-dojo-attach-point="videographerNameNode" class="namer"></div>
 						<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
-							<div data-dojo-type="dijit/form/Button" data-dojo-attach-point="submitVideosNode" id="submitVideos" type="button" role="button">Submit Videos</div>
+							<div data-dojo-type="dijit/form/Button" data-dojo-attach-point="submitVideosNode" type="button" role="button">Submit Video</div>
 							<div data-dojo-attach-point="VStatus" class="status"></div>
 						</div>
 					</div>
             			</div>
+            			<div data-dojo-type="dijit/form/TextBox" name="UPLOADIDVideo" value="" data-dojo-attach-point="UPLOADIDVideoNode" class="hidden"></div>
+                        <div data-dojo-type="dijit/form/TextBox" name="VIDEOIDVideo" value="" data-dojo-attach-point="VIDEOIDVideoNode" class="hidden"></div>
+                        <div data-dojo-type="dijit/form/TextBox" name="latitudeVideo" value="" data-dojo-attach-point="latitudeVideoNode" class="hidden"></div>
+                        <div data-dojo-type="dijit/form/TextBox" name="longitudeVideo" value="" data-dojo-attach-point="longitudeVideoNode" class="hidden"></div>
                 	</div>
-            		<div data-dojo-type="dijit/layout/ContentPane" title="Instructions">
+            		<div data-dojo-type="dijit/layout/ContentPane" title="Instructions" class="tabClass">
             			<p>
             				Video
             			</p>

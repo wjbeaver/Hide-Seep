@@ -85,12 +85,14 @@ function readGPSinfoEXIF($exif, &$exif_data) {
         	$altitude = -1*$altitude;
         }
         
-        $data = explode("/", $exif['GPS']['GPSImgDirection']);
+        if ($exif['GPS']['GPSImgDirection']) {      
+            $data = explode("/", $exif['GPS']['GPSImgDirection']);
   
-        $heading = (int) $data[0] / (int) $data[1];
+            $heading = (int) $data[0] / (int) $data[1];
 
-        if ($exif['GPS']['GPSImgDirectionRef']!="T") {
-        	$heading = $heading-9.77; // might need to calculate this, don't know if any cameras use it
+            if ($exif['GPS']['GPSImgDirectionRef']!="T") {
+                $heading = $heading-9.77; // might need to calculate this, don't know if any cameras use it
+            }
         }
         
         $gps_int = array("latitude"=>$lat_int, "longitude"=>$lon_int,
@@ -155,11 +157,15 @@ function tileImage($upload_path, $hash, $imageNumber, &$exif_data) {
             $exif_data[$n]["FileDate"] = date('m-d-Y', $timestamp);
             $exif_data[$n]["FileTime"] = date('H:i:s', $timestamp);
             
-            $data = explode(" ", $exif["EXIF"]["DateTimeOriginal"]);
-            
+            if ($exif["EXIF"]["DateTimeOriginal"]) {
+                $data = explode(" ", $exif["EXIF"]["DateTimeOriginal"]);
+            } else {
+                $data = explode(" ", $exif["IFD0"]["DateTime"]);
+            }
+                       
             $exif_data[$n]["Date"] = implode("/", explode(":", $data[0]));
             $exif_data[$n]["Time"] = $data[1];
-            
+          
             $message += readGPSinfoEXIF($exif, $exif_data[$n]);
         }
     }

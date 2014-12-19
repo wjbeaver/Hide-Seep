@@ -1,0 +1,35 @@
+<div>
+<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, orientation:'vert'">
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:4, showLabels:false">
+        <div data-dojo-type="dijit/form/Select" title="" value="Mr" data-dojo-attach-point="honorificNode">
+            <span value="Mr">Mr.</span>					
+            <span value="Mrs">Mrs.</span>					
+            <span value="Miss">Miss</span>					
+            <span value="Ms">Ms.</span>					
+            <span value="Dr">Dr.</span>					
+        </div>
+        <div data-dojo-type="dijit/form/TextBox" value="" data-dojo-attach-point="firstNameNode" class="firstName"></div>
+        <div data-dojo-type="dijit/form/TextBox" value="" data-dojo-attach-point="middleNameNode" class="middleName"></div>
+        <div data-dojo-type="dijit/form/TextBox" value="" data-dojo-attach-point="lastNameNode" class="lastName"></div>
+    </div>
+    <div data-dojo-type="dijit/form/TextBox" title="Email:" value="" data-dojo-attach-point="emailNode"></div>
+     <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
+        <div data-dojo-type="dijit/form/Select" value="" data-dojo-attach-point="nameListNode" data-dojo-props="style: { display: 'block'}">
+                <span value="0">Names</span>
+        </div>
+    </div>
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-attach-point="nameContainerNode" data-dojo-props="cols:3, showLabels:false" class="nameContainer">
+        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
+            <div data-dojo-type="dijit/form/Select" data-dojo-attach-point="newNameListNode" class="dynaList">
+            </div>
+        </div>
+        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false" class="buttons">
+            <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="addNameNode" type="button" role="button" data-dojo-props="style: { display: 'block'}">Add</div>
+            <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="updateNameNode" type="button" role="button" data-dojo-props="style: { display: 'none'}">Update</div>
+        </div>
+        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false" class="buttons">
+            <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="removeNameNode" type="button" role="button">Remove</div>
+        </div>
+    </div>
+</div>
+</div>				

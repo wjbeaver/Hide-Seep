@@ -1,0 +1,32 @@
+<div>
+<div data-dojo-type="dojox.layout.FloatingPane"  data-dojo-attach-point="attributeBarNode"
+   title="A floating pane" data-dojo-props="resizable:false, dockable:false, title:'Annotation', closeable:false"
+   style="position:absolute;top:50;left:50;width:210px;height:500px;visibility:hidden;" class="attributeBar">
+   <div data-dojo-type="dijit/form/Button" class="close" data-dojo-attach-point="attributeCloseNode" type="button" role="button"><img src="/Seep/formSeepApp/images/stock_close.png"></div>
+    <div class="infoBlock">
+       <p><span class="attributesubTitle">Type: </span><span data-dojo-attach-point="TYPENode"></span></p>
+        <p><span class="attributesubTitle">Date Found: </span><span data-dojo-attach-point="dateFoundNode"></span></p>
+        <p><span class="attributesubTitle">Device: </span><span data-dojo-attach-point="deviceNode"></span></p>
+        <p><span class="attributesubTitle">Flow: </span><span data-dojo-attach-point="flowNode"></span></p>
+        <p><span class="attributesubTitle">Condition: </span><span data-dojo-attach-point="conditionNode"></span></p>
+        <p><span class="attributesubTitle">Accuracy: </span><span data-dojo-attach-point="accuracyNode"></span></p>
+        <p><span class="attributesubTitle">Comment: </span><span data-dojo-attach-point="commentNode"></span></p>
+        <p><span class="attributesubTitle">Describe: </span><span data-dojo-attach-point="describeNode"></span></p>
+        <p><span class="attributesubTitle">Discoverer(s): </span><span style="display:block; margin-left: 10px;" data-dojo-attach-point="namesNode"></span></p>
+    </div>
+    <div class="buttons">
+        <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="editNode" type="button" role="button" class="submit">Edit</div>
+        <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="deleteNode" type="button" role="button" class="submit">Delete</div>
+        <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="viewImageNode" type="button" role="button" class="submit">Photos(s)</div>
+        <div style="display:block;" data-dojo-type="dijit/form/Button" data-dojo-attach-point="zoomImageNode" type="button" role="button" class="submit">Photo Zoom In</div>
+        <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="viewVTNode" type="button" role="button" class="submit">Video/Tracks</div>                    
+    </div>
+    <div class="multipleFeature">
+        <span data-dojo-attach-point="viewFeatureNumberNode">x of y</span>
+        <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="viewFirstNode" type="button" role="button" class="first"></div>                    
+        <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="viewPreviousNode" type="button" role="button" class="previous"></div>                    
+        <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="viewNextNode" type="button" role="button" class="next"></div>                    
+        <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="viewLastNode" type="button" role="button" class="last"></div>                    
+    </div>
+</div>
+</div>

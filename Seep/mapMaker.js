@@ -1,6 +1,7 @@
 var map;
 var addSpringFromCoords;
 var editorWidget;
+var springDeleted;
 
 var generateUUID = function () {
 	var d = Date.now();
@@ -54,27 +55,18 @@ var imagePan = function () {
 	dialog_image.imagePan();
 };
 
-        //console.log(location.href.substring(0, location.href.lastIndexOf("/") + 1));
-
-         // addNew
-         // bring up the form editor
-         // add a point to newfoundFeatureLayer
-         // add to the collection
-
-/*         "esri/config",
-
-        "dojo/_base/event", 
-        "dojo/parser", 
-        "dijit/registry",
-
-        "dijit/form/Button"
- */
         require([
             "esri/map",
             "esri/dijit/Scalebar",
             "esri/layers/FeatureLayer",
             "esri/dijit/PopupTemplate",
             "esri/geometry/Point",
+            "esri/geometry/Extent",
+			"esri/tasks/query",
+			"esri/dijit/AttributeInspector",
+			"dojo/dom-construct",
+			"dijit/form/Button",
+			"esri/dijit/InfoWindow",
             "esri/graphic",
             "esri/renderers/SimpleRenderer",
             "esri/renderers/UniqueValueRenderer",
@@ -86,6 +78,7 @@ var imagePan = function () {
             "dojo/parser",
             "dojo/dom",
             'dojo/dom-style',
+            "dojo/dom-class",
             "dojo/_base/lang",
             "dijit/registry",
             "esri/layers/CodedValueDomain",
@@ -103,8 +96,9 @@ var imagePan = function () {
             "dijit/layout/ContentPane",
             "dijit/layout/AccordionContainer",
             "dojox/layout/FloatingPane",
+            'formSeepApp/formSeep/attributeBar',
             "dojox/layout/Dock",
-            "dijit/form/Button",
+            "esri/SpatialReference",
             "dojo/domReady!"
         ],
             function (Map,
@@ -112,6 +106,12 @@ var imagePan = function () {
                 FeatureLayer,
                 PopupTemplate,
                 Point,
+                Extent,
+                Query,
+                AttributeInspector,
+                domConstruct,
+                Button,
+                InfoWindow,
                 Graphic,
                 simpleRenderer,
                 uniqueValueRenderer,
@@ -123,6 +123,7 @@ var imagePan = function () {
                 parser,
                 dom,
                 domStyle,
+                domClass,
                 lang,
                 registry,
 //                Editor,
@@ -137,23 +138,28 @@ var imagePan = function () {
                 InfoTemplate,
 //                FeatureTemplate,
                 Popup,
-                urlUtils) {
+                urlUtils,
+                SpatialReference) {
                 parser.parse();
 
-                
                 map = new Map("map", {
                     basemap: "topo",
                     center: [-111.93, 34.17],
-                    zoom: 7
+                    zoom: 7,
+                    SpatialReference: new SpatialReference({wkid:3857}),
+                    barShow: false
+//                    infoWindow: infoWindow
                 });
+
+                map.infoWindow.resize(300,300);
+                map.infoWindow.set("anchor", "top");
                 
-                map.on("zoom-end", function (evt) {
-                		if (evt.level>=11) {
-                			domStyle.set(dom.byId("zoomedIn"), "display", "block");
-                		} else {
-                			domStyle.set(dom.byId("zoomedIn"), "display", "none");
-                		}
-                });
+                domClass.add(map.infoWindow.domNode, "popSeep");
+                
+                springDeleted = function () {
+                    var bar = dijit.byId('seepAttributes').attributeBarNode;
+                    bar.hide();
+                }
 
                 map.on("layers-add-result", function (evt) {
                     // add the legend, first filter out the layers not needed
@@ -173,12 +179,12 @@ var imagePan = function () {
                                 layer: layer.layer,
                                 title: "Published Springs Boundary"
                             };
-                        } else if (layer.layer.name == "HideAndSeep.DBO.Images" && layer.layer.id==2) {
+                        } else if (layer.layer.name == "Pictures" && layer.layer.id==2) {
                             return {
                                 layer: layer.layer,
                                 title: "Hide & Seep Photos"
                             };
-                        } else if (layer.layer.name == "HideAndSeep.DBO.AnnotatedSprings" && layer.layer.id==1) {
+                        } else if (layer.layer.name == "Annotated Springs" && layer.layer.id==1) {
                             return {
                                 layer: layer.layer,
                                 title: "Hide & Seep Springs"
@@ -212,38 +218,6 @@ var imagePan = function () {
                         return layer.layer;
                     });
                    
-                   console.log(templateLayers);
-
-                   var editToolbar = new Edit(map);
-                   editToolbar.on("deactivate", function(evt) {
-                   		   currentLayer.applyEdits(null, [evt.graphic], null);
-                   });
-                   
-                   arrayUtils.forEach(templateLayers, function(layer) {
-                   		   var editingEnabled = false;
-                   		   layer.on("dbl-click", function(evt) {
-                   		   		   event.stop(evt);
-                   		   		   if (editingEnabled === false) {
-                   		   		   	   editingEnabled = true;
-                   		   		   	   editToolbar.activate(Edit.EDIT_VERTICES , evt.graphic);
-                   		   		   } else {
-                   		   		   	   currentLayer = this;
-                   		   		   	   editToolbar.deactivate();
-                   		   		   	   editingEnabled = false;
-                   		   		   }
-                   		   });
-                   		   
-                   		   layer.on("click", function(evt) {
-                   		   		   event.stop(evt);
-                   		   		   if (evt.ctrlKey === true || evt.metaKey === true) {  //delete feature if ctrl key is depressed
-                   		   		   	   layer.applyEdits(null,null,[evt.graphic]);
-                   		   		   	   currentLayer = this;
-                   		   		   	   editToolbar.deactivate();
-                   		   		   	   editingEnabled=false;
-                   		   		   }
-                   		   });
-                   });
-                   
                    var templatePicker = new TemplatePicker({
                    		   featureLayers: templateLayers,
                    		   rows: "auto",
@@ -258,38 +232,39 @@ var imagePan = function () {
                    
                    var selectedTemplate;
                    templatePicker.on("selection-change", function() {
-                   		   if( templatePicker.getSelected() ) {
+                   		   if ( templatePicker.getSelected() ) {
                    		   	   selectedTemplate = templatePicker.getSelected();
-                   		   }
-                   		   switch (selectedTemplate.featureLayer.geometryType) {
-                   		   case "esriGeometryPoint":
-                   		   	   drawToolbar.activate(Draw.POINT);
-                   		   	   break;
-                    		   }
+                   		   	   
+                               switch (selectedTemplate.featureLayer.geometryType) {
+                                   case "esriGeometryPoint":
+                                       drawToolbar.activate(Draw.POINT);
+                                       break;
+                                   }
+                            } else {
+                                drawToolbar.deactivate();
+                            }
                    });
                    
                    drawToolbar.on("draw-end", function(evt) {
-                   		   drawToolbar.deactivate();
-                   		   editToolbar.deactivate();
-                   		   var newAttributes = lang.mixin({}, selectedTemplate.template.prototype.attributes);
-                   		   
-                   		   layers[0] = addSeepObject(layers[0]);
-    	
-                   		   indx = layers[0].objects.length-1;
-    	
-                   		   layers[0].objects[indx].attributes[0].value = generateUUID();
-    	
-                   		   dialog_seepMain.seepSelected(evt.geometry, newAttributes, selectedTemplate.featureLayer);
-                   		   
-                   		   dialog_seepMain.show();                   		   
+//                   		   drawToolbar.deactivate();
+                            var newAttributes = lang.mixin({}, selectedTemplate.template.prototype.attributes);
+
+                            dialog_seepMain.clearLayers();
+                            
+                            layers[0] = addSeepObject(layers[0]);
+
+                            layers[0].objects[0].attributes[0].value = generateUUID();
+
+                            dialog_seepMain.seepSelected(evt.geometry, newAttributes, selectedTemplate);
+
+                            dialog_seepMain.show();                 		                    		   
                    });
                    
                   domStyle.set(dom.byId("zoomedIn"), "display", "none");
                   
                    on(dom.byId('btnZoom'), 'click', function () {
                    		   	map.setZoom(11);
- //                  		   	domStyle.set(dom.byId("zoomedIn"), "display", "block");
-                   });
+                    });
                    
                    domStyle.set(dom.byId("loading"), "display", "none");
 
@@ -314,7 +289,7 @@ var imagePan = function () {
                         "<b>Land Detail</b>: ${LandDetail}<br><b>Latitude</b>: ${Latitude}<br><b>Longitude</b>: ${Longitude}"),
                     outFields: [
                     "NAME", "ElevM", "County", "LandUnit", "LandDetail", "Latitude", "Longitude"
-                ]
+                    ]
                 });
 
                 urlUtils.addProxyRule({
@@ -322,17 +297,19 @@ var imagePan = function () {
                     proxyUrl: "http://overtexplorations.com/proxy/proxy.php"
                 });
 
-                seepMapLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideAndSeepWB/MapServer/1", {
+                seepMapLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/MapServer/1", {
                     id: '1',
-                    visible: true
+                    editable: true,
+                    visible: true,
+                    outFields: [ "*" ]
                 });
  
-                 seepImagesMapLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideAndSeepWB/MapServer/0", {
+                 seepImagesMapLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/MapServer/0", {
                     id: '2',
                     visible: true
                 });
                  
-                seepFeatureLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideAndSeepWB/FeatureServer/1", {
+                seepFeatureLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/FeatureServer/1", {
                     id: '5',
                     mode: FeatureLayer.MODE_SNAPSHOT,
                     editable: true,
@@ -340,11 +317,68 @@ var imagePan = function () {
                     outFields: [ "*" ]
                 });
                 
-                seepImagesFeatureLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideAndSeepWB/FeatureServer/0", {
+                infoTemplate = new InfoTemplate();
+                infoTemplate.setTitle("${Title}");
+                infoTemplate.setContent("<b>Description</b>: ${Description}<br>" +
+                        '<a href="${IMAGE}" target="_blank"><img src="${IMAGE:small}" /></a><br>' +
+                        "<b>Time Zone</b>: ${TimeZoneName}<br><b>UTC</b>: ${UTC}<br>" + 
+                        "${Altitude:fill}${Orientation:fill}");
+
+                fill = function (value, key, data) {
+                  var results = "";
+                  
+                    switch (key) {
+                        case "Altitude":
+                            if (data.Altitude!=null) {
+                                results = "<b>Altitude</b>: " + data.Altitude + " m.";
+                            }
+                            break;
+                        case "Orientation":
+                            if (data.Orientation!=null) {
+                                results = "<b>Orientation</b>: " + data.Orientation + "&deg;";
+                            }
+                            break;
+                    }
+                  return results;
+                };
+
+                small = function (value, key, data) {
+                  var results = "";
+
+                  var parts = data.IMAGE.split("/");
+                  var num = parts.length-1;
+                  var name = parts[num];
+                  var names = name.split(".");
+                  names[0] = "sized_"+names[0]+"/"+names[0]+"_small";
+                  name = names.join(".");
+                  parts[num] = name;
+                  results = parts.join("/");
+                  
+                  return results;
+                };
+
+                seepImagesFeatureLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/FeatureServer/0", {
                     id: '6',
                     mode: FeatureLayer.MODE_SNAPSHOT,
                     editable: true,
                     visible: true,
+                    infoTemplate: infoTemplate,
+                    outFields: [ "*" ]
+                });
+ 
+                seepNamesFeatureLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/FeatureServer/2", {
+                    id: '7',
+                    mode: FeatureLayer.MODE_SNAPSHOT,
+                    editable: true,
+                    visible: false,
+                    outFields: [ "*" ]
+                });
+ 
+                seepFeatureNameFeatureLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/FeatureServer/3", {
+                    id: '8',
+                    mode: FeatureLayer.MODE_SNAPSHOT,
+                    editable: true,
+                    visible: false,
                     outFields: [ "*" ]
                 });
  
@@ -355,9 +389,9 @@ var imagePan = function () {
                         level: 11
                     }, // Existing Springs and annotated
                     {
-                        min: 4513.98888,
+                        min: 18055.955520,
                         max: 0,
-                        level: 17
+                        level: 15
                     }, // Images
                     {
                         min: 36978596.91,
@@ -387,10 +421,10 @@ var imagePan = function () {
                 /////////////////////////////// Seep ////////////////////////////////
                 
                 seepMapLayer.setMaxScale(layerScales[0].max);
-                seepMapLayer.setMinScale(layerScales[0].min);
+                seepMapLayer.setMinScale(layerScales[2].min);
 
                 seepFeatureLayer.setMaxScale(layerScales[0].max);
-                seepFeatureLayer.setMinScale(layerScales[0].min);
+                seepFeatureLayer.setMinScale(layerScales[2].min);
             	
             	var createSymbol = function(path, color){
             		var markerSymbol = new SimpleMarkerSymbol();
@@ -400,15 +434,18 @@ var imagePan = function () {
             		return markerSymbol;
             	};
                 
-                var iconPaths = [ { name: "unknown", color: "#7B8C1E", path: "M16,1.466C7.973,1.466,1.466,7.973,1.466,16c0,8.027,6.507,14.534,14.534,14.534c8.027,0,14.534-6.507,14.534-14.534C30.534,7.973,24.027,1.466,16,1.466z M17.328,24.371h-2.707v-2.596h2.707V24.371zM17.328,19.003v0.858h-2.707v-1.057c0-3.19,3.63-3.696,3.63-5.963c0-1.034-0.924-1.826-2.134-1.826c-1.254,0-2.354,0.924-2.354,0.924l-1.541-1.915c0,0,1.519-1.584,4.137-1.584c2.487,0,4.796,1.54,4.796,4.136C21.156,16.208,17.328,16.627,17.328,19.003z"},
+                var iconPaths = [ { name: "unknown", color: "#E3485E", path: "M16,1.466C7.973,1.466,1.466,7.973,1.466,16c0,8.027,6.507,14.534,14.534,14.534c8.027,0,14.534-6.507,14.534-14.534C30.534,7.973,24.027,1.466,16,1.466z M17.328,24.371h-2.707v-2.596h2.707V24.371zM17.328,19.003v0.858h-2.707v-1.057c0-3.19,3.63-3.696,3.63-5.963c0-1.034-0.924-1.826-2.134-1.826c-1.254,0-2.354,0.924-2.354,0.924l-1.541-1.915c0,0,1.519-1.584,4.137-1.584c2.487,0,4.796,1.54,4.796,4.136C21.156,16.208,17.328,16.627,17.328,19.003z"},
                 	{ name: "existing", color: "#A3B443", path: "M22.727,18.242L4.792,27.208l8.966-8.966l-4.483-4.484l17.933-8.966l-8.966,8.966L22.727,18.242z"},
-                	{ name: "new", color: "#EDF8AB", path: "M24.485,2c0,8-18,4-18,20c0,6,2,8,2,8h2c0,0-3-2-3-8c0-4,9-8,9-8s-7.981,4.328-7.981,8.436C21.239,24.431,28.288,9.606,24.485,2z"},
-                	{ name: "photo", color: "#A29B40", path: "M15.318,7.677c0.071-0.029,0.148-0.046,0.229-0.046h11.949c-2.533-3.915-6.938-6.506-11.949-6.506c-5.017,0-9.428,2.598-11.959,6.522l4.291,7.431C8.018,11.041,11.274,7.796,15.318,7.677zM28.196,8.84h-8.579c2.165,1.357,3.605,3.763,3.605,6.506c0,1.321-0.334,2.564-0.921,3.649c-0.012,0.071-0.035,0.142-0.073,0.209l-5.973,10.347c7.526-0.368,13.514-6.587,13.514-14.205C29.77,13.002,29.201,10.791,28.196,8.84zM15.547,23.022c-2.761,0-5.181-1.458-6.533-3.646c-0.058-0.046-0.109-0.103-0.149-0.171L2.89,8.855c-1,1.946-1.565,4.153-1.565,6.492c0,7.624,5.999,13.846,13.534,14.205l4.287-7.425C18.073,22.698,16.848,23.022,15.547,23.022zM9.08,15.347c0,1.788,0.723,3.401,1.894,4.573c1.172,1.172,2.785,1.895,4.573,1.895c1.788,0,3.401-0.723,4.573-1.895s1.895-2.785,1.895-4.573c0-1.788-0.723-3.4-1.895-4.573c-1.172-1.171-2.785-1.894-4.573-1.894c-1.788,0-3.401,0.723-4.573,1.894C9.803,11.946,9.081,13.559,9.08,15.347z"},
+                	{ name: "new", color: "#526199", path: "M24.485,2c0,8-18,4-18,20c0,6,2,8,2,8h2c0,0-3-2-3-8c0-4,9-8,9-8s-7.981,4.328-7.981,8.436C21.239,24.431,28.288,9.606,24.485,2z"},
+                	{ name: "photo", color: "#725f2d", path: "M15.318,7.677c0.071-0.029,0.148-0.046,0.229-0.046h11.949c-2.533-3.915-6.938-6.506-11.949-6.506c-5.017,0-9.428,2.598-11.959,6.522l4.291,7.431C8.018,11.041,11.274,7.796,15.318,7.677zM28.196,8.84h-8.579c2.165,1.357,3.605,3.763,3.605,6.506c0,1.321-0.334,2.564-0.921,3.649c-0.012,0.071-0.035,0.142-0.073,0.209l-5.973,10.347c7.526-0.368,13.514-6.587,13.514-14.205C29.77,13.002,29.201,10.791,28.196,8.84zM15.547,23.022c-2.761,0-5.181-1.458-6.533-3.646c-0.058-0.046-0.109-0.103-0.149-0.171L2.89,8.855c-1,1.946-1.565,4.153-1.565,6.492c0,7.624,5.999,13.846,13.534,14.205l4.287-7.425C18.073,22.698,16.848,23.022,15.547,23.022zM9.08,15.347c0,1.788,0.723,3.401,1.894,4.573c1.172,1.172,2.785,1.895,4.573,1.895c1.788,0,3.401-0.723,4.573-1.895s1.895-2.785,1.895-4.573c0-1.788-0.723-3.4-1.895-4.573c-1.172-1.171-2.785-1.894-4.573-1.894c-1.788,0-3.401,0.723-4.573,1.894C9.803,11.946,9.081,13.559,9.08,15.347z"},
+//                	{ name: "photo", color: "#725f2d", path: "m 210.40419,182.70238 c 0,0 -0.36019,0.0247 0,0 4.74532,-0.32606 11.40999,5.61044 11.40999,5.61044 -2.533,-3.915 -6.938,-6.506 -11.949,-6.506 -5.017,0 -9.428,2.598 -11.959,6.522 l 1.44432,0.78646 c 0.5818,-2.22837 2.95339,-3.94115 4.91107,-4.89501 1.95768,-0.95386 4.12062,-1.45839 6.14262,-1.51789 z m 12.10999,6.81944 -2.1274,0.245 c 2.165,1.357 2.46167,4.49799 2.46167,7.24099 0,1.321 -1.04857,6.38187 -3.7793,8.52852 0,0 0.29676,-0.37852 0,0 -0.29676,0.37853 -2.37196,2.13622 -3.82448,2.92987 -1.39491,0.76217 -4.69562,1.7956 -4.69562,1.7956 7.19934,-0.77633 13.5385,-6.61599 13.5385,-14.23399 0.001,-2.344 -0.568,-4.555 -1.573,-6.506 z m -23.3066,14.45383 -0.0438,0.0438 c -4.22956,-4.62845 -3.33377,-10.65257 -1.93748,-14.19116 -0.14798,-1.0839 -1.58314,3.86155 -1.58314,6.20055 0,7.624 5.999,13.846 13.534,14.205 l 1.0523,-0.97063 c -5.16142,0.26512 -9.41497,-3.05951 -11.0219,-5.28754 z m 4.1906,-7.94683 c 0,1.788 0.723,3.401 1.894,4.573 1.172,1.172 2.785,1.895 4.573,1.895 1.788,0 3.401,-0.723 4.573,-1.895 1.172,-1.172 1.895,-2.785 1.895,-4.573 0,-1.788 -0.723,-3.4 -1.895,-4.573 -1.172,-1.171 -2.785,-1.894 -4.573,-1.894 -1.788,0 -3.401,0.723 -4.573,1.894 -1.171,1.172 -1.893,2.785 -1.894,4.573 z"},
                 	{ name: "video", color: "#A27B40", path: "M27.188,4.875v1.094h-4.5V4.875H8.062v1.094h-4.5V4.875h-1v21.25h1v-1.094h4.5v1.094h14.625v-1.094h4.5v1.094h1.25V4.875H27.188zM8.062,23.719h-4.5v-3.125h4.5V23.719zM8.062,19.281h-4.5v-3.125h4.5V19.281zM8.062,14.844h-4.5v-3.125h4.5V14.844zM8.062,10.406h-4.5V7.281h4.5V10.406zM11.247,20.59V9.754l9.382,5.418L11.247,20.59zM27.188,23.719h-4.5v-3.125h4.5V23.719zM27.188,19.281h-4.5v-3.125h4.5V19.281zM27.188,14.844h-4.5v-3.125h4.5V14.844zM27.188,10.406h-4.5V7.281h4.5V10.406z"},
                 	{ name: "arrow", color: "#000000", path: "M8.5454545,55.090909C31.090909,11.454545,31.272727,3.6363637,31.272727,3.6363637,36.07112,20.391033,41.302739,36.712034,50.909091,54.909091,37.171372,38.60001,36.666666,37.393939,30,30.727272,22.727272,37.636363,22.478498,39.491067,8.5454545,55.090909z"}
                 ];
                 
-                var uniqueRenderer = new uniqueValueRenderer(null, "TYPE");
+                uniqueSpringsRenderer = new uniqueValueRenderer(null, "TYPE");
+                uniqueSpringsRendererSmall = new uniqueValueRenderer(null, "TYPE");
+                var uniqueImageRenderer = new uniqueValueRenderer(null, "TYPE");
                 
                 arrayUtils.forEach(iconPaths, function(iconPath) {
                 	var symbol = createSymbol(iconPath.path, iconPath.color);
@@ -419,33 +456,39 @@ var imagePan = function () {
                 	
                 	switch (iconPath.name) {
                 		case "photo":
-                			renderer = new simpleRenderer(symbol);
-                			seepImagesMapLayer.setRenderer(renderer);
-                			seepImagesFeatureLayer.setRenderer(renderer);
+                			uniqueImageRenderer.addValue({
+                					value: 0,
+                					symbol: symbol,
+                					label: "No Orientation"
+                			});
                 			break;
                 		case "arrow":
-                			// do nothing yet
+                			uniqueImageRenderer.addValue({
+                					value: 1,
+                					symbol: symbol,
+                					label: "Orientation"
+                			});
                 			break;
                 		case "video":
                 			// do nothing yet
                 			break;
                 		// seep features
                 		case "unknown":
-                			uniqueRenderer.addValue({
+                			uniqueSpringsRenderer.addValue({
                 					value: 0,
                 					symbol: symbol,
                 					label: "Unknown"
                 			});
                 			break
                 		case "existing":
-                 			uniqueRenderer.addValue({
+                 			uniqueSpringsRenderer.addValue({
                 					value: 1,
                 					symbol: symbol,
                 					label: "Existing"
                 			});
                 			break
                 		case "new":
-                			uniqueRenderer.addValue({
+                			uniqueSpringsRenderer.addValue({
                 					value: 2,
                 					symbol: symbol,
                 					label: "New"
@@ -454,10 +497,45 @@ var imagePan = function () {
                 	}
             	});
             	
-            	seepMapLayer.setRenderer(uniqueRenderer);
-            	seepFeatureLayer.setRenderer(uniqueRenderer);
+                arrayUtils.forEach(iconPaths, function(iconPath) {
+                	var symbol = createSymbol(iconPath.path, iconPath.color);
+                	
+                	var renderer = null;
+                	
+                	switch (iconPath.name) {
+                		// seep features
+                		case "unknown":
+                			uniqueSpringsRendererSmall.addValue({
+                					value: 0,
+                					symbol: symbol,
+                					label: "Unknown"
+                			});
+                			break
+                		case "existing":
+                 			uniqueSpringsRendererSmall.addValue({
+                					value: 1,
+                					symbol: symbol,
+                					label: "Existing"
+                			});
+                			break
+                		case "new":
+                			uniqueSpringsRendererSmall.addValue({
+                					value: 2,
+                					symbol: symbol,
+                					label: "New"
+                			});
+                			break
+                	}
+            	});
 
-                map.addLayers([seepFeatureLayer, seepBoundaryMapLayer, seepExistingSpringsLayer, seepMapLayer, seepImagesMapLayer, seepImagesFeatureLayer]);
+            	seepMapLayer.setRenderer(uniqueSpringsRenderer);
+            	seepFeatureLayer.setRenderer(uniqueSpringsRenderer);
+                seepImagesMapLayer.setRenderer(uniqueImageRenderer);
+                seepImagesFeatureLayer.setRenderer(uniqueImageRenderer);
+
+                map.addLayers([seepBoundaryMapLayer, seepFeatureLayer, seepImagesMapLayer, seepImagesFeatureLayer, seepMapLayer, 
+                    seepNamesFeatureLayer, seepFeatureNameFeatureLayer, 
+                    seepExistingSpringsLayer]);
 
                 // scalebar
                 var scalebar = new Scalebar({
@@ -470,5 +548,70 @@ var imagePan = function () {
 
                 // north arrow
                 dojo.byId("north").innerHTML = "<img id='img' src='images/north-arrow.gif' />";
-                 
+               
+                map.on("zoom-end", lang.hitch(this, function (evt) {
+                    var mapLayer = map.getLayer("1");
+                    var featureLayer = map.getLayer("5");
+                    
+                    if (evt.level>=15) {
+                        mapLayer.setRenderer(uniqueSpringsRendererSmall);
+                        featureLayer.setRenderer(uniqueSpringsRendererSmall);
+                    } else {
+                        mapLayer.setRenderer(uniqueSpringsRenderer);
+                        featureLayer.setRenderer(uniqueSpringsRenderer);
+                    }
+                    
+                    if (evt.level>=11) {
+                        domStyle.set(dom.byId("zoomedIn"), "display", "block");
+                    } else {
+                        domStyle.set(dom.byId("zoomedIn"), "display", "none");
+                    }
+                }));
+                
+ 				var selectQuery = new Query();
+				
+               map.on("click", function (evt) {
+                    var centerPoint = new Point(evt.mapPoint.x,evt.mapPoint.y,evt.mapPoint.spatialReference);
+                    var mapWidth = this.extent.getWidth();
+
+                    //Divide width in map units by width in pixels
+                    var pixelWidth = mapWidth/this.width;
+
+                    //Calculate a 50 pixel envelope width (25 pixel tolerance on each side)
+                    var tolerance = 50 * pixelWidth;
+
+                    //Build tolerance envelope and set it as the query geometry
+                    var queryExtent = new Extent(1,1,tolerance,tolerance,evt.mapPoint.spatialReference);
+                    selectQuery.geometry = queryExtent.centerAt(centerPoint);
+                    var updateFeature;
+
+                    seepFeatureLayer.selectFeatures(selectQuery, FeatureLayer.SELECTION_NEW, function(features) {
+                        var bar = dijit.byId('seepAttributes').attributeBarNode;
+                        if (features.length > 0) {
+                            if (!map.barShow) {
+                                // center and maybe select
+                                map.centerAt(centerPoint);
+
+                                //store the current feature
+                                updateFeature = features[0];
+                                dijit.byId('seepAttributes').setID(features);
+                                map.barShow = true;
+                                bar.show();
+                            }
+                        } else {
+                            bar.hide();
+                            map.barShow = false;
+                        }
+                    });
+
+                    if (map.getZoom()>=15) {
+                        seepImagesFeatureLayer.selectFeatures(selectQuery, FeatureLayer.SELECTION_NEW, function(features) {
+                            if (features.length > 0) {
+                                // display the photos with attributes
+                                map.infoWindow.setFeatures(features);
+                                map.infoWindow.show(evt.screenPoint);
+                            }
+                        });
+                    }					
+                });
 });

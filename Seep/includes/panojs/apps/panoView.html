@@ -33,17 +33,17 @@ body {
 
 var xOffset = 0;
 var yoffset = 0;
+var viewer1 = null;
 
 PanoJS.MSG_BEYOND_MIN_ZOOM = null;
 PanoJS.MSG_BEYOND_MAX_ZOOM = null;
-var viewer1 = null;
 
 var pageParameters = Ext.urlDecode(window.location.search.substring(1));
 
 var url = "/Seep/data/images/" + pageParameters.UPLOADID + "/tiles_" + pageParameters.IMAGEID;
 
 function createViewer( viewer, dom_id, url, prefix, w, h ) {
-    if (viewer) return;
+    if (viewer) return viewer;
   
     var MY_URL      = url;
     var MY_PREFIX   = prefix;
@@ -69,11 +69,13 @@ function createViewer( viewer, dom_id, url, prefix, w, h ) {
 
     Ext.EventManager.addListener( window, 'resize', callback(viewer, viewer.resize) );
     viewer.init();
+    
+    return viewer;
 };
 
 
 function initViewer() {
-  createViewer( viewer1, 'viewer1', url,'tiles_', pageParameters.width,  pageParameters.height );
+  viewer1 = createViewer( viewer1, 'viewer1', url,'tiles_', pageParameters.width,  pageParameters.height );
 }
   
 Ext.onReady(initViewer);

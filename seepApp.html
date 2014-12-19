@@ -8,6 +8,7 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
     <title>Hide & Seep</title>
 
+    <link rel="stylesheet" href="css/seepApp.css">
     <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/dojo/dijit/themes/claro/claro.css">
     <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/esri/css/esri.css">
     <link rel="stylesheet" href="dojo/1.9.3/dojox/form/resources/UploaderFileList.css" />
@@ -16,7 +17,6 @@
     <link rel="stylesheet" href="dojo/1.9.3/dojox/widget/ColorPicker/ColorPicker.css" />
      <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/esri/css/esri.css">
     <link rel="stylesheet" href="Seep/formSeepApp/theme/formSeep.css">
-    <link rel="stylesheet" href="css/seepApp.css">
     <script>
         // Configure application.
         appConfig = {
@@ -48,7 +48,6 @@
     <script src="Seep/mapMaker.js"></script>
     <script src="/Seep/includes/fabric/dist/fabric.min.js"></script>
     <script src="http://crypto-js.googlecode.com/svn/tags/3.0.2/build/rollups/md5.js"></script>
-
 </head>
 
 <body class="claro">
@@ -64,6 +63,7 @@
 	</div>
     <div id="content" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline', gutters:true" style="width: 100%; height: 100%; margin: 0;">
         <div id="centerPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'" style="overflow:hidden;">
+			<div data-dojo-type="attributeBar" id="seepAttributes"></div>
             <div data-dojo-type="dojox/layout/FloatingPane" id="floatingPane" title="Menu" style="width:300px;" data-dojo-props="resizable:true, dockable:true, title:'Menu', closable:false">
                 <div data-dojo-type="dijit/layout/AccordionContainer" id="AC">
                     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title:'Hide & Seep', selected:true" id="AC1">
@@ -72,7 +72,7 @@
                             <button style="margin-left:10px;" id="btnStart" data-dojo-type="dijit/form/Button" type="button" role="button">Coordinates</button>
                             <p>Or use the map:<br><button id="btnZoom" data-dojo-type="dijit/form/Button" type="button" role="button">Zoom</button> in to see published springs and annotate new/existing springs.</p>
                             <div id="zoomedIn">
-                            	<p>To add a spring select a type below and add to the map. Select again to turn off.</p>
+                            	<p>To add a spring select a type below and add to the map. Select again to turn off. When selecting an existing spring, click the existing spring twice.</p>
                             	<div id="templatePickerDiv"></div>
                             </div>
                         </div>
@@ -119,3 +119,5 @@
             <span id="north" style="position:absolute; right:150px; top:10px; color:#000; z-index:50;"></span>
         </div>
     </div>
+    </body>
+    </html>

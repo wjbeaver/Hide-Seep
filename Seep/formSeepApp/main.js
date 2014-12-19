@@ -6,6 +6,7 @@ var dialog_seepMain;
 var dialog_video;
 var dialog_trackSubmit;
 var dialog_track;
+var map_open_layers;
 var requestGoogle;
 var currentWidget;
 var admin = false;
@@ -22,12 +23,18 @@ dojo.declare("layer.seep",null,{
 	}
 });
 
-dojo.declare("layer.object",null,{
-	coordinates: {
+dojo.declare("layer.coordinates", null, {
 		latitude: 0,
 		latNode: "",
 		longitude: 0,
-		longNode: ""
+		longNode: "",
+	    constructor: function(args) {
+		    dojo.safeMixin(this,args);
+	    }
+	});
+
+dojo.declare("layer.object",null,{
+	coordinates: {
 	},
 	attributes: [
 	],
@@ -48,7 +55,7 @@ dojo.declare("layer.attribute",null,{
 });
 
 dojo.declare("layer.attributesSeep", null, {
-		EstimatedFlow: null,
+		EstimatedFlow: null, // remove
 		UPLOADID_PK: null,
 		DateFound: null,
 		Device: null,
@@ -62,6 +69,55 @@ dojo.declare("layer.attributesSeep", null, {
 });
 
 dojo.declare("layer.attributesImage", null, {
+        Title: null,
+        IMAGEID_PK: null,
+        SPRINGID_FK: null,
+        TimeZoneName: null,
+        UPLOADID_FK: null,
+        Description: null,
+        UTC: null,
+        Altitude: null,
+        IMAGE: null,
+        TYPE: 0,
+        Orientation: null
+});
+
+dojo.declare("layer.attributesName", null, {
+        Honorific: "Mr",
+        MiddleName: null,
+        NAMEID_PK: null,
+        FirstName: null,
+        LastName: null,
+        Email: null
+});
+
+dojo.declare("layer.attributesFeatureName", null, {
+        NAMEID_FK: null,
+        UPLOADID_FK: null,
+        FEATUREID_TYPE: null
+});
+
+dojo.declare("layer.attributesVideo", null, {
+			videoid_pk : null,
+			uploadid_fk: null,
+			timezone: null,
+			utc: null,
+			type: 0,
+			title: null,
+			url: null,
+			trackid_fk: null,
+			description: null
+});
+
+dojo.declare("layer.attributesTrack", null, {
+			trackid_pk: null,
+			uploadid_fk: null,
+			type: 0,
+			title: null,
+			track: null,
+			description: null,
+			latitude: null,
+			longitude: null
 });
 
 var seepLayer = new layer.seep({
@@ -88,44 +144,112 @@ var imageLayer = new layer.seep({
 	objects: []
 });
 
-var photographerLayer = new layer.seep({
-	name: "photographerLayer",
-	type: "table",
-	objects: []
-});
-
 var videoLayer = new layer.seep({
 	name: "videoLayer",
 	type: "point",
 	objects: []
 });
 
-var videographerLayer = new layer.seep({
-	name: "videographerLayer",
-	type: "table",
+var trackLayer = new layer.seep({
+	name: "trackLayer",
+	type: "mixed",
 	objects: []
 });
 
-var trackPointLayer = new layer.seep({
-	name: "trackPointLayer",
-	type: "point",
-	objects: []
-});
+layers = [seepLayer, nameLayer, nameFeatureLayer, imageLayer, videoLayer, trackLayer];
 
-var trackLineLayer = new layer.seep({
-	name: "trackLineLayer",
-	type: "line",
-	objects: []
-});
+var addTrackObject = function(trackLayer) {
+	trackLayer.objects[trackLayer.objects.length] = new layer.object({
+	coordinates: new layer.coordinates(),
+	attributes: [
+		new layer.attribute({
+			name: "TRACKID_PK",
+			label: "TRACKID"
+		}),
+		new layer.attribute({
+			name: "UPLOADID_FK",
+			label: "UPLOADID"
+		}),
+		new layer.attribute({
+			name: "TYPE",
+			label: "Track Type"
+		}),
+		new layer.attribute({
+			name: "title",
+			label: "Title"
+		}),
+		new layer.attribute({
+			name: "track",
+			label: "Track"
+		}),
+		new layer.attribute({
+			name: "description",
+			label: "Description"
+		})
+	]});
+	
+	return trackLayer;
+}
 
-var trackTableLayer = new layer.seep({
-	name: "trackTableLayer",
-	type: "table",
-	objects: []
-});
+/*
+	TYPE
+	1 - Walk around
+	2 - Trail
+	3 - Other
+*/
 
-layers = [seepLayer, nameLayer, nameFeatureLayer, imageLayer, photographerLayer, videoLayer, videographerLayer, trackPointLayer, trackLineLayer, trackTableLayer];
+var addVideoObject = function(videoLayer) {
+	videoLayer.objects[videoLayer.objects.length] = new layer.object({
+	coordinates: new layer.coordinates(),
+	attributes: [
+		new layer.attribute({
+			name: "VIDEOID_PK",
+			label: "VIDEOID"
+		}),
+		new layer.attribute({
+			name: "UPLOADID_FK",
+			label: "UPLOADID"
+		}),
+		new layer.attribute({
+			name: "timeZone",
+			label: "Time Zone"
+		}),
+		new layer.attribute({
+			name: "UTC",
+			label: "UTC"
+		}),
+		new layer.attribute({
+			name: "TYPE",
+			label: "Video Type"
+		}),
+		new layer.attribute({
+			name: "title",
+			label: "Title"
+		}),
+		new layer.attribute({
+			name: "url",
+			label: "Url"
+		}),
+		new layer.attribute({
+			name: "TRACKID_FK",
+			label: "TRACKID"
+		}),
+		new layer.attribute({
+			name: "description",
+			label: "Description"
+		})
+	]});
+	
+	return videoLayer;
+}
 
+/*
+	TYPE
+	1 - Pan around
+	2 - Walk around
+	3 - Trail
+	4 - Other
+*/
 
 var addNameObject = function(nameLayer) {
 	nameLayer.objects[nameLayer.objects.length] = new layer.object({
@@ -167,7 +291,7 @@ var addNameFeatureObject = function(nameFeatureLayer) {
 			label: "NAMEID"
 		}),
 		new layer.attribute({
-			name: "FEATUREID_FK",
+			name: "UPLOADID_FK",
 			label: "FEATUREID"
 		}),
 		new layer.attribute({
@@ -184,11 +308,11 @@ var addNameFeatureObject = function(nameFeatureLayer) {
 	0 - Seep
 	1 - Image
 	2 - Video
-	3 - Track
 */
 
 var addImageObject = function(imageLayer) {
 	imageLayer.objects[imageLayer.objects.length] = new layer.object({
+	coordinates: new layer.coordinates(),
 	attributes: [
 		new layer.attribute({
 			name: "IMAGEID_PK",
@@ -237,6 +361,7 @@ var addImageObject = function(imageLayer) {
 
 var addSeepObject = function(seepLayer) {
 	seepLayer.objects[seepLayer.objects.length] = new layer.object({
+	coordinates: new layer.coordinates(),
 	attributes: [
 		new layer.attribute({
 			name: "UPLOADID_PK",
@@ -343,7 +468,11 @@ define([
      * Create seepForm dialog.
      */
     app.seepForm = function (options) {
-        require(['formSeepApp/formSeep/formSeep', 'formSeepApp/formSeep/formSeep01', 'formSeepApp/formSeep/formSeep02', 'formSeepApp/formSeep/formSeep03', 'formSeepApp/formSeep/formSeep04', 'formSeepApp/formSeep/formSeep05', 'formSeepApp/formSeep/formSeep06', 'formSeepApp/formSeep/formSeep07'], function (Dialog, Dialog_image_loader, Dialog_image, Dialog_imagePan, Dialog_seepMain, Dialog_video, Dialog_trackSubmit, Dialog_track) {
+        require(['formSeepApp/formSeep/formSeep', 'formSeepApp/formSeep/formSeep01', 'formSeepApp/formSeep/formSeep02', 
+                'formSeepApp/formSeep/formSeep03', 'formSeepApp/formSeep/formSeep04', 'formSeepApp/formSeep/formSeep05', 
+                'formSeepApp/formSeep/formSeep06', 'formSeepApp/formSeep/formSeep07', 'formSeepApp/formSeep/mapOpenLayers'], 
+        function (Dialog, Dialog_image_loader, Dialog_image, Dialog_imagePan, Dialog_seepMain, Dialog_video, 
+                Dialog_trackSubmit, Dialog_track, mapOpenLayers) {
             if (typeof dialog === "undefined") {
                options.closable = true;
                dialog = new Dialog(options);
@@ -351,6 +480,7 @@ define([
 
             if (typeof dialog_seepMain === "undefined") {
                options.closable = true;
+               
                 dialog_seepMain = new Dialog_seepMain(options);
             }
 
@@ -383,7 +513,12 @@ define([
                options.closable = false;
                 dialog_track = new Dialog_track(options);
             } 
-        });
+
+            if (typeof map_open_layers === "undefined") {
+                options.closable = true;
+                map_open_layers = new mapOpenLayers(options);
+            } 
+       });
     };
 
     /**
@@ -404,11 +539,11 @@ define([
      * Button click action.
      */
     app.onButtonClick = function () {
+        dialog_seepMain.clearLayers();
+                            
     	layers[0] = addSeepObject(layers[0]);
     	
-    	indx = layers[0].objects.length-1;
-    	
-    	layers[0].objects[indx].attributes[0].value = generateUUID();
+    	layers[0].objects[0].attributes[0].value = generateUUID();
     	
     	dialog.setID();
         dialog.show();

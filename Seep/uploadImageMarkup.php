@@ -7,26 +7,47 @@
 	
 	$parsed = json_decode($markup);
 	
-	$source = $parsed->objects[0]->source;
+	$indx = count($parsed->objects);
+	$indx--;
 	
-	$imageCount = $parsed->objects[0]->image_count;
+	$uploadID = $parsed->objects[$indx]->UPLOADID;
 	
-	$markupCount = $parsed->objects[0]->markup_count;
+	$imageID = $parsed->objects[$indx]->IMAGEID;
 	
-	$datadir .= $source."/";
+	$markupCount = $parsed->objects[$indx]->markup_count;
 	
-	$markup_path = $datadir."/markup_".$imageCount;
+	$datadir .= $uploadID."/";
+	
+	$markup_path = $datadir."/markup_".$imageID;
 	
 	// check to see if exists
 	if (!file_exists ( $markup_path )) {
 		mkdir($markup_path, 0775);
+    }
+    
+    $count = 0;
+    foreach (scandir($markup_path) as $file) {
+        if ('.' === $file) continue;
+        if ('..' === $file) continue;
+
+        $temp = explode("_", $file);
+        $num = explode(".", $temp[1]);
+        if (intVal($num[0])>$count) {
+            $count = intVal($num[0]);
         }
+    } 
+    
+    if ($count>$markupCount) {
+        $markupCount += $count-$markupCount;
+    }   
+    
+    $parsed->objects[$indx]->markup_count = $markupCount;
         
-        if (!file_put_contents($markup_path."/markup_".$markupCount.".txt")) {
-        	$response->response = "Save Failed!";
-        } else {
-        	$response->response = "Saved!";
-        }
+    if (!file_put_contents($markup_path."/markup_".$markupCount.".txt", json_encode($parsed))) {
+        $response->response = "Save Failed!";
+    } else {
+        $response->response = "Saved!";
+    }
 	
 	echo json_encode($response);
 ?>

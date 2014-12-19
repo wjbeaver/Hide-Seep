@@ -30,23 +30,18 @@ define([
         templateString: template,
 
         setID: function () {
-        	// get nodes
-        	indx = layers[0].objects.length-1;
-        	
-        	layers[0].objects[indx].attributes[0].node = this.UPLOADIDNode;
-         	layers[0].objects[indx].coordinates.latNode = this.latitudeNode;
-        	layers[0].objects[indx].coordinates.longNode = this.longitudeNode;
-        	layers[0].objects[indx].attributes[2].node = this.deviceNode;
+        	layers[0].objects[0].attributes[0].node = this.UPLOADIDNode;
+         	layers[0].objects[0].coordinates.latNode = this.latitudeNode;
+        	layers[0].objects[0].coordinates.longNode = this.longitudeNode;
+        	layers[0].objects[0].attributes[2].node = this.deviceNode;
         	
         	// set ID
-        	layers[0].objects[indx].attributes[0].node.set("value", layers[0].objects[indx].attributes[0].value);
+        	layers[0].objects[0].attributes[0].node.set("value", layers[0].objects[0].attributes[0].value);
 
         },
         
         cleanup: function() {
-                indx = layers[0].objects.length-1;
-        	
-        	layers[0].objects[indx] = null;
+        	layers[0].objects = [];
         	
         	this.hide();
         },
@@ -63,15 +58,11 @@ define([
                 if (!this.seepForm.validate()) {
                     console.log("onSubmit false");
                 } else {
-                    console.log("onSubmit true");
-
                     // collect attributes and open main form
-                    indx = layers[0].objects.length-1;
-        	
-                    layers[0].objects[indx].coordinates.latitude = layers[0].objects[indx].coordinates.latNode.get("value");
-                    layers[0].objects[indx].coordinates.longitude = layers[0].objects[indx].coordinates.longNode.get("value");
-                    layers[0].objects[indx].attributes[2].valueLabel = layers[0].objects[indx].attributes[2].node.get("label");
-                    layers[0].objects[indx].attributes[2].value = layers[0].objects[indx].attributes[2].node.get("value");
+                    layers[0].objects[0].coordinates.latitude = layers[0].objects[0].coordinates.latNode.get("value");
+                    layers[0].objects[0].coordinates.longitude = layers[0].objects[0].coordinates.longNode.get("value");
+                    layers[0].objects[0].attributes[2].valueLabel = layers[0].objects[0].attributes[2].node.get("label");
+                    layers[0].objects[0].attributes[2].value = layers[0].objects[0].attributes[2].node.get("value");
                     
                     dialog_seepMain.setID();
                     

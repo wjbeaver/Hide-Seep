@@ -1,16 +1,26 @@
 <div class="dijitDialog appConfirmDialog" role="dialog" aria-labelledby="${id}_title">
     <div data-dojo-attach-point="titleBar" class="dijitDialogTitleBar">
         <span data-dojo-attach-point="titleNode" class="dijitDialogTitle" id="${id}_title" role="heading" level="1"></span>
-        <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: onCancel" title="${buttonCancel}" role="button" tabindex="0">
+        <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: cleanup" title="${buttonCancel}" role="button" tabindex="0">
             <span data-dojo-attach-point="closeText" class="closeText" title="${buttonCancel}">x</span>
         </span>
     </div>
     <div class="dijitDialogPaneContent">
  	<div id="bd-wrapper" ng-controller="CanvasControls">
-    		<iframe data-dojo-attach-point="viewerFrameNode" id="viewerFrame" class="viewerFrame" src=""></iframe>
+    	<iframe data-dojo-attach-point="viewerFrameNode" id="viewerFrame" class="viewerFrame" src=""></iframe>
 		<div class="drawing-block">
+            <div class="editing-block" id="editing-block">
+                <div>
+                    <div data-dojo-type="dijit/form/Select" name="" title="" value="0" data-dojo-attach-point="annotationListNode">
+                        <span value=0">Annotations</span>
+                    </div>
+                    <div id="editing-mode" data-dojo-type="dijit/form/Button" data-dojo-attach-point="editModeNode" type="button" role="button">View/Edit annotation</div>
+                    <div id="deleting-mode" data-dojo-type="dijit/form/Button" data-dojo-attach-point="deleteModeNode" type="button" role="button">Delete annotation</div>
+                </div>
+                <span id="editing-result" class="status" data-dojo-attach-point="editingResultNode"></span>
+            </div>
 			<div id="instructions" data-dojo-attach-point="instructionsNode">For best results zoom to full screen and minimize the reference window.</div>
-			<div id="drawing-mode" data-dojo-type="dijit/form/Button" data-dojo-attach-point="annotationModeNode" type="button" role="button">Enter annotation mode</div>
+			<div id="drawing-mode" data-dojo-type="dijit/form/Button" data-dojo-attach-point="annotationModeNode" type="button" role="button">Add annotation</div>
 	
 			<div id="drawing-mode-options" data-dojo-attach-point="annotationNode">
 				<div id="clear-canvas" class="btn" data-dojo-type="dijit/form/Button" data-dojo-attach-point="clearNode" type="button" role="button">Clear</div>
@@ -31,7 +41,11 @@
 					<div data-dojo-type="dojox/widget/ColorPicker" value="#000000" data-dojo-attach-point="colorPickerNode"></div>
 				</div>
 				<br>
-				
+				<br>		
+				<span class="option-label">Title:</span>
+				<div data-dojo-type="dijit/form/TextBox" data-dojo-attach-point="titleNode" value="" id="drawing-title"></div>
+				<br>
+				<br>				
 				<span class="option-label">Comment:</span>
 				<div data-dojo-type="dijit/form/Textarea" title="Comment: " data-dojo-attach-point="commentNode" name="comment" value="" id="drawing-comment" class="textarea" rows="2" wrap="hard"></div>
 				<br><br>

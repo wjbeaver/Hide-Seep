@@ -1,30 +1,46 @@
 <div class="dijitDialog appConfirmDialog" role="dialog" aria-labelledby="${id}_title">
     <div data-dojo-attach-point="titleBar" class="dijitDialogTitleBar">
         <span data-dojo-attach-point="titleNode" class="dijitDialogTitle" id="${id}_title" role="heading" level="1">Photo </span><span data-dojo-attach-point="imageNumberNode" class="dijitDialogTitle">#</span>
-        <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: onCancel" title="${buttonCancel}" role="button" tabindex="0">
-        </span>
+        <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: onCancel" title="${buttonCancel}" role="button" tabindex="0"></span>
+        <div data-dojo-type="dojox/layout/TableContainer" class="close2" data-dojo-props="cols:1, showLabels:false" id="imageViewClose">
+            <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="imageViewCloseNode" type="button" role="button"><img src="/Seep/formSeepApp/images/stock_close.png"></div>
+        </div>
     </div>
     <div class="dijitDialogPaneContent">
         <div data-dojo-attach-point="containerNode">
             <div data-dojo-attach-point="seepFormImage" data-dojo-type="dijit/form/Form" id="sForm_image">
                 <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
-                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, orientation:'vert'">
-                        <div data-dojo-attach-point="imageClickNode" class="status" title="View and annotate full photo">
-                                <a href="javascript:void(0)" onclick="imagePan();"><img class="image" src="" width="200" height="300" data-dojo-attach-point="imageNode"></a>
-                             <p>Click to view and annotate full photo</p>
-                      </div>
-                     	<div data-dojo-type="dijit/form/TextBox" name="title" value="" title="Title:" data-dojo-attach-point="titleImageNode" class="title" id="title"></div>
+                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, showLabels:false" id="photoList">
+                        <div data-dojo-type="dijit/form/Select" name="" title="" value="0" data-dojo-attach-point="photoListNode">
+                            <span value=0">Photos</span>
+                        </div>
+                        <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="seepDeleteImage" type="button" role="button">Delete Selected</div>
+                    </div>
+                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2">
+                        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
+                            <div data-dojo-attach-point="imageClickNode" class="status" title="View and annotate full photo">
+                                    <a href="javascript:void(0)" onclick="imagePan();"><img class="image" src="" data-dojo-attach-point="imageNode"></a>
+                                 <p>Click to view and annotate full photo</p>
+                            </div>
+                        </div>
+                        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, orientation:'vert'">
+                    	     <div data-dojo-type="dijit/form/TextBox" name="title" value="" title="Title:" data-dojo-attach-point="titleImageNode" class="title" id="title"></div>
+                             <div data-dojo-type="dijit/form/Textarea" title="Description:" data-dojo-attach-point="descriptionImageNode" name="description" value="" class="textarea"></div>
+                        </div>
                    </div>
-                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, showLabels:true" class="nameBox">
+                    <div data-dojo-type="dojox/layout/TableContainer" class="nameBox" data-dojo-props="cols:2, showLabels:true" id="imageTaken">
                         <div title="Date Taken:" data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
-                            <div data-dojo-attach-point="date_takenImageViewNode"></div>
+                           <div data-dojo-attach-point="date_takenImageViewNode"></div>
                         </div>
                         <div title="Time Taken:" data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
                             <div data-dojo-attach-point="time_takenImageViewNode"></div>
                         </div>
+                   </div>
+                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, showLabels:true" class="nameBox">
                         <div title="Time Zone:" data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
                             <div title="Time Zone:" data-dojo-attach-point="time_zoneImageViewNode"></div>
-                        </div>
+                            <div data-dojo-attach-point="UTCStatus" class="status"></div>
+                       </div>
                         <div title="UTC Taken:" data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
                             <div data-dojo-attach-point="time_UTCImageViewNode"></div>
                         </div>
@@ -34,47 +50,18 @@
                         <div title="Bearing:" data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
                             <div data-dojo-attach-point="bearingImageViewNode"></div>
                         </div>
-                        <div data-dojo-attach-point="UTCStatus" class="status"></div>
                     </div>
-                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, orientation:'vert'">
-                    	<div data-dojo-type="dijit/form/Textarea" title="Description:" data-dojo-attach-point="descriptionImageNode" name="description" value="" class="textarea"></div>
+                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, showLabels:false">
+				        <div data-dojo-type="namer" class="namer" data-dojo-attach-point="photographerNameNode"></div>
+                        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
+                            <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false" id="addPhoto">
+                                <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="seepSubmitImage" type="button" role="button">Add Photo</div>
+                            </div>
+                            <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false" id="updatePhoto">
+                                <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="seepEditImage" type="button" role="button">Update Photo</div>
+                            </div>
+                        </div>
                     </div>
-                    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, orientation:'vert'">
-                        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, showLabels:false">
-                            <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:4, showLabels:false">
-                                <div data-dojo-type="dijit/form/Select" title="" name="honorificPhotographer" value="Mr" data-dojo-attach-point="honorificPhotographerNode" id="honorificPhotographer">
-                                    <span value="Mr">Mr.</span>					
-                                    <span value="Mrs">Mrs.</span>					
-                                    <span value="Miss">Miss</span>					
-                                    <span value="Ms">Ms.</span>					
-                                    <span value="Dr">Dr.</span>					
-                                </div>
-                                <div data-dojo-type="dijit/form/TextBox" id="firstNamePhotographer" name="firstNamePhotographer" value="" data-dojo-attach-point="firstNamePhotographerNode"></div>
-                                <div data-dojo-type="dijit/form/TextBox" id="middleNamePhotographer" name="middleNamePhotographer" value="" data-dojo-attach-point="middleNamePhotographerNode"></div>
-                                <div data-dojo-type="dijit/form/TextBox" id="lastNamePhotographer" name="lastNamePhotographer" value="" data-dojo-attach-point="lastNamePhotographerNode"></div>
-                            </div>                   
-                             <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, orientation:'vert'">
-                                <div data-dojo-type="dijit/form/Select" title="Name(s):" name="discoverer" value="" data-dojo-attach-point="discovererImageNode" id="discovererImage"></div>
-                            </div>
-                        </div>
-                        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1">
-                            <div data-dojo-type="dijit/form/TextBox" title="Email:" id="emailPhotographer" name="emailPhotographer" value="" data-dojo-attach-point="emailPhotographerNode"></div>
-                        </div>
-                        <div data-dojo-type="dojox/layout/TableContainer" title="Photographer (only one):" data-dojo-props="cols:3, orientation:'vert'" id="listContainerPhotographer">
-                            <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false" id="photographerListBox">
-                                <div data-dojo-type="dijit/form/Select" name="photographer" value="" data-dojo-attach-point="photographerListNode" id="photographer"></div>
-                            </div>
-                            <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false" class="buttons">
-                                <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="addPhotographerNode" type="button" role="button">Add</div>
-                            </div>
-                            <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false" class="buttons">
-                                <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="removePhotographerNode" type="button" role="button">Remove</div>
-                            </div>
-                        </div>
-                    </div>               
-                </div>
-                <div class="appDialogPaneButtons">
-                    <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="seepSubmitImage" type="button" role="button">Add Photo</div>
                 </div>
                 <div data-dojo-type="dijit/form/TextBox" name="UPLOADIDImage" value="" data-dojo-attach-point="UPLOADIDImageNode" class="hidden"></div>
                 <div data-dojo-type="dijit/form/TextBox" name="IMAGEIDImage" value="" data-dojo-attach-point="IMAGEIDImageNode" class="hidden"></div>

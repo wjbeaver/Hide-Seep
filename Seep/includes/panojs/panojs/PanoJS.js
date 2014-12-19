@@ -49,7 +49,9 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 *******************************************************************************/
- 
+ var panoXOffset;
+ var panoYOffset;
+ var panoScale;
  
 function PanoJS(viewer, options) {
     
@@ -285,16 +287,15 @@ PanoJS.prototype.init = function() {
     this.notifyViewerMoved();
     
     // look at some values
-    this.whereAmI();
+    this.whereAmI("init");
 };
 
-PanoJS.prototype.whereAmI = function() {
-    console.log("width: "+this.width);
-    console.log("height: "+this.height);
-    console.log("level: "+this.level);
-    console.log("x: "+this.x);
-    console.log("y: "+this.y);
-    console.log("scale: "+this.currentScale());
+PanoJS.prototype.whereAmI = function(where) {
+    console.log(where+" - x: "+this.x+" y: "+this.y+" scale: "+this.currentScale());    
+    panoXOffset = this.x;
+    panoYOffset = this.y;
+    panoScale = this.currentScale();
+
 }
 
 PanoJS.prototype.viewerDomElement = function() {    
@@ -439,7 +440,7 @@ PanoJS.prototype.positionTiles = function(motion, reset) {
       this.y += motion.y;
     }
     
-    // this.whereAmI();
+    this.whereAmI("PositionTiles");
 };
     
 PanoJS.prototype.removeTileFromWell = function(tile) {        
@@ -640,7 +641,7 @@ PanoJS.prototype.notifyViewerZoomed = function() {
     for (var i = 0; i < this.viewerZoomedListeners.length; i++)
       this.viewerZoomedListeners[i].viewerZoomed( new PanoJS.ZoomEvent(this.x, this.y, this.zoomLevel, scale, w, h) );
   
-  this.whereAmI();
+  this.whereAmI("Zoomed");
 
 };
   
@@ -652,7 +653,7 @@ PanoJS.prototype.notifyViewerResized = function() {
     for (var i = 0; i < this.viewerResizedListeners.length; i++)
       this.viewerResizedListeners[i].viewerResized( new PanoJS.ResizeEvent(this.x, this.y, w, h) );
 
-  this.whereAmI();
+  this.whereAmI("Resize");
 
 };
     
@@ -669,7 +670,7 @@ PanoJS.prototype.notifyViewerMoved = function(coords) {
                                               );
     }
   
-  this.whereAmI();
+  this.whereAmI("Moved");
 };
 
 PanoJS.prototype.zoom = function(direction) {       

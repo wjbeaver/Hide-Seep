@@ -1,7 +1,14 @@
 define([
+    "esri/tasks/query",
+    "esri/graphic",
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo',
+    "dojo/dom",
+    "dojo/on",
+    "dojo/json",
+    "dojo/dom-style",
+    "dojo/request",
     'dijit/Dialog',
     'dijit/_WidgetsInTemplateMixin',
     'dojo/text!./formSeep02.html',
@@ -20,21 +27,22 @@ define([
     "dojo/date",
     "dojo/date/stamp",
     "dojox/validate/web",
-    "dojox/validate/us",
-    "dojo/dom",
-    "dojo/on",
-    "dojo/json"
-], function (declare, lang, dojo, Dialog, _WidgetsInTemplateMixin, template, hash, date, stamp, validate, dom, on, JSON) {
+    "dojox/validate/us"
+ ], function (Query, Graphic, declare, lang, dojo, dom, on, JSON, domStyle, request, Dialog, _WidgetsInTemplateMixin, 
+                template, hash, date, stamp, validate) {
     return declare('formSeep.templates.formSeep02', [Dialog, _WidgetsInTemplateMixin], {
 
         title: 'Photo Form',
-        style: 'width:600px;',
+        style: 'width:650px;',
         templateString: template,
         images: null,
+        geometries: null,
         count: 0,
+        mode: "",
         baseAddress: "http://overtexplorations.com/Seep/data/images/",
         keyGoogle: "AIzaSyAJeXarCpe7QTjf_XIrVbaAWnaoBDASGXA",
         timeZoneRequest: "https://maps.googleapis.com/maps/api/timezone/json",
+        ignoreSet: false,
         
         meta: function (images) {
             this.count = Object.keys(images).length - 2;
@@ -42,18 +50,46 @@ define([
             this.images = images;
             
             // create the images
-            for (i=0;i<this.count;i++) {
+            var indx = layers[3].objects.length;
+            
+            for (i=0;i<this.count;i++) {               
                 layers[3] = addImageObject(layers[3]);
+                
+                var name = this.images.exif[i].FileName;
+                
+                layers[3].objects[indx+i].attributes[0].value = name.split(".")[0];
     	    }
     	
             this.imageFormFill();
             this.show();
         },
         
+        newNameNode: function() {
+            this.photographerNameNode.set("nameType", "Image");
+            this.photographerNameNode.set("featureValue", this.IMAGEIDImageNode.value);
+            this.photographerNameNode.set("newNameListTitle", "Photographer");
+            this.photographerNameNode.set("unique", true);
+         	this.photographerNameNode.fillNameList();
+        },
+        
+        getIndexOfImage: function (value) {
+            indx = -1;
+            
+            var images = layers[3].objects;
+            for (i=0;i<images.length;i++) {
+                var attributes = images[i].attributes;
+                if (attributes[0].value == value) {
+                    indx = i;
+                    break;
+                }
+            }
+            
+            return indx;
+        },
+        
         getUTCSuccess: function (data, widget) {
         	var count = widget.count+1;
-            var indx = layers[3].objects.length-count;
-            var attributesImage = layers[3].objects[indx].attributes;
+            var attributesImage = layers[3].objects[widget.getIndexOfImage(widget.IMAGEIDImageNode.value)].attributes;
             
 	        widget.DSToffsetImageNode.value = data.dstOffset;
             widget.UTCoffsetImageNode.value = data.rawOffset;
@@ -142,131 +178,283 @@ define([
             requestGoogle(this.timeZoneRequest, query, this.getUTCSuccess, this.getUTCError, this);
         },
         
-        imagePan: function () {
-        	count = this.count+1;
-        	dialog_imagePan.setCount(count);
-        	dialog_imagePan.setSource(this.signature);
-        	
-            indx = layers[3].objects.length-count;
-            var attributesImage = layers[3].objects[indx].attributes;
+        getWidthHeight: function (attributesImage) {
+            var send = {
+                uploadid: attributesImage[1].value,
+                imageid: attributesImage[0].value
+            };
             
-        	pan = "/Seep/includes/panojs/apps/panoView.html?UPLOADID=" + attributesImage[1].value + 
-        		"&IMAGEID=" + attributesImage[0].value + "&width=" + this.images[this.count].width + "&height=" + this.images[this.count].height;
-        	dialog_imagePan.viewerFrameNode.src = pan;
+            request.post("/Seep/getWidthHeight.php", {
+                data: send
+            }).then(function(response){
+                var response = JSON.parse(response);
 
-        	dialog_imagePan.show();
+                var pan = "/Seep/includes/panojs/apps/panoView.html?UPLOADID=" + response.uploadid + 
+                    "&IMAGEID=" + response.imageid + "&width=" + response.width + "&height=" + response.height;
+ 
+                dialog_imagePan.viewerFrameNode.src = pan;
+
+                dialog_imagePan.setForMode("edit");
+                
+                dialog_imagePan.show();
+            });
+        },
+        
+        imagePan: function () {
+        	dialog_imagePan.set("UPLOADID", this.UPLOADIDImageNode.get("value"));
+        	dialog_imagePan.set("IMAGEID", this.IMAGEIDImageNode.get("value"));
+        	
+            var attributesImage = layers[3].objects[this.getIndexOfImage(this.IMAGEIDImageNode.value)].attributes;
+            
+            if (this.mode=="add") {
+                pan = "/Seep/includes/panojs/apps/panoView.html?UPLOADID=" + attributesImage[1].value + 
+                    "&IMAGEID=" + attributesImage[0].value + "&width=" + this.images[this.count].width + "&height=" + this.images[this.count].height;
+            
+                dialog_imagePan.viewerFrameNode.src = pan;
+                
+                dialog_imagePan.setForMode("add");
+                
+                dialog_imagePan.show();
+        	} else {
+        	    this.getWidthHeight(attributesImage);
+        	}
 	    },
-        
-        createName: function (honorific, fName, mName, lName) {
-        	
-        	if (fName != "") {
-        		honorific += " " + fName;
-        	}
-        	
-        	if (mName != "") {
-        		honorific += " " + mName;
-        	}
-        	
-        	return honorific + " " + lName;
-        },
-        
-        getHonorific: function (honorific) {
-        	if (honorific!="Miss") {
-        		honorific+=".";
-        	}
-        	return honorific
-        },
+	    
+	    setForMode: function () {
+            if (this.mode == "add") {
+                domStyle.set(dom.byId("photoList"), "display", "none");
+                domStyle.set(dom.byId("updatePhoto"), "display", "none");
+                domStyle.set(dom.byId("addPhoto"), "display", "block");
+                domStyle.set(dom.byId("imageTaken"), "display", "block");
+                domStyle.set(dom.byId("imageViewClose"), "display", "none");
+                this.photographerNameNode.setAdd();
+            } else {
+                domStyle.set(dom.byId("photoList"), "display", "block");
+                domStyle.set(dom.byId("updatePhoto"), "display", "block");
+                domStyle.set(dom.byId("addPhoto"), "display", "none");
+                domStyle.set(dom.byId("imageTaken"), "display", "none");
+                domStyle.set(dom.byId("imageViewClose"), "display", "block");
+                this.photographerNameNode.setEdit();
+            }
+	    },
+	    
+	    clearEditForm: function () {
+            var indx = this.photoListNode.options.length-1;
+            
+            for (i=indx;i>=0;i--) {
+        		this.photoListNode.removeOption(this.photoListNode.options[i]);
+        	}      	
+
+            this.photoListNode.addOption({
+                label: "Photos",
+                value: 0
+            });
+            
+            this.ignoreSet = true;
+            this.photoListNode.set("value", 0);
+            
+            this.imageNode.src = "";
+            
+            this.titleImageNode.set("value", "");
+            this.descriptionImageNode.set("value", "");
+            
+            this.date_takenImageViewNode.innerHTML = "";
+            this.time_takenImageViewNode.innerHTML = "";
+            this.time_zoneImageViewNode.innerHTML = "";
+            this.time_UTCImageViewNode.innerHTML = "";
+            this.altitudeImageViewNode.innerHTML = "";
+            this.bearingImageViewNode.innerHTML = "";
+            
+            this.photographerNameNode.clearNode();
+            
+            this.UPLOADIDImageNode.set("value", "");
+            this.IMAGEIDImageNode.set("value", "");
+            this.latitudeImageNode.set("value", "");
+            this.longitudeImageNode.set("value", "");
+            this.date_takenImageNode.set("value", null);
+            this.time_takenImageNode.set("value", null);
+            this.timeZoneNameImageNode.set("value", "");
+            this.timeZoneIDImageNode.set("value", "");
+            this.DSToffsetImageNode.set("value", "");
+            this.UTCoffsetImageNode.set("value", "");
+            this.UTCImageNode.set("value", "");
+            this.altitudeImageNode.set("value", null);
+            this.bearingImageNode.set("value", null);
+	    },
+	    
+	    fillEditForm: function (indx, start) {
+	    
+ 	       var image = this.images[indx];
+ 	       
+ 	       this.count = indx;
+ 	       
+ 	       var attributes = layers[3].objects[indx].attributes
+	        
+           this.imageNumberNode.innerHTML= "#"+indx+1;
+            
+            if (start) {
+                var options = [];
+                var value;
+                for (i=0;i<this.images.length;i++) {
+                    options[options.length] = {
+                        label: this.images[i].Title,
+                        value: this.images[i].IMAGEID_PK
+                    };
+                    if (i==indx) {
+                        value = this.images[i].IMAGEID_PK;
+                    }
+	        }
+	        
+	        this.photoListNode.addOption(options);
+	        
+	        this.ignoreSet = true;
+            this.photoListNode.set("value", value);
+            }
+            // link
+            this.imageNode.src = this.baseAddress + image.UPLOADID_FK + "/" + "sized_" + image.IMAGEID_PK + "/" + image.IMAGEID_PK + "_small" + ".jpg";
+            attributes[0].value = image.IMAGEID_PK;
+            attributes[0].node = this.IMAGEIDImageNode
+            attributes[0].node.set("value", attributes[0].value);
+            
+            attributes[1].value = image.UPLOADID_FK;
+            attributes[1].node = this.UPLOADIDImageNode
+            attributes[1].node.set("value", attributes[1].value);
+            
+            attributes[2].node = this.titleImageNode;
+            attributes[2].node.set("value", image.Title);
+            attributes[2].value = image.Title;
+            
+            attributes[3].node = this.descriptionImageNode;
+            attributes[3].node.set("value", image.Description);
+            attributes[3].value = image.Description;
+            
+            this.time_zoneImageViewNode.innerHTML = image.TimeZoneName;
+            this.time_UTCImageViewNode.innerHTML = image.UTC;
+            
+            if (image.Altitude==null) {
+                this.altitudeImageViewNode.innerHTML = "";
+            } else {
+                this.altitudeImageViewNode.innerHTML = image.Altitude;
+            }
+            
+            if (image.Orientation==null) { 
+                this.bearingImageViewNode.innerHTML = "";
+            } else {
+                this.bearingImageViewNode.innerHTML = image.Orientation;
+            }
+            
+            this.UPLOADIDImageNode.set("value", image.UPLOADID_FK);
+            this.IMAGEIDImageNode.set("value", image.IMAGEID_PK);
+
+            this.photographerNameNode.set("nameType", "Image");
+            this.photographerNameNode.set("featureValue", this.IMAGEIDImageNode.value);
+            this.photographerNameNode.set("newNameListTitle", "Photographer");
+            this.photographerNameNode.set("unique", true);
+            this.photographerNameNode.editNames(image.UPLOADID_FK, image.IMAGEID_PK, "Image");
+	    },
+	    
+	    fetchRecords: function(featureSet) {
+	        this.images = [];
+	        this.geometries = [];
+	        if (featureSet.features.length > 0) {
+	            for (i=0;i<featureSet.features.length;i++) {
+	                this.images[i] = featureSet.features[i].attributes;
+	                this.geometries[i] = featureSet.features[i].geometry;
+	                layers[3] = addImageObject(layers[3]);
+	            }
+	            
+	            // clear the form
+	            this.clearEditForm();
+	            
+	            // fill the form with the first image
+	            this.fillEditForm(0, true);
+	            
+	            this.show();
+	        } else {
+	            alert("No Images!");
+	        }
+	    },
+	    
+	    imageSetEdit: function (UPLOADID) {
+            this.mode = "edit";
+            this.setForMode();
+            
+            // query for images
+            var layer = map.getLayer("6");
+            var query = new Query();
+            query.returnGeometry = true;
+            query.outFields = ["*"];
+            query.where = "UPLOADID_FK='"+UPLOADID+"'";
+            
+            layer.queryFeatures(query, lang.hitch(this, function (featureSet) {
+                this.fetchRecords(featureSet);
+            }));
+	    },
+	    
+	    fetchAndDeleteAll: function(featureSet) {
+	        if (featureSet.features.length > 0) {
+	            var deletes = [];
+	            for (i=0;i<featureSet.features.length;i++) {
+	                var image = featureSet.features[i].attributes;
+	                var geometry = featureSet.features[i].geometry;
+            
+                    var layer = map.getLayer("6");
+            
+                    deletes[deletes.length] = new Graphic(geometry, null, image);        
+	            }
+	            
+	            layer.applyEdits(null,null,deletes);
+            
+                imageLayer = map.getLayer("2");
+            
+                imageLayer.refresh();
+	        }
+	    },
+	    
+	    deleteAllImages: function (UPLOADID) {
+            // query for images
+            var layer = map.getLayer("2");
+            var query = new Query();
+            query.returnGeometry = true;
+            query.outFields = ["*"];
+            query.where = "UPLOADID_FK='"+UPLOADID+"'";
+            
+            layer.queryFeatures(query, lang.hitch(this, function (featureSet) {
+                this.fetchAndDeleteAll(featureSet);
+            }));
+	    },
         
         imageFormFill: function () {
             if (this.count > 0) {
+        	    this.mode = "add";
+        	    this.setForMode();
+        	
                 var count = this.count;
                 this.count--;
 
                 this.imageNumberNode.innerHTML= "#"+count;
 
-                indx = layers[0].objects.length-1;
-                var attributes = layers[0].objects[indx].attributes;
-                var coordinates = layers[0].objects[indx].coordinates;
+                var attributes = layers[0].objects[0].attributes;
+                var coordinates = layers[0].objects[0].coordinates;
 
-                indx = layers[3].objects.length-count;
+                var name = this.images.exif[this.count].FileName;
+                
+                var indx = this.getIndexOfImage(name.split(".")[0]);
+                
                 var attributesImage = layers[3].objects[indx].attributes;
                 var coordinatesImage = layers[3].objects[indx].coordinates;
 
-                // add any current photographers to photographers
-                var photographers = layers[4].objects;
-                var nAttributes;
-                
-                var options = [];
-                if (photographers.length>0) {
-                    for (i=0;i<photographers.length;i++) {
-                        nAttributes = photographers[i].attributes;
-                        options[i] = {
-                                            label: this.createName(nAttributes[1].valueLabel, nAttributes[2].value, nAttributes[3].value, nAttributes[4].value),
-                                            value: i
-                                        };
-                    }
-                    this.photographerNode.addOption(options);
-                    this.photographerNode.set("value", 0);
-               }
-
-                // add any names of discoverers to names
-                var discoverers = layers[1].objects;
-                
-                options = [];
-                if (discoverers.length>0) {
-                    for (i=0;i<discoverers.length;i++) {
-                        nAttributes = discoverers[i].attributes;
-                        options[i] = {
-                                            label: this.createName(nAttributes[1].valueLabel, nAttributes[2].value, nAttributes[3].value, nAttributes[4].value),
-                                            value: i
-                                        };
-                    }
-                }
-                
-                // add any names of videographers to names
-                var videographers = layers[9].objects;
-                
-                if (videographers.length>0) {
-                    len = options.length;
-                    for (i=0;i<videographers.length;i++) {
-                        nAttributes = discoverers[i].attributes;
-                        options[len+i] = {
-                                            label: this.createName(nAttributes[1].valueLabel, nAttributes[2].value, nAttributes[3].value, nAttributes[4].value),
-                                            value: i
-                                        };
-                    }
-                }
-                
-                if (options.length>0) {
-                    this.discovererImageNode.addOption(options);
-                    this.discovererImageNode.set("value", 0);
-                }
-                
                 // UPLOADID
                 attributesImage[1].value = attributes[0].value;
                 attributesImage[1].node = this.UPLOADIDImageNode;
                 attributesImage[1].node.set("value", attributesImage[1].value);
 
                 // IMAGEID
-                var name = this.images.exif[this.count].FileName;
-                attributesImage[0].value = name.split(".")[0];
                 attributesImage[0].node = this.IMAGEIDImageNode;
                 attributesImage[0].node.set("value", attributesImage[0].value);
 
-                // portrait, landscape or square
-                if (this.images[this.count].width > this.images[this.count].height) {
-                    this.imageNode.width = 200;
-                    this.imageNode.height = 150;
-                } else if (this.images[this.count].width < this.images[this.count].height) {
-                    this.imageNode.width = 150;
-                    this.imageNode.height = 200;
-                } else {
-                    this.imageNode.width = 200;
-                    this.imageNode.height = 200;
-                }
-
                 // link
-                this.imageNode.src = this.baseAddress + attributesImage[1].value + "/" + "sized_" + attributesImage[0].value + "/" + attributesImage[0].value + "_medium" + ".jpg";
+                this.imageNode.src = this.baseAddress + attributesImage[1].value + "/" + "sized_" + attributesImage[0].value + "/" + attributesImage[0].value + "_small" + ".jpg";
 
                 // date
                 if (this.images.exif[this.count].Date) {
@@ -295,7 +483,7 @@ define([
                 // altitude and heading
                 if (this.images.exif[this.count].gpsAltitude) {
                     attributesImage[8].value = this.images.exif[this.count].gpsAltitude;
-                    this.altitudeImageViewNode.innerHTML = attributesImage[8].value.toFixed(2)+"m.";
+                    this.altitudeImageViewNode.innerHTML = attributesImage[8].value.toFixed(2)+" m.";
                     attributesImage[8].node = this.altitudeImageNode;
                     attributesImage[8].node.set("value", attributesImage[8].value);
                 } else {
@@ -330,96 +518,120 @@ define([
     
                     this.getUTC(coordinatesImage.latitude, coordinatesImage.longitude, Date.parse(this.images.exif[this.count].Date+" "+this.images.exif[this.count].Time));
                 } else {
-                    this.time_takenImageViewNode.innerHTML = "Unknown";
+                    attributesImage[5].node = this.time_takenImageNode;
+                   this.time_takenImageViewNode.innerHTML = "Unknown";
                 }
+                
+                this.newNameNode();
            } else {
-                // going back to the main form, anything to do?
+                // going back to the main form, name fix
+                this.photographerNameNode.clearNode();
+                dialog_seepMain.discovererNameNode.updateNameList();
+                
                 this.hide();
             }
         },
         
-        addPhotographerList: function (honorific, honorificLabel, fName, mName, lName, email) {
-            indx = layers[3].objects.length-1;
-            iAttributes = layers[3].objects[indx].attributes;
-        
-            layers[4] = addNameObject(layers[4]);
-            attributes = layers[4].objects[0].attributes;
-                    
-            layers[2] = addNameFeatureObject(layers[2]);
-            indxF = layers[2].objects.length-1;
-            nfAttributes = layers[2].objects[indxF].attributes;
-        
-            // generate id for name
-            attributes[0].value = generateUUID();
-
-            // cross link table name id and featureid
-            nfAttributes[0].value = attributes[0].value;
-            nfAttributes[1].value = iAttributes[0].value;
-            nfAttributes[2].value = 0;
-            nfAttributes[2].valueLabel = "Photograph";
-
-            attributes[1].value = honorific;
-            attributes[1].valueLabel = honorificLabel;
-            attributes[2].value = fName;
-            attributes[3].value = mName;
-            attributes[4].value = lName;
-            attributes[5].value = email;
-    
-            if (this.photographerListNode.containerNode.childNodes.length>0) {
-                // remove old value
-                this.photographerListNode.removeOption({ 
-                    value: 0 
-                });
-    
-                this.photographerListNode.containerNode.childNodes[0].innerHTML="";
-            }
-            
-            // add new value
-            // create name
-            name = this.createName(honorificLabel, fName, mName, lName);
-        
-            // put in selection
-            var option = {
-                label: name,
-                value: 0
-            }
-        
-            this.photographerListNode.addOption([option]);
-            this.photographerListNode.set("value", 0);
-        
-            // clear photographer
-            this.clearPhotographer();
-        },
-        
-        clearPhotographer: function () {
-            this.honorificPhotographerNode.set("value", "1");
-            this.firstNamePhotographerNode.set("value", "");
-            this.middleNamePhotographerNode.set("value", "");
-            this.lastNamePhotographerNode.set("value", "");
-            this.emailPhotographerNode.set("value", "");
-        },
-    
-        removePhotographerList: function () {
-            // remove from name layer object
-            var object = layers[3].objects.splice(0,1);
-    
-            // remove name feature layer object
-            var len = layers[2].objects.length-1;
-            for (i=len;i>-1;i--) {		    
-                if (layers[2].objects[i].attributes[0].value==object[0].attributes[0].value) {
-                    layers[2].objects.splice(i,1);
+        getImageIndex: function (value) {
+            var indx = -1;
+            for (i=0;i<this.images.length;i++) {
+                if (this.images[i].IMAGEID_PK==value) {
+                    indx=i;
                     break;
                 }
-             }
-             
-            // remove old value
-            this.photographerListNode.removeOption({ 
-                value: 0 
-            });
-    
-            this.photographerListNode.containerNode.childNodes[0].innerHTML="";
-        },
+            }
             
+            return indx;
+        },
+        
+        changePhoto: function () {
+            if (!this.ignoreSet) {
+                var value = this.photoListNode.get("value");
+            
+                if (value == 0) {
+                    alert("Select a photo!");
+                } else {
+                    var indx = this.getImageIndex(value);
+                    this.fillEditForm(indx, false);
+                }
+            } else {
+                this.ignoreSet = false;
+            }
+        },
+        
+        updateImage: function () {
+            // list of photos
+            var indx = this.count+1;
+            this.photoListNode.options[indx].label = this.titleImageNode.get("value");
+            this.ignoreSet = true;
+            this.photoListNode.set("value", this.photoListNode.get("value"));
+            
+            // just update photographer
+            this.photographerNameNode.updateNames(null);
+            
+            // update title and description
+            var attributesImage = layers[3].objects[this.getIndexOfImage(this.IMAGEIDImageNode.value)].attributes;
+
+            attributesImage[2].value = attributesImage[2].node.get("value");
+            attributesImage[3].value = attributesImage[3].node.get("value");
+            
+            indx--;
+ 	        var image = this.images[indx];
+ 	        var geometry = this.geometries[indx];
+            
+            image.Title = attributesImage[2].value;
+            image.Description = attributesImage[3].value;
+            
+            var layer = map.getLayer("6");
+            
+            var newGraphic = new Graphic(geometry, null, image);
+            
+            layer.applyEdits(null,[newGraphic],null);
+        },
+        
+        deleteImage: function () {
+            // delete from database
+            var indx = this.count;
+            
+ 	        var image = this.images[indx];
+ 	        var geometry = this.geometries[indx];
+            
+            var layer = map.getLayer("6");
+            
+            var newGraphic = new Graphic(geometry, null, image);
+            
+            layer.applyEdits(null,null,[newGraphic]);
+            
+            imageLayer = map.getLayer("2");
+            
+            imageLayer.refresh();
+
+            // delete feature names
+            this.photographerNameNode.deleteNames(image.IMAGEID_PK);
+
+            // delete from geometries/ images
+            this.geometries.splice(indx,1);
+            this.images.splice(indx,1);
+           
+            // delete from layers
+            layers[3].objects.splice(this.getIndexOfImage(image.IMAGEID_PK),1);
+            
+            // delete from list
+            this.photoListNode.removeOption(this.photoListNode.get("value"));
+            
+            if (this.photoListNode.options.length>1) {
+                for (i=0;i<this.photoListNode.options.length;i++) {
+                    if (this.photoListNode.options[i].value!=0) {
+                        this.photoListNode.set("value", this.photoListNode.options[i].value);
+                        break;
+                    }
+                }
+            } else {
+                this.clearEditForm();
+                this.hide();
+            }
+        },
+        
         constructor: function (options) {
             lang.mixin(this, options);
 
@@ -432,8 +644,7 @@ define([
            this.seepSubmitImage.on("click", lang.hitch(this, function () {
                 // get and clear all the values
         	    count = this.count+1;
-                indx = layers[3].objects.length-count;
-                var attributesImage = layers[3].objects[indx].attributes;
+                var attributesImage = layers[3].objects[this.getIndexOfImage(this.IMAGEIDImageNode.value)].attributes;
 
                 attributesImage[2].value = attributesImage[2].node.get("value");
                 attributesImage[3].value = attributesImage[3].node.get("value");
@@ -453,52 +664,36 @@ define([
                 attributesImage[8].node.set("value", "");
                 attributesImage[9].node.set("value", "");
                 
-                // clear names from list
+                // clear names from list and update name list
+               this.photographerNameNode.clearNode();
+               this.photographerNameNode.updateNameList();
                
                 // continue
                 this.imageFormFill();
             }));
             
-            this.addPhotographerNode.on("click", lang.hitch(this, function () {
-            		    
-            		    // check if both are empty
-            		    if (this.lastNamePhotographerNode.get("value")=="" && this.emailPhotographerNode.get("value")=="") {
-            		        var value = this.discovererImageNode.get("value");
-            		        
-            		        var attributes;
-            		        if (value<layers[1].objects.length) {
-            		            // get discoverer and attributes
-                                attributes = layers[1].objects[value].attributes;
-                            } else {
-             		           // get videographer and attributes
-                               value = value-layers[1].objects.length;
-                                attributes = layers[9].objects[value].attributes;
-                            }
-            		        
-             		    	// put in photographer List
-            		    	this.addPhotographerList(attributes[1].value, this.getHonorific(attributes[1].value), attributes[2].value, attributes[3].value, attributes[4].value, attributes[5].value);
-            		    } else if (this.lastNamePhotographerNode.get("value")=="") {
-            		    		    alert("A last name is required!");
-            		    } else if (this.emailPhotographerNode.get("value")=="") {
-            		    		    alert("An email address is required!");
-            		    } else {
-            		    	    // put in photographer List
-            		    	    this.addPhotographerList(this.honorificPhotographerNode.get("value"), this.getHonorific(this.honorificPhotographerNode.get("value")), this.firstNamePhotographerNode.get("value"), this.middleNamePhotographerNode.get("value"), this.lastNamePhotographerNode.get("value"), this.emailPhotographerNode.get("value"));
-            		    }
+            this.imageViewCloseNode.on("click", lang.hitch(this, function () {
+                if (confirm("Closing this will remove all changes that haven't been updated. OK?")) {
+                    this.clearEditForm();
+                    this.hide();
+                }
             }));
 
-            this.removePhotographerNode.on("click", lang.hitch(this, function () {
-            		    if (this.photographerListNode.get("value")>=0) {
-                            // ask fer sher
-                            if (confirm("Do you want to delete the selected name?")) {
-                                // remove from list
-                                this.removePhotographerList(this.photographerListNode.get("value"))
-                            }
-            		    } else {
-            		    	    alert("Nothing to remove!");
-            		    }
+           this.seepEditImage.on("click", lang.hitch(this, function () {
+                if (confirm("This will update the image. OK?")) {
+                    this.updateImage();
+                }
             }));
-
+            
+           this.seepDeleteImage.on("click", lang.hitch(this, function () {
+                if (confirm("This will delete the image. OK?")) {
+                    this.deleteImage();
+                }
+            }));
+            
+           this.photoListNode.on("change", lang.hitch(this, function () {
+                this.changePhoto();
+            }));
         }
     });
 });

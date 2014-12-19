@@ -4,29 +4,37 @@ define([
     'dojo',
     "dojo/dom",
     "dojo/on",
+    "dojo/json",
+    "dojo/request",
     "dojo/dom-style",
     "dojo/dom-attr",
+    'formSeepApp/formSeep/namer',
     'dijit/Dialog',
     'dijit/_WidgetsInTemplateMixin',
     'dojo/text!./formSeep04.html',
     "esri/geometry/Point",
+    "esri/graphic",
+    "dojo/date/locale",
+    "esri/SpatialReference",
     'dijit/form/Button',
     'dijit/form/Form',
     'dijit/form/TextBox',
     'dojox/layout/TableContainer',
     "dijit/form/Select",
     'dijit/form/Textarea',
-    "dijit/form/DateTextBox"
-], function (declare, lang, dojo, dom, on, domStyle, domAttr, Dialog, _WidgetsInTemplateMixin, template, Point) {
+    "dijit/form/DateTextBox",
+], function (declare, lang, dojo, dom, on, JSON, request, domStyle, domAttr, namer, Dialog, _WidgetsInTemplateMixin, template, Point, Graphic, locale, SpatialReference) {
     return declare('formSeep.templates.formSeep04', [Dialog, _WidgetsInTemplateMixin], {
 
         title: 'Springs Attributes',
         style: 'width:auto',
         templateString: template,
         geometry: null,
-        featureLayer: null,
+        selectedTemplate: null,
         attributes: null,
-        mode: "",
+        mode: "add",
+        attributeBar: null,
+        url_base: "http://overtexplorations.com/Seep/data/images/",
         option: {
         		label: "Used Map App",
         		value: "App"
@@ -37,8 +45,8 @@ define([
                 		value: "WebMap"
                 	},
                 	{
-                		label: "GPSDevice",
-                		value: "GPS Device"
+                		label: "GPS Device",
+                		value: "GPSDevice"
                 	},
                 	{
                 		label: "Topo Map",
@@ -59,21 +67,45 @@ define([
         	},
         optionType3: {
         		label: "Unknown",
-        		value: 0
+        		value: 3
         	},
 
+        newNameNode: function() {
+            this.discovererNameNode.set("nameType", "Seep");
+            this.discovererNameNode.set("featureValue", layers[0].objects[0].attributes[0].value);
+            this.discovererNameNode.set("newNameListTitle", "Discoverer(s)");
+         	this.discovererNameNode.fillNameList();
+        },
         
-        seepSelected: function (geometry, attributes, featureLayer) {
+        namesList: function () {
+            return this.discovererNameNode.namesList();
+        },
+        
+        setForMode: function () {
+            if (this.mode == "add") {
+                domStyle.set(dom.byId("addButtons"), "display", "block");
+                domStyle.set(dom.byId("editButtons"), "display", "none");
+                this.discovererNameNode.setAdd();
+            } else {
+                domStyle.set(dom.byId("addButtons"), "display", "none");
+                domStyle.set(dom.byId("editButtons"), "display", "block");
+                this.discovererNameNode.setEdit();
+            }
+        },
+        
+        seepSelected: function (geometry, attributes, selectedTemplate) {
+            this.resetForm();
+            this.clearThis();
         	this.mode = "add";
+        	this.setForMode();
         	
         	this.geometry = geometry;
         	this.attributes = attributes;
-        	this.featureLayer = featureLayer;
+        	this.selectedTemplate = selectedTemplate;
         	
         	// set values and nodes
-        	indx = layers[0].objects.length-1;
-    		attributes = layers[0].objects[indx].attributes;
-    		coordinates = layers[0].objects[indx].coordinates;
+    		attributes = layers[0].objects[0].attributes;
+    		coordinates = layers[0].objects[0].coordinates;
     		
         	attributes[0].node = this.UPLOADIDMainNode;
          	attributes[0].node.set("value", attributes[0].value);
@@ -92,11 +124,11 @@ define([
         		attributes[1].node.set("value", attributes[1].value);
         	}
         	
-        	attributes[2].node = this.springDeviceMainNode;
+       	    attributes[2].node = this.springDeviceMainNode;
         	attributes[2].value="App";
         	attributes[2].node.addOption([this.option]);
         	attributes[2].node.set("value", attributes[2].value);
-        	
+     	
         	attributes[3].node = this.springFlowMainNode;
         	if (attributes[3].value!="") {
         		attributes[3].node.set("value", attributes[3].value);
@@ -137,15 +169,19 @@ define([
         	
          	attributes[8].node = this.springDescribeMainNode;
          	attributes[8].node.set("value", attributes[8].value);
+         	
+            this.newNameNode();
         },
         
         setID: function () {
+            this.resetForm();
+            this.clearThis();
         	this.mode = "add";
+        	this.setForMode();
         	
         	// set values and nodes
-        	indx = layers[0].objects.length-1;
-    		attributes = layers[0].objects[indx].attributes;
-    		coordinates = layers[0].objects[indx].coordinates;
+    		attributes = layers[0].objects[0].attributes;
+    		coordinates = layers[0].objects[0].coordinates;
     		
         	attributes[0].node = this.UPLOADIDMainNode;
          	attributes[0].node.set("value", attributes[0].value);
@@ -154,7 +190,7 @@ define([
          	coordinates.latNode.set("value", coordinates.latitude);
          	
         	coordinates.longNode = this.longitudeMainNode;
-         	coordinates.longNode.set("value", coordinates.longtitude);
+         	coordinates.longNode.set("value", coordinates.longitude);
         	
         	attributes[1].node = this.springDateMainNode;
          	
@@ -164,24 +200,9 @@ define([
         	
         	attributes[2].node = this.springDeviceMainNode;
         	attributes[2].node.addOption(this.options);
-        	attributes[2].node.set("value", "WebMap");
+        	attributes[2].node.set("value", attributes[2].value);
         	
-/*    		put this in editor area
-
-        	if (attributes[2].value!="") {
-        		if (attributes[2].value=="App") {
-        			attributes[2].node.addOption([this.option]);
-        		} else {
-        			attributes[2].node.addOption(this.options);
-        		}
-         		attributes[2].node.set("value", attributes[2].value);
-        	} else {
-        		attributes[2].node.addOption(this.options);
-         		attributes[2].node.set("value", "WebMap");
-        	}
-        	
- */        	
- 		attributes[3].node = this.springFlowMainNode;
+ 		    attributes[3].node = this.springFlowMainNode;
         	if (attributes[3].value!="") {
         		attributes[3].node.set("value", attributes[3].value);
         	}
@@ -213,158 +234,334 @@ define([
          	attributes[8].node = this.springDescribeMainNode;
          	attributes[8].node.set("value", attributes[8].value);
          	
+            this.newNameNode();
         },
         
-        createName: function (honorific, fName, mName, lName) {
-        	
-        	if (fName != "") {
-        		honorific += " " + fName;
-        	}
-        	
-        	if (mName != "") {
-        		honorific += " " + mName;
-        	}
-        	
-        	return honorific + " " + lName;
-        },
-        
-        getHonorific: function (honorific) {
-        	if (honorific!="Miss") {
-        		honorific+=".";
-        	}
-        	return honorific
-        },
-        
-        addDiscovererList: function (honorific, honorificLabel, fName, mName, lName, email) {
-        	indx = layers[0].objects.length-1;
-    		sAttributes = layers[0].objects[indx].attributes;
+        setEdit: function (attributeBar) {
+		    this.discovererNameNode.clearNode();
+            this.attributeBar = attributeBar;
+            this.mode = "edit";
+        	this.setForMode();
+            
+    		attributes = layers[0].objects[0].attributes;
     		
-    		layers[1] = addNameObject(layers[1]);
-        	nameIndx = layers[1].objects.length-1;
-        	attributes = layers[1].objects[nameIndx].attributes;
-        	        	
-        	layers[2] = addNameFeatureObject(layers[2]);
-    		indxF = layers[2].objects.length-1;
-    		nfAttributes = layers[2].objects[indxF].attributes;
-    		
-    		// generate id for name
-        	attributes[0].value = generateUUID();
+        	attributes[0].node = this.UPLOADIDMainNode;
+         	attributes[0].node.set("value", attributes[0].value);
+       	         	
+         	this.discovererNameNode.editNames(attributes[0].value, attributes[0].value, "Springs", attributeBar);
 
-        	// cross link table name id and featureid
-    		nfAttributes[0].value = attributes[0].value;
-    		nfAttributes[1].value = sAttributes[0].value;
-    		nfAttributes[2].value = 0;
-    		nfAttributes[2].valueLabel = "Seep";
-
-        	attributes[1].value = honorific;
-        	attributes[1].valueLabel = honorificLabel;
-        	attributes[2].value = fName;
-        	attributes[3].value = mName;
-        	attributes[4].value = lName;
-         	attributes[5].value = email;
-       	
-        	// create name
-        	name = this.createName(honorificLabel, fName, mName, lName);
-        	
-        	nameIndx++;
-        	
-        	// put in selection
-        	var option = {
-        		label: name,
-        		value: nameIndx
+        	attributes[1].node = this.springDateMainNode;
+         	
+        	if (attributes[1].value!=null) {
+        		attributes[1].node.set("value", attributes[1].value);
         	}
         	
-        	this.discovererListNode.addOption([option]);
-        	this.discovererListNode.set("value", nameIndx);
+        	attributes[2].node = this.springDeviceMainNode;
+        	if (attributes[2].value=="App") {
+                attributes[2].node.addOption([this.option]);
+        	} else {
+                attributes[2].node.addOption(this.options);
+        	}
+            attributes[2].node.set("value", attributes[2].value);
         	
-        	// clear discoverer
-        	this.clearDiscoverer();
+ 		    attributes[3].node = this.springFlowMainNode;
+        	if (attributes[3].value!=null) {
+        		attributes[3].node.set("value", attributes[3].value);
+        	}
+        	
+        	attributes[4].node = this.springTypeMainNode;
+        	
+        	switch (attributes[4].value) {
+        	    case 0:
+      	            attributes[4].node.addOption([this.optionType3]);
+        	        break;
+        	    case 1:
+       	            attributes[4].node.addOption([this.optionType1]);
+       	        break;
+        	    case 2:
+      	            attributes[4].node.addOption([this.optionType2]);
+        	        break;
+        	    default:
+       	            attributes[4].node.addOption([this.optionType1, this.optionType2, this.optionType3]);
+        	}
+         	
+        	attributes[4].node.set("value", attributes[4].value);
+        	
+         	if (attributes[4].node.get('value')==2) {
+        		domStyle.set(dom.byId("locationAccuracy"), "display", "block");
+        	} else {
+        		domStyle.set(dom.byId("locationAccuracy"), "display", "none");
+        	}
+        	
+        	attributes[5].node = this.springConditionMainNode;
+        	if (attributes[5].value!=null) {
+        		attributes[5].node.set("value", attributes[5].value);
+        	}
+        	
+        	attributes[6].node = this.springAccuracyMainNode;
+        	if (attributes[6].value!=null) {
+        		attributes[6].node.set("value", attributes[6].value);
+        	}
+        	
+        	attributes[7].node = this.springCommentMainNode;
+         	attributes[7].node.set("value", attributes[7].value);
+        	
+         	attributes[8].node = this.springDescribeMainNode;
+         	attributes[8].node.set("value", attributes[8].value);
         },
         
         resetForm: function () {
-        	indx = layers[0].objects.length-1;
-    		attributes = layers[0].objects[indx].attributes;
-
-    		attributes[1].node.set("value", "");
-		this.removeAllOptions(attributes[2].node);
-		attributes[3].node.set("value", 9);
-		this.removeAllOptions(attributes[4].node);
-		attributes[5].node.set("value", 9);
-		attributes[6].node.set("value", "Verified");
-		attributes[7].node.set("value", "");
-		attributes[8].node.set("value", "");
+    		this.springDateMainNode.set("value", null);
+		    this.removeAllOptions(this.springDeviceMainNode);
+            this.springFlowMainNode.set("value", 9);
+            this.removeAllOptions(this.springTypeMainNode);
+            this.springConditionMainNode.set("value", 9);
+            this.springAccuracyMainNode.set("value", "");
+            this.springCommentMainNode.set("value", "");
+            this.springDescribeMainNode.set("value", "");
 		    
-		this.clearDiscoverer();
+		    this.discovererNameNode.clearNode();
        },
-        
-        clearDiscoverer: function () {
-        	this.honorificNode.set("value", "1");
-        	this.firstNameNode.set("value", "");
-        	this.middleNameNode.set("value", "");
-        	this.lastNameNode.set("value", "");
-        	this.emailNode.set("value", "");
-        },
-        
-        removeDiscovererList: function (value) {
-            var index = value-1;
-                        
-            // remove from name layer object
-            var object = layers[1].objects.splice(index,1);
-        
-            // remove name feature layer object
-            var len = layers[2].objects.length-1;
-            for (i=len;i>-1;i--) {		    
-                if (layers[2].objects[i].attributes[0].value==object[0].attributes[0].value) {
-                    layers[2].objects.splice(i,1);
-                    break;
-                }
-            }
-        
-            // remove from list and select the first name
-            this.discovererListNode.removeOption({ 
-                    value: value 
-            });
-        
-            if (layers[1].objects.length>0) {
-                this.discovererListNode.set("value", 1);
-            } else {
-                // do something here that works
-                if (this.discovererListNode.containerNode.length>0) {
-                    this.discovererListNode.containerNode.childNodes[0].innerHTML="";
-                    this.discovererListNode.containerNode.childNodes[0].textContent="";
-                }
-            }
-        },
         
         removeAllOptions: function (node) {
         	for (i=0;i<node.options.length;i++) {
         		node.removeOption(i);
-        	}
-        	
-        	// clear the node
-            if (this.discovererListNode.containerNode.length>0) {
-			    this.discovererListNode.containerNode.childNodes[0].innerHTML="";
-			}
+        	}        	
+        },
+        
+        deleteImages: function () {
+            dialog_image.deleteAllImages(layers[0].objects[0].attributes[0].value);
+        },
+        
+        addImages: function () {
+            var images = layers[3].objects;
+            var attributes
+            for (i=0;i<images.length;i++) {
+                attributes = images[i].attributes;
+                coordinates = images[i].coordinates;
+                 
+        		this.attributes = new layer.attributesImage();
+        		
+        		this.attributes.IMAGEID_PK = attributes[0].value;
+        		this.attributes.UPLOADID_FK = attributes[1].value;
+        		this.attributes.Title = attributes[2].value;
+                this.attributes.Description = attributes[3].value;
+                this.attributes.TimeZoneName = attributes[6].value;
+                this.attributes.UTC = attributes[7].value;
+                
+                this.attributes.Altitude = attributes[8].value;
+                if (this.attributes.Altitude=="") {
+                    this.attributes.Altitude = null;
+                }
+                
+                this.attributes.Orientation = attributes[9].value;
+                if (this.attributes.Orientation=="") {
+                    this.attributes.Orientation = null;
+                }
+               
+                if (this.attributes.Altitude == null) {
+                    this.attributes.TYPE = 0;
+                } else {
+                    this.attributes.TYPE = 1;
+                }
+                
+                this.attributes.IMAGE = this.url_base+ this.attributes.UPLOADID_FK+"/"+this.attributes.IMAGEID_PK+".jpg";
+
+                var imageLayer = map.getLayer("6");
+
+                // var type = this.getType(imageLayer.types, this.attributes.TYPE);
+                // var template = type.templates[0];
+                
+                this.selectedTemplate = {
+                    featureLayer: imageLayer,
+                    type: null,
+                    template: null,
+                    symbolInfo: null,
+                    item: null,
+                    showTitle: true,
+                    spanlabel: false,
+                    splitter: false
+                }
+
+        		this.geometry = new Point([coordinates.longitude,coordinates.latitude]);
+
+                var newGraphic = new Graphic(this.geometry, null, this.attributes);
+        	    this.selectedTemplate.featureLayer.applyEdits([newGraphic], null, null);
+            }
+            
+            // zoom in?
+            if (images.length>0) {
+            }
+        },
+        
+        addNames: function () {
+            var names = layers[1].objects;
+            var attributes;
+            var nameList = [];
+            for (i=0;i<names.length;i++) {
+                attributes = names[i].attributes;
+                
+                this.attributes = new layer.attributesName();
+                
+                this.attributes.NAMEID_PK = attributes[0].value;
+                this.attributes.Honorific = attributes[1].value;
+                this.attributes.FirstName = attributes[2].value;
+                this.attributes.MiddleName = attributes[3].value;
+                this.attributes.LastName = attributes[4].value;
+                this.attributes.Email = attributes[5].value;
+                
+                var name = {
+                    attributes: this.attributes
+                };
+                
+                nameList[nameList.length] = name;
+            }
+            tableLayer = map.getLayer("7");
+                     
+            tableLayer.applyEdits(nameList, null, null);
+            
+            var featureNames = layers[2].objects;
+            var featureNameList = [];
+            for (i=0;i<featureNames.length;i++) {
+                attributes = featureNames[i].attributes;
+                
+                this.attributes = new layer.attributesFeatureName();
+                
+                this.attributes.NAMEID_FK = attributes[0].value;
+                this.attributes.UPLOADID_FK = attributes[1].value;
+                this.attributes.FEATUREID_TYPE = attributes[2].value;
+
+                var name = {
+                    attributes: this.attributes
+                };
+                
+                featureNameList[featureNameList.length] = name;
+            }
+                
+            var tableLayer = map.getLayer("8");
+
+            tableLayer.applyEdits(featureNameList, null, null);
+        },
+        
+        sendVideoTracks: function () {
+            var videos = layers[4].objects;
+            
+            var send = {
+                videos: [],
+                tracks: []
+            };
+
+            for (i=0;i<videos.length;i++) {
+                attributes = videos[i].attributes;
+                coordinates = videos[i].coordinates;
+                
+                this.attributes = new layer.attributesVideo();
+                
+                this.attributes.videoid_pk = attributes[0].value;
+                this.attributes.uploadid_fk = attributes[1].value;
+                this.attributes.timezone = attributes[2].value;
+                this.attributes.utc = attributes[3].value;
+                this.attributes.type = attributes[4].value;
+                this.attributes.title = attributes[5].value;
+                this.attributes.url = attributes[6].value;
+                this.attributes.trackid_fk = attributes[7].value;
+                this.attributes.description = attributes[8].value;
+                this.attributes.latitude = coordinates.latitude;
+                this.attributes.longitude = coordinates.longitude;
+               
+                send.videos[send.videos.length] = this.attributes;
+            }
+
+            var tracks = layers[5].objects;
+
+            for (i=0;i<tracks.length;i++) {
+                attributes = tracks[i].attributes;
+                coordinates = tracks[i].coordinates;
+                
+                this.attributes = new layer.attributesTrack();
+                
+                this.attributes.trackid_pk = attributes[0].value;
+                this.attributes.uploadid_fk = attributes[1].value;
+                this.attributes.type = attributes[2].value;
+                this.attributes.title = attributes[3].value;
+                this.attributes.track = attributes[4].value;
+                this.attributes.description = attributes[5].value;
+                this.attributes.latitude = coordinates.latitude;
+                this.attributes.longitude = coordinates.longitude;
+
+                send.tracks[send.tracks.length] = this.attributes;
+            }
+
+        	var json = JSON.stringify(send);
+
+            request.post("/Seep/addVideoTrackFeatures.php", {
+                handleAs: "json",
+                method: "POST",
+                headers:{'X-Requested-With': null},
+                data: json
+            }).then(function(response){
+                console.log("The server returned: ", response);
+            });
+        },
+        
+        addVideoTracks: function () {
+            videos = layers[4].objects;
+            tracks = layers[5].objects;
+            
+            if (videos.length>0 || tracks.length>0) {
+                this.sendVideoTracks();
+            }
+        },
+        
+        deleteVideoTracks: function () {
+        },
+        
+        getType: function (types, value) {
+            var type = null;
+            for (i=0;i<types.length;i++) {
+                if (types[i].id==value) {
+                    type = types[i];
+                    break;
+                }
+            }
+            return type;
         },
         
         addSeepFeatures: function () {
-        	indx = layers[0].objects.length-1;
-    		attributes = layers[0].objects[indx].attributes;
-    		coordinates = layers[0].objects[indx].coordinates;
+    		attributes = layers[0].objects[0].attributes;
+    		coordinates = layers[0].objects[0].coordinates;
+    		
+    		// nasty little hack
+    		if (attributes[4].value==3) {
+                attributes[4].value = 0;
+        	}
         	
         	// check to see if a graphic has been created
         	if (this.geometry==null) {
-        		// create graphic, eatureLayer, attributes
+        		// create graphic, featureLayer, attributes
         		this.attributes = new layer.attributesSeep();
         		
-        		this.geometry = new Point([coordinates.longitudeNode.value,coordinates.latitudeNode.value],new SpatialReference({ wkid:3857 }));
-
-           		this.featureLayer = map.getLayer("5");
+        		this.geometry = new Point(coordinates.longNode.value,coordinates.latNode.value);
+                
+                var featureLayer = map.getLayer("5");
+                var type = this.getType(featureLayer.types, attributes[4].value);
+                var template = type.templates[0];
+                
+                this.selectedTemplate = {
+                    featureLayer: featureLayer,
+                    type: type,
+                    template: template,
+                    symbolInfo: null,
+                    item: null,
+                    showTitle: true,
+                    spanlabel: false,
+                    splitter: false
+                }
         	}
         	
         	// add attributes
         	this.attributes.UPLOADID_PK = attributes[0].value;
-        	this.attributes.DateFound = attributes[1].value;
+        	this.attributes.DateFound = locale.format(attributes[1].value, {selector:"date"});
         	this.attributes.Device = attributes[2].value;
         	this.attributes.Flow = attributes[3].value;
         	this.attributes.TYPE = attributes[4].value;
@@ -372,78 +569,151 @@ define([
         	this.attributes.Accuracy = attributes[6].value;
         	this.attributes.Comment = attributes[7].value;
         	this.attributes.Describe = attributes[8].value;
+        	this.attributes.Example = 0;
         	
         	// add point to feature layer
-        	var newGraphic = new Point(this.geometry, null, this.attributes);
-        	this.featureLayer.applyEdits([newGraphic], null, null);
+            var newGraphic = new Graphic(this.geometry, null, this.attributes);
+        	this.selectedTemplate.featureLayer.applyEdits([newGraphic], null, null);
         	
-        	this.resetForm();
-        	
-        	this.clearParameters();
-
-        	// add names
+         	// add names
+        	this.addNames();
         	
         	// add image points
+        	this.addImages();
         	
         	// send video and tracks to get processed
+           	this.addVideoTracks();
            	
+       	    this.resetForm();
+        	
+        	this.clearParameters();
+
         	this.hide();
         },
         
-        editSeepFeature: function () {
+        editSeepFeatures: function () {
+            this.discovererNameNode.updateNames(layers[0].objects[0].attributes[0].value);
+            
+            var feature = this.attributeBar.currentFeature;
+            
+    		var attributes = layers[0].objects[0].attributes;
+
+            feature.attributes.UPLOADID_PK = attributes[0].value;
+        	feature.attributes.DateFound = locale.format(attributes[1].value, {selector:"date"});
+        	feature.attributes.Device = attributes[2].value;
+        	feature.attributes.Flow = attributes[3].value;
+        	feature.attributes.TYPE = attributes[4].value;
+        	feature.attributes.Condition = attributes[5].value;
+        	feature.attributes.Accuracy = attributes[6].value;
+        	feature.attributes.Comment = attributes[7].value;
+        	feature.attributes.Describe = attributes[8].value;
+        	feature.attributes.Example = 0;
+            
+            var newGraphic = new Graphic(feature.geometry, null, feature.attributes);
+            
+            var seepLayer = map.getLayer("5");
+
+            seepLayer.applyEdits(null,[newGraphic],null);
+        	
+        	this.attributeBar.resetAttributes();
+        	
+        	this.hide();
+        },
+        
+        deleteSeepFeatures: function () {
+            this.discovererNameNode.deleteAllNames();
+            
+            this.deleteImages();
+            
+            this.deleteVideoTracks();
+            
+            var feature = this.attributeBar.currentFeature;
+            
+             var newGraphic = new Graphic(feature.geometry, null, feature.attributes);
+            
+            var seepLayer = map.getLayer("5");
+
+            seepLayer.applyEdits(null,null,[newGraphic]);
+            
+            seepLayer = map.getLayer("1");
+            
+            seepLayer.refresh();
         	
         	this.resetForm();
         	
         	this.clearParameters();
-           	
-        	this.hide();
-        },
-        
-        deleteSeepFeature: function () {
-         	
-        	this.resetForm();
-        	
-        	this.clearParameters();
-           	
-        	this.hide();
        },
         
-        checkForName: function () {
-        	var name = false;
-        	
-         	for (i=0;i<layers[2].objects.length;i++) {
-         		indx = layers[0].objects.length-1;
-         		sAttributes = layers[0].objects[indx].attributes;
-         		attributes = layers[2].objects[i].attributes
-         		if (attributes[1].value==sAttributes[0].value) {
-         			name = true;
-         		}
-         	}
-         	
-        	return name;
-        },
-
         cleanup: function() {
         	// ask about this as a bunch of stuff could be lost
-        	
-           		    	    	    
-         	this.resetForm();
-        	
-         	this.clearParameters();
-           	
-        	this.hide();
+        	if (this.mode=="add") {
+        	    if (confirm("Canceling will remove everything including images and tracks. Do you really want to do this?")) {
+                    this.resetForm();
+            
+                    this.clearParameters();
+                    this.hide();
+        	    }
+        	} else if (confirm("Canceling will remove any edits. Do you really want to do this?")) {
+        	    this.hide();
+        	}	    	    	    
         },
         
-        clearParameters: function () {
-        	// and all objects ??? destructor ????
+        clearLayers: function () {
+        	// and all objects
         	for (i=0;i<layers.length;i++) {
         		layers[i].objects = [];
         	}
-        	
+        },
+        
+        clearParameters: function () {
+            this.clearLayers();
+            
+        	this.clearThis();
+        },
+        
+        clearThis: function () {
         	this.geometry = null;
-           	this.featureLayer = null;
+           	this.selectedTemplate = null;
            	this.attributes = null;
            	this.mode = "";
+        },
+        
+        leaveWithAction: function () {
+            // check to see if there is a name in the name list;
+            if (this.discovererNameNode.checkForName(this.UPLOADIDMainNode.value)) {
+                    // check to see if there is a date
+                    var attributes = layers[0].objects[0].attributes;
+                if (attributes[1].node.get("value")!=null) {
+                            
+                        // get attributes and clear nodes
+                            attributes[1].value = attributes[1].node.get("value");
+                            
+                            attributes[2].value = attributes[2].node.get("value");    
+                            
+                            attributes[3].value = attributes[3].node.get("value");
+                            
+                            attributes[4].value = attributes[4].node.get("value");
+                            
+                            attributes[5].value = attributes[5].node.get("value");
+                            
+                            attributes[6].value = attributes[6].node.get("value");
+                            
+                            attributes[7].value = attributes[7].node.get("value");
+                            
+                            attributes[8].value = attributes[8].node.get("value");
+
+                        // add points and send attributes to where they belong
+                        if (this.mode=="add") {
+                                this.addSeepFeatures();
+                        } else if (this.mode=="edit"){
+                                this.editSeepFeatures();
+                        }
+                    } else {
+                            alert("No Date!");
+                    }
+            } else {
+                    alert("No Discoverer!");
+            }           		    
         },
 
         constructor: function (options) {
@@ -453,7 +723,7 @@ define([
         postCreate: function () {
             //make sure any parent widget's postCreate functions get called.
             this.inherited(arguments);
-
+            
             this.springTypeMainNode.on("change", lang.hitch(this, function () {
             
              	if (arguments[0]=="2") {
@@ -464,37 +734,8 @@ define([
 		    }
             }));
 
-            this.addNameNode.on("click", lang.hitch(this, function () {
-            		    
-            		    // validate
-            		    if (this.lastNameNode.get("value")=="") {
-            		    		    alert("A last name is required!");
-            		    } else if (this.emailNode.get("value")=="") {
-            		    		    alert("An email address is required!");
-            		    } else {
-            		    	    // put in discovererList
-            		    	    console.log(this.honorificNode);
-            		    	    this.addDiscovererList(this.honorificNode.get("value"), this.getHonorific(this.honorificNode.get("value")), this.firstNameNode.get("value"), this.middleNameNode.get("value"), this.lastNameNode.get("value"), this.emailNode.get("value"));
-            		    }
-            }));
-
-            this.removeNameNode.on("click", lang.hitch(this, function () {
-            		    if (this.discovererListNode.get("value")>=1) {
-				    // ask fer sher
-				    if (confirm("Do you want to delete the selected name?")) {
-					    // remove from list
-					    this.removeDiscovererList(this.discovererListNode.get("value"))
-				    }
-            		    } else {
-            		    	    alert("Nothing to remove!");
-            		    }
-            }));
-
             this.addPhotoNode.on("click", lang.hitch(this, function () {
-                        var indx = layers[0].objects.length-1;
-                        var attributes = layers[0].objects[indx].attributes;
-
-                        console.log(attributes[1].node.get("value"));
+                        var attributes = layers[0].objects[0].attributes;
                         
                         if (attributes[1].node.get("value")!=null) {
                             attributes[1].value = attributes[1].node.get("value");
@@ -506,50 +747,28 @@ define([
             }));
 
             this.addVideoNode.on("click", lang.hitch(this, function () {
-            		    dialog_video.show();
+                        var attributes = layers[0].objects[0].attributes;
+                        
+                        if (attributes[1].node.get("value")!=null) {
+                            attributes[1].value = attributes[1].node.get("value");
+                            dialog_video.videoSetID();
+            		        dialog_video.show();
+                        } else {
+                            alert("Needs a valid date");
+                        }
             }));
 
             this.addTrackNode.on("click", lang.hitch(this, function () {
+             		    dialog_trackSubmit.setID();
              		    dialog_trackSubmit.show();
            }));
             
+            this.editMainNode.on("click", lang.hitch(this, function () {
+               this.leaveWithAction();
+           }));
+            
             this.submitMainNode.on("click", lang.hitch(this, function () {
-            		    // check to see if there is a name in the name list;
-            		    if (this.checkForName()) {
-            		    	    // check to see if there is a date
-            		    	    var indx = layers[0].objects.length-1;
-            		    	    var attributes = layers[0].objects[indx].attributes;
-           		    	    if (attributes[1].node.get("value")!=null) {
-            		    	    	    
-           		    	    	    // get attributes and clear nodes
-            		    	    	    attributes[1].value = attributes[1].node.get("value");
-            		    	    	    
-            		    	    	    attributes[2].value = attributes[2].node.get("value");    
-            		    	    	    
-            		    	    	    attributes[3].value = attributes[3].node.get("value");
-            		    	    	    
-            		    	    	    attributes[4].value = attributes[4].node.get("value");
-            		    	    	    
-            		    	    	    attributes[5].value = attributes[5].node.get("value");
-             		    	    	    
-            		    	    	    attributes[6].value = attributes[6].node.get("value");
-            		    	    	    
-            		    	    	    attributes[7].value = attributes[7].node.get("value");
-            		    	    	    
-            		    	    	    attributes[8].value = attributes[8].node.get("value");
-
-           		    	    	    // add points and send attributes to where they belong
-           		    	    	    if (this.mode=="add") {
-           		    	    	    	    this.addSeepFeatures();
-           		    	    	    } else if (this.mode=="change"){
-           		    	    	    	    this.editSeepFeatures();
-           		    	    	    }
-            		    	    } else {
-            		    	    	    alert("No Date!");
-            		    	    }
-            		    } else {
-            		    	    alert("No Discoverer!");
-            		    }           		    
+                this.leaveWithAction();
             }));
         },
         

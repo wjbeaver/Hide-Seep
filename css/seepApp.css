@@ -3,7 +3,7 @@ body {
 	height: 98%;
 	width: 98%;
 	margin: 1%;
-	background-color: #606564;
+	background-image: url("/Seep/formSeepApp/images/grey_wash_wall.png");
 	font-family: Tahoma,Verdana;
 }
 
@@ -25,6 +25,10 @@ a:hover {
 
 a:active {
 	text-decoration: none;
+}
+
+#seepAttributes {
+    z-index: 150;
 }
 
 .login {
@@ -87,11 +91,11 @@ a:active {
 	height: 75%;
 	z-index: 100;
 	padding: 2px;
-	background-color: #5F5400;
+	background-color: #646235;
 }
 
 #legendPane {
-	border: solid #5F5400 1px;
+	border: solid #646235 1px;
 }
 
 #topPane {
@@ -103,7 +107,7 @@ a:active {
 
 #centerPane {
 	border-radius: 5px;
-	background-color: #606564;
+	background-image: url("/Seep/formSeepApp/images/grey_wash_wall.png");
 	border: 0px;
 }
 
@@ -121,6 +125,7 @@ a:active {
         /*           background-color: #FFFEF5;           color: #5F5400; */
 }
 
+/*
 .dojoxDock {
 	left: 90% !important;
 	top: 140px !important;
@@ -128,20 +133,438 @@ a:active {
 	border: 0px;
 	z-index: 100;
 }
-
+*/
 .dojoxDockNode {
 	width: 100%;
 	background: #C0C4E6;
 }
 
+.templatePicker {
+    border: 1px solid #646235 !important;
+    background-color: white;
+}
+
+/*
+.templatePicker .dojoxGrid {
+    background-color: rgba(0, 0, 0, .4) !important;
+}
+*/
+
 .dijitAccordionContainer-dijitContentPane {
-        /*   background-color: #FFFEF5 !important; */
+	background-image: url("/Seep/formSeepApp/images/frenchstucco.png");
+}
+
+.claro .dijitSelectHover, .claro .dijitSelectHover .dijitButtonContents, .claro .dijitTextBoxHover, .claro .dijitTextBoxHover .dijitButtonNode {
+	background-image: url("/Seep/formSeepApp/images/noisy.png") !important;
+}
+.claro .dijitTextBoxHover {
+	background-image: url("/Seep/formSeepApp/images/noisy.png") !important;
+}
+
+claro .dijitSelectFocused, .claro .dijitSelectFocused .dijitButtonContents, .claro .dijitTextBoxFocused, .claro .dijitTextBoxFocused .dijitButtonNode {
+    border-color: #725229 !important;
+}
+
+.claro .dijitComboBoxOpenOnClickHover .dijitButtonNode, .claro .dijitComboBox .dijitDownArrowButtonHover, .claro .dijitComboBoxFocused .dijitArrowButton {
+	background-image: url("/Seep/formSeepApp/images/noisy.png") !important;
+}
+
+.claro .dijitComboBox .dijitHasDropDownOpen {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitButton .dijitButtonNode, .claro .dijitDropDownButton .dijitButtonNode, .claro .dijitComboButton .dijitButtonNode, .claro .dijitToggleButton .dijitButtonNode {
+	background-image: url("/Seep/formSeepApp/images/old_moon.png") !important;
+    border: 1px solid #725229 !important;
+}
+
+.claro .dijitButtonHover .dijitButtonNode, .claro .dijitDropDownButtonHover .dijitButtonNode, .claro .dijitComboButton .dijitButtonNodeHover, .claro .dijitComboButton .dijitDownArrowButtonHover, .claro .dijitToggleButtonHover .dijitButtonNode {
+	background-image: url("/Seep/formSeepApp/images/noisy.png") !important;
+    color: #000000 !important;
+}
+
+.claro .dijitButtonActive .dijitButtonNode, .claro .dijitDropDownButtonActive .dijitButtonNode, .claro .dijitComboButtonActive .dijitButtonNode, .claro .dijitToggleButtonActive .dijitButtonNode, .claro .dijitToggleButtonChecked .dijitButtonNode {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitSelectHover .dijitArrowButton {
+	background-image: url("/Seep/formSeepApp/images/noisy.png") !important;
+}
+
+.claro .dijitSelectFocused .dijitArrowButton {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitSelectMenu .dijitMenuSeparatorTop {
+    border-bottom: 1px solid #725229 !important;
+}
+
+.claro .dijitTabHover {
+	background-image: url("/Seep/formSeepApp/images/noisy.png") !important;
+    border-color: #725229 !important;
+    color: #000000 !important;
+}
+
+.claro .dijitTabActive {
+	background-image: url("/Seep/formSeepApp/images/old_moon.png") !important;
+    border-color: #725229 !important;
+    color: #000000 !important;
+}
+
+.claro .dijitTabChecked {
+	background-image: url("/Seep/formSeepApp/images/old_moon.png") !important;
+    border-color: #b5bcc7 !important;
+    color: #000000 !important;
+}
+
+.claro .tabStripButton {
+	background-image: url("/Seep/formSeepApp/images/old_moon.png") !important;
+    border: 1px solid #b5bcc7 !important;
+}
+
+.claro .tabStripButtonHover {
+	background-image: url("/Seep/formSeepApp/images/noisy.png") !important;
+}
+
+.claro .tabStripButtonActive {
+	background-image: url("/Seep/formSeepApp/images/noisy.png") !important;
+}
+
+.claro .dijitTabContainerTabListNested .dijitTabHover {
+	background-image: url("/Seep/formSeepApp/images/noisy.png") !important;
+    border: 1px solid #725229 !important;
+}
+
+.claro .dijitTabContainerTabListNested .dijitTabActive {
+    border: 1px solid #725229 !important;
+}
+
+.claro .dijitTabContainerTabListNested .dijitTabChecked {
+    background-color: #FFF7EC !important;
+    border: 1px solid #725229 !important;
+}
+
+.claro .dijitDialog {
+    border: 1px solid #727029 !important;
+}
+
+.claro .dijitDialogPaneContent {
+    border-top: 1px solid #727029 !important;
+}
+
+.claro .dijitDialogTitleBar {
+    background-color: #8A884A !important;
+}
+
+.claro .dijitTooltipContainer {
+    border: 1px solid #725229 !important;
+    color: #000000 !important;
+}
+
+.claro .dijitCalendar {
+	background-image: url("/Seep/formSeepApp/images/old_moon.png") !important;
+    border: 1px solid #b5bcc7 !important;
+}
+
+.claro .dijitCalendarHover, .claro .dijitCalendar:hover, .claro .dijitCalendarActive {
+	background-image: url("/Seep/formSeepApp/images/noisy.png") !important;
+    border: 1px solid #725229 !important;
+}
+
+.claro .dijitCalendarPreviousMonth, .claro .dijitCalendarNextMonth {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitCalendarPreviousMonth .dijitCalendarDateLabel, .claro .dijitCalendarNextMonth .dijitCalendarDateLabel {
+	background-image: url("/Seep/formSeepApp/images/old_moon.png") !important;
+     color: #725229 !important;
+}
+
+.claro .dijitCalendarHoveredDate .dijitCalendarDateLabel, .claro .dijitCalendarEnabledDate:hover .dijitCalendarDateLabel {
+	background-image: url("/Seep/formSeepApp/images/noisy.png") !important;
+    border: 1px solid #725229 !important;
+    color: #000000 !important;
+}
+
+.claro .dijitCalendarNextYearHover, .claro .dijitCalendarNextYear:hover, .claro .dijitCalendarPreviousYearHover, .claro .dijitCalendarPreviousYear:hover {
+	background-image: url("/Seep/formSeepApp/images/noisy.png") !important;
+    color: #000000 !important;
+ }
+
+.claro .dijitCalendarNextYearActive, .claro .dijitCalendarNextYear:active .claro .dijitCalendarPreviousYearActive, .claro .dijitCalendarPreviousYear:active {
+    background-color: #FFF7EC !important;
+    border: 1px solid #725229 !important;
+ }
+
+.claro .dijitCalendarActiveDate .dijitCalendarDateLabel, .claro .dijitCalendarEnabledDate:active .dijitCalendarDateLabel {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitCalendarSelectedDate .dijitCalendarDateLabel {
+    background-color: #FFF7EC; !important
+    border-color: #725229 !important;
+    color: #000000 !important;
+}
+
+.claro .dijitCalendar .dijitDropDownButtonHover .dijitButtonNode, .claro .dijitCalendar .dijitDropDownButton:hover .dijitButtonNode {
+	background-image: url("/Seep/formSeepApp/images/noisy.png") !important;
+}
+
+.claro .dijitCalendarMonthMenu {
+    border-color: #725229 !important;
+}
+
+.claro .dijitCalendarMonthMenu .dijitCalendarMonthLabelHover, .claro .dijitCalendarMonthMenu .dijitCalendarMonthLabel:hover {
+	background-image: url("/Seep/formSeepApp/images/noisy.png") !important;
+    border-color: #725229 !important;
+}
+
+.claro .dijitMenu {
+    border: 1px solid #725229 !important;
+}
+
+.claro .dijitMenuBar .dijitMenuItemHover, .claro .dijitMenuBar .dijitMenuItemSelected {
+    border: 1px solid #725229 !important;
+ }
+ 
+ .claro .dijitMenu .dijitMenuItemHover td, .claro .dijitMenu .dijitMenuItemSelected td, .claro .dijitMenuItemHover, .claro .dijitComboBoxMenu .dijitMenuItemHover, .claro .dijitMenuItemSelected {
+	background-image: url("/Seep/formSeepApp/images/noisy.png") !important;
+    border-color: #725229 !important;
+}
+
+.claro .dijitMenu .dijitMenuItemSelected td, .claro .dijitComboBoxMenu .dijitMenuItemSelected {
+    background-color: #FFF7EC !important;
+    border-color: #725229 !important;
+    color: #000000 !important;
+}
+
+.claro .dijitComboBoxMenuActive .dijitMenuItemSelected {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitSliderFocused .dijitSliderBar {
+    border-color: #725229 !important;
+}
+
+.claro .dijitSliderHover .dijitSliderBar {
+    border-color: #725229 !important;
+}
+
+.claro .dijitSlider .dijitSliderProgressBarH, .claro .dijitSlider .dijitSliderLeftBumper {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitSliderHover .dijitSliderProgressBarH, .claro .dijitSliderHover .dijitSliderLeftBumper {
+    background-color: #FFF7EC !important;
+    border-color: #725229 !important;
+}
+.claro .dijitSliderHover .dijitSliderRemainingBarH, .claro .dijitSliderHover .dijitSliderRightBumper {
+    border-color: #725229 !important;
+}
+
+.claro .dijitSliderFocused .dijitSliderProgressBarH, .claro .dijitSliderFocused .dijitSliderLeftBumper {
+    background-color: #FFF7EC !important;
+    border-color: #725229 !important;
+}
+
+.claro .dijitSliderFocused .dijitSliderRemainingBarH, .claro .dijitSliderFocused .dijitSliderRightBumper {
+    border-color: #725229 !important;
+}
+
+.claro .dijitSlider .dijitSliderProgressBarV, .claro .dijitSlider .dijitSliderBottomBumper {
+    background-color: #FFF7EC !important;
+    border-color: #b5bcc7 !important;
+}
+
+.claro .dijitSliderHover .dijitSliderProgressBarV, .claro .dijitSliderHover .dijitSliderBottomBumper {
+    background-color: #FFF7EC !important;
+    border-color: #725229 !important;
+}
+
+.claro .dijitSliderHover .dijitSliderRemainingBarV, .claro .dijitSliderHover .dijitSliderTopBumper {
+    border-color: #725229 !important;
+}
+
+.claro .dijitSliderFocused .dijitSliderProgressBarV, .claro .dijitSliderFocused .dijitSliderBottomBumper {
+    background-color: #FFF7EC !important;
+    border-color: #725229 !important;
+}
+
+.claro .dijitSliderFocused .dijitSliderRemainingBarV, .claro .dijitSliderFocused .dijitSliderTopBumper {
+    border-color: #725229 !important;
+}
+
+.claro .dijitSliderActive .dijitSliderDecrementIconH, .claro .dijitSliderActive .dijitSliderIncrementIconH, .claro .dijitSliderActive .dijitSliderDecrementIconV, .claro .dijitSliderActive .dijitSliderIncrementIconV, .claro .dijitSliderHover .dijitSliderDecrementIconH, .claro .dijitSliderHover .dijitSliderIncrementIconH, .claro .dijitSliderHover .dijitSliderDecrementIconV, .claro .dijitSliderHover .dijitSliderIncrementIconV {
+    border: 1px solid #725229 !important;
+}
+
+.claro .dijitSliderButtonContainerV .dijitSliderDecrementButtonHover, .claro .dijitSliderButtonContainerH .dijitSliderDecrementButtonHover, .claro .dijitSliderButtonContainerV .dijitSliderIncrementButtonHover, .claro .dijitSliderButtonContainerH .dijitSliderIncrementButtonHover {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitSliderButtonContainerV .dijitSliderDecrementButtonActive, .claro .dijitSliderButtonContainerH .dijitSliderDecrementButtonActive, .claro .dijitSliderButtonContainerV .dijitSliderIncrementButtonActive, .claro .dijitSliderButtonContainerH .dijitSliderIncrementButtonActive {
+    background-color: #FFF7EC !important;
+    border-color: #725229 !important;
+}
+
+.claro .dijitInlineEditBoxDisplayModeHover {
+    background-color: #FFF7EC !important;
+    border: 1px solid #725229 !important;
+}
+
+.claro .dijitProgressBarEmpty {
+    border-color: #725229 !important;
+}
+
+.claro .dijitProgressBarTile {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitProgressBarFull {
+    border-color: #725229 !important;
+}
+
+.claro .dijitTimePickerTickHover, .claro .dijitTimePickerMarkerHover, .claro .dijitTimePickerMarkerSelected, .claro .dijitTimePickerTickSelected {
+    background-color: #FFF7EC !important;
+    color: #000000 !important;
+}
+
+.claro .dijitTimePicker .dijitUpArrowHover, .claro .dijitTimePicker .dijitDownArrowHover {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitSplitterHHover, .claro .dijitSplitterVHover {
+    background-color: #FFF7EC;
+}
+
+.claro .dijitSplitterHHover .dijitSplitterThumb, .claro .dijitSplitterVHover .dijitSplitterThumb {
+    background: none repeat scroll 0 0 #725229 !important;
+}
+
+.claro .dijitSplitterHActive, .claro .dijitSplitterVActive {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitTreeRowSelected {
+    background-color: ##FFF7EC !important;
+    border-color: #725229 !important;
+    color: #000000 !important;
+}
+
+.claro .dijitTreeRowHover {
+    background-color: #FFF7EC !important;
+    border-color: #725229 !important;
+    color: #000000;
+}
+
+.claro .dijitTreeRowActive {
+    background-color: #FFF7EC !important;
+    border-color: #725229 !important;
+    color: #000000 !important;
+}
+
+.claro .dijitTreeNode .dojoDndItemBefore .dijitTreeContent {
+    border-top: 2px solid #725229 !important;
+}
+
+.claro .dijitTreeNode .dojoDndItemAfter .dijitTreeContent {
+    border-bottom: 2px solid #725229 !important;
+}
+
+.dj_ie .claro .dijitToolbar .dijitButtonHover .dijitButtonNode, .dj_ie .claro .dijitToolbar .dijitDropDownButtonHover .dijitButtonNode, .dj_ie .claro .dijitToolbar .dijitComboButton .dijitButtonNodeHover, .dj_ie .claro .dijitToolbar .dijitComboButton .dijitDownArrowButtonHover, .dj_ie .claro .dijitToolbar .dijitToggleButtonHover .dijitButtonNode {
+    background-color: #FFF7EC !important;
+}
+
+.dj_ie .claro .dijitToolbar .dijitButtonActive .dijitButtonNode, .dj_ie .claro .dijitToolbar .dijitDropDownButtonActive .dijitButtonNode, .dj_ie .claro .dijitToolbar .dijitComboButtonActive .dijitButtonNode, .dj_ie .claro .dijitToolbar .dijitToggleButtonActive .dijitButtonNode {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitToolbar .dijitButtonHover .dijitButtonNode, .claro .dijitToolbar .dijitDropDownButtonHover .dijitButtonNode, .claro .dijitToolbar .dijitToggleButtonHover .dijitButtonNode, .claro .dijitToolbar .dijitComboButtonHover .dijitButtonNode {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitToolbar .dijitComboButtonHover .dijitButtonNode, .claro .dijitToolbar .dijitComboButtonHover .dijitDownArrowButton {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitToolbar .dijitComboButtonHover .dijitButtonNodeHover, .claro .dijitToolbar .dijitComboButtonHover .dijitDownArrowButtonHover {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitToolbar .dijitButtonActive .dijitButtonNode, .claro .dijitToolbar .dijitDropDownButtonActive .dijitButtonNode, .claro .dijitToolbar .dijitToggleButtonActive .dijitButtonNode {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitToolbar .dijitComboButtonActive .dijitButtonNode, .claro .dijitToolbar .dijitComboButtonActive .dijitDownArrowButton {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitToolbar .dijitComboButtonActive .dijitButtonNodeActive {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitToolbar .dijitComboButtonActive .dijitDownArrowButtonActive {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitToolbar .dijitToggleButtonChecked .dijitButtonNode {
+    border-color: #FFF7EC !important;
+}
+
+.claro .dijitEditorHover .dijitEditorIFrameContainer, .claro .dijitEditorHover .dijitEditorIFrameContainer .dijitEditorIFrame {
+    background-color: #FFF7EC !important;
+}
+
+.claro .dijitTitlePaneTitleOpen, .claro .dijitTitlePaneTitleFixedOpen {
+    background-color: #FFF7EC !important;
+    color: #000000 !important;
+}
+
+.claro .dijitTitlePaneTitleHover {
+    background-color: #FFF7EC !important;
+    border-color: #725229 !important;
+}
+
+.claro .dijitTitlePaneTitleActive {
+    background-color: #FFF7EC !important;
+    border-color: #725229 !important;
+}
+
+.claro .dijitUpArrowButtonActive, .claro .dijitDownArrowButton {
+	background: url("/Seep/formSeepApp/images/old_moon.png") !important;
+}
+
+.claro .dijitSpinner .dijitUpArrowButtonHover, .claro .dijitSpinner .dijitDownArrowButtonHover, .claro .dijitSpinnerFocused .dijitArrowButton {
+	background: url("/Seep/formSeepApp/images/noisy.png") !important;
+}
+
+.claro .dijitSpinner .dijitDownArrowButtonActive, .claro .dijitSpinner .dijitUpArrowButtonActive {
+    background-color: #FFF7EC !important;
+}
+
+.dijitAccordionContainer .dijitAccordionChildWrapper {
+    border: 1px solid #646235 !important;
+}
+
+.dijitAccordionInnerContainerHover {
+    background-color: #AFAE88 !important;
+    border: 1px solid #646235 !important;
+}
+
+.dijitAccordionInnerContainerActive {
+    background-color: #AFAE88 !important;
+    border: 1px solid #646235 !important;
+}
+
+.dijitAccordionInnerContainerSelected {
+    background-color: #AFAE88 !important;
+    border-color: #646235 !important;
+}
+
+.dijitAccordionInnerContainer {
+    background-color: #doce98 !important;
+    border: 1px solid #8aa848 !important;
 }
 
 .dojoxFloatingPaneTitle {
-	background: #ACADB2;
-	color: #36013F;
-}
-#zoomedIn {
-	display: block;
-}
+    background: none repeat-x scroll left bottom #doce98 !i

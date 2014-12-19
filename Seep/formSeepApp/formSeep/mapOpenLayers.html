@@ -1,0 +1,13 @@
+<div class="dijitDialog appConfirmDialog" role="dialog" aria-labelledby="${id}_title">
+    <div data-dojo-attach-point="titleBar" class="dijitDialogTitleBar">
+        <span data-dojo-attach-point="titleNode" class="dijitDialogTitle" id="${id}_title" role="heading" level="1"></span>
+        <span data-dojo-attach-point="closeButtonNode" class="dijitDialogCloseIcon" data-dojo-attach-event="ondijitclick: cleanup" title="${buttonCancel}" role="button" tabindex="0">
+            <span data-dojo-attach-point="closeText" class="closeText" title="${buttonCancel}">x</span>
+        </span>
+    </div>
+    <div class="dijitDialogPaneContent" style="height:100%;">
+        <div data-dojo-attach-point="containerNode" style="position:relative">
+            <iframe src="" data-dojo-attach-point="mapOLNode" style=" width: 78%; height: 72%; position:fixed"><h1>LOADING IFRAME</h1></iframe>
+        </div>
+    </div>
+</div>

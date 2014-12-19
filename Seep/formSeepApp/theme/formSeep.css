@@ -1,5 +1,131 @@
 @CHARSET "UTF-8";
 
+.esriAttributeInspector .atiLayerName {display:none;}
+
+.esriPopup.popSeep .titlePane, .dj_ie7 .esriPopup.popSeep .titlePane .title {
+    background-image: url("/Seep/formSeepApp/images/grey_wash_wall.png");
+  color:#f5f2f0;
+  font-weight:700;
+}
+
+.esriPopup.popSeep .titlePane {
+  border-bottom:1px solid #646235;
+}
+
+.esriPopup.popSeep a {
+  color:#5F5400;
+}
+
+.esriPopup.popSeep .contentPane,
+.esriPopup.popSeep .actionsPane {
+  background-image: url("/Seep/formSeepApp/images/frenchstucco.png");
+  color:#5F5400;
+  border-color:0 solid #5F5400;
+}
+
+#photoList {
+    display: hidden;
+	background-image: url("/Seep/formSeepApp/images/ricepaper2.png");
+	border:2px solid #5F5400;
+}
+
+#updatePhoto {
+    display: hidden;
+}
+
+#addPhoto {
+    display: block;
+}
+
+#imageTaken {
+    display: block;
+}
+
+#imageViewClose {
+    display: none;
+}
+
+#addButtons {
+    display: block;
+	background-image: url("/Seep/formSeepApp/images/frenchstucco.png");
+}
+
+#editButtons {
+    display: hidden;
+	background-image: url("/Seep/formSeepApp/images/frenchstucco.png");
+	margin:0px;
+}
+
+.close {
+	position: absolute;
+	top: 5px;
+	left: 194px;
+    cursor: pointer;
+    font-size: 0.85em;
+}
+
+.close2 {
+	position: absolute;
+	top: -5px;
+	left: 90%;
+    cursor: pointer;
+    font-size: 0.85em;
+}
+
+.multipleFeature {
+    text-align:center;
+    visibility: hidden !important;
+    font-size: 0.85em;
+}
+
+.buttons {
+    text-align:center;
+    margin-top: 7px;
+    margin-bottom: 7px;
+    font-size: 0.85em;
+}
+
+.attributesubTitle {
+    font-weight: bold;
+    width: 50px;
+}
+
+.attributeBar{
+    padding:5px;
+    margin:0px;
+	background-image: url("/Seep/formSeepApp/images/ricepaper2.png");
+	border:2px solid #5F5400;
+	z-index: 150;
+}
+
+.dojoxFloatingPaneTitle {
+	background-image: url("/Seep/formSeepApp/images/old_moon.png");
+	color: #5F5400;
+	border:1px solid #5F5400;
+    cursor: pointer;
+    padding: 4px 4px 2px;
+    white-space: nowrap;
+}
+
+.dojoxFloatingPaneContent {
+	background-image: url("/Seep/formSeepApp/images/frenchstucco.png");
+	color: #5F5400;
+}
+
+.infoBlock {
+    padding: 3px;
+    border-radius: 4px;
+    background-color: white;
+    border: 1px solid #646235;    
+    margin: 4px;
+    font-size: 0.85em;
+}
+
+.saveButton {
+    padding-left:45px;
+     margin:0px;width:16px; height:16px;
+}
+
 .appConfirmDialog {
 	min-width:275px;
 }
@@ -7,10 +133,11 @@
 	text-align:center;
 }
 
-.appConfirmDialog .dijitDialogPaneContent {
+.claro .dijitDialogPaneContent {
 	text-align:left;
-	background-color: #FFFEF5;
+	background: url("/Seep/formSeepApp/images/frenchstucco.png");
 	color: #5F5400;
+    overflow: visible;
 }
 
 #radio1 {
@@ -22,7 +149,7 @@
 }
 
 #radio3 {
-	display:none;
+	display:block;
 }
 
 .honor {
@@ -46,7 +173,6 @@
 }
 
 .nameBox {
-	background-color: #FFFEF5;
 	padding: 5px;
 	margin-bottom: 6px;
 	white-space: nowrap;
@@ -59,7 +185,7 @@
 }
 
 .dojoxUploaderFileListHeader th {
-	background-color: #FFFEF5;
+	background-image: url("/Seep/formSeepApp/images/noisy.png");
 }
 
 .dojoxUploaderFileList {
@@ -94,6 +220,13 @@
 	display: inline-block;
 	margin-left: 10px;
 }
+.editing-block {
+	vertical-align: top;
+	margin-left: 10px;
+}
+#editing-block {
+	display: none;
+}
 #drawing-mode {
 	margin-bottom: 10px;
 	vertical-align: top;
@@ -103,7 +236,7 @@
 	vertical-align: top;
 	margin-bottom: 10px;
 	margin-top: 10px;
-	background: #f5f2f0;
+	background: url("/Seep/formSeepApp/images/ricepaper2.png");
 	padding: 10px;
 }
 #c {
@@ -152,31 +285,21 @@
 #instructions {
 	display: block;
 }
-#widget_firstName {
+.firstName {
 	width:100px;
 }
-#widget_middleName {
+.middleName {
 	width: 50px !important;
 }
-#widget_lastName {
+.lastName {
 	width: 100px !important;
 }
-#widget_firstNamePhotographer {
-	width:100px;
+#namer_1 {
+    width: 70%;
 }
-#widget_middleNamePhotographer {
-	width: 50px !important;
-}
-#widget_lastNamePhotographer {
-	width: 100px !important;
-}
-#listContainerDiscoverer {
-	border:1px solid #aaa;
-	padding: 3px;
-}
-#listContainerPhotographer {
-	border:1px solid #aaa;
-	width: 70%;
+.nameContainer {
+	background-image: url("/Seep/formSeepApp/images/ricepaper2.png");
+	border:1px solid #ccc;
 	padding: 3px;
 }
 #widget_dateMain {
@@ -199,4 +322,14 @@
 }
 #radioChoice1 .tableContainer-labelCell {
 	width: 10px !important;
+}
+
+.tabClass {
+	background-image: url("/Seep/formSeepApp/images/frenchstucco.png");
+}
+
+.namer {
+	background-image: url("/Seep/formSeepApp/images/old_moon.png");
+	color: #5F5400;
+	border:1px solid #5F5400;
 }
