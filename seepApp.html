@@ -11,10 +11,10 @@
     <link rel="stylesheet" href="css/seepApp.css">
     <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/dojo/dijit/themes/claro/claro.css">
     <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/esri/css/esri.css">
-    <link rel="stylesheet" href="dojo/1.9.3/dojox/form/resources/UploaderFileList.css" />
-    <link rel="stylesheet" href="dojo/1.9.3/dojox/layout/resources/FloatingPane.css" />
-    <link rel="stylesheet" href="dojo/1.9.3/dojox/layout/resources/ResizeHandle.css" />
-    <link rel="stylesheet" href="dojo/1.9.3/dojox/widget/ColorPicker/ColorPicker.css" />
+    <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/dojo/dojox/form/resources/UploaderFileList.css" />
+    <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/dojo/dojox/layout/resources/FloatingPane.css" />
+    <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/dojo/dojox/layout/resources/ResizeHandle.css" />
+    <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/dojo/dojox/widget/ColorPicker/ColorPicker.css" />
      <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/esri/css/esri.css">
     <link rel="stylesheet" href="Seep/formSeepApp/theme/formSeep.css">
     <script>
@@ -64,7 +64,7 @@
     <div id="content" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline', gutters:true" style="width: 100%; height: 100%; margin: 0;">
         <div id="centerPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'" style="overflow:hidden;">
 			<div data-dojo-type="attributeBar" id="seepAttributes"></div>
-            <div data-dojo-type="dojox/layout/FloatingPane" id="floatingPane" title="Menu" style="width:300px;" data-dojo-props="resizable:true, dockable:true, title:'Menu', closable:false">
+            <div data-dojo-type="dojox/layout/FloatingPane" id="floatingPane" title="Menu" style="width:300px;" data-dojo-props="resizable:true, dockable:false, title:'Menu', closable:false">
                 <div data-dojo-type="dijit/layout/AccordionContainer" id="AC">
                     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title:'Hide & Seep', selected:true" id="AC1">
                         <div class="accordian">
@@ -115,7 +115,9 @@
 		    </div>
                 </div>
             </div>
-            <div id="map"></div>
+            <div id="map">
+               <div id="BasemapToggle"></div>
+            </div>
             <span id="north" style="position:absolute; right:150px; top:10px; color:#000; z-index:50;"></span>
         </div>
     </div>

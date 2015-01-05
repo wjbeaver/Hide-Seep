@@ -8,7 +8,7 @@ un: seepAdmin
 pw: mySeep23+
 
 select AddGeometryColumn('public', 'track_lines', 'geom', 3857, 'LINESTRING', 2)
-select AddGeometryColumn('public', 'track_poin’ts, 'geom', 3857, ‘POINT’, 2)
+select AddGeometryColumn('public', 'track_points’, 'geom', 3857, ‘POINT’, 2)
 
 demo gmail
 billbeaversdemo@gmail.com

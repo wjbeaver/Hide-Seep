@@ -85,8 +85,8 @@ a:active {
 #floatingPane {
 	border-radius: 5px;
 	position: absolute;
-	top: 50px;
-	right: 95px;
+	top: 60px;
+	right: 60px;
 	width: 20%;
 	height: 75%;
 	z-index: 100;
@@ -567,4 +567,13 @@ claro .dijitSelectFocused, .claro .dijitSelectFocused .dijitButtonContents, .cla
 }
 
 .dojoxFloatingPaneTitle {
-    background: none repeat-x scroll left bottom #doce98 !i
+    background: none repeat-x scroll left bottom #doce98 !important;
+    border: 1px solid #8aa848 !important;
+}
+
+#BasemapToggle {
+    position: absolute;
+    top: 20px;
+    left: 80px;
+    z-index: 50;
+}

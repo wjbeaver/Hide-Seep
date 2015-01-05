@@ -58,6 +58,8 @@ var imagePan = function () {
         require([
             "esri/map",
             "esri/dijit/Scalebar",
+            "esri/dijit/OverviewMap",
+            "esri/dijit/BasemapToggle",
             "esri/layers/FeatureLayer",
             "esri/dijit/PopupTemplate",
             "esri/geometry/Point",
@@ -97,12 +99,14 @@ var imagePan = function () {
             "dijit/layout/AccordionContainer",
             "dojox/layout/FloatingPane",
             'formSeepApp/formSeep/attributeBar',
-            "dojox/layout/Dock",
+//            "dojox/layout/Dock",
             "esri/SpatialReference",
             "dojo/domReady!"
         ],
             function (Map,
                 Scalebar,
+                OverviewMap,
+                BasemapToggle,
                 FeatureLayer,
                 PopupTemplate,
                 Point,
@@ -160,6 +164,23 @@ var imagePan = function () {
                     var bar = dijit.byId('seepAttributes').attributeBarNode;
                     bar.hide();
                 }
+                
+                var overviewMap = new OverviewMap({
+                    map: map,
+                    attachTo: "bottom-left",
+                    color:" #D84E13",
+                    opacity: .40,
+                    visible: true
+                });
+        
+                overviewMap.startup();
+                
+                var toggle = new BasemapToggle({
+                    map: map,
+                    basemap: "satellite"
+                }, "BasemapToggle");
+                
+                toggle.startup();
 
                 map.on("layers-add-result", function (evt) {
                     // add the legend, first filter out the layers not needed
@@ -540,6 +561,7 @@ var imagePan = function () {
                 // scalebar
                 var scalebar = new Scalebar({
                     map: map,
+                    attachTo: "bottom-center",
                     // "dual" displays both miles and kilmometers
                     // "english" is the default, which displays miles
                     // use "metric" for kilometers
@@ -547,7 +569,7 @@ var imagePan = function () {
                 });
 
                 // north arrow
-                dojo.byId("north").innerHTML = "<img id='img' src='images/north-arrow.gif' />";
+                dojo.byId("north").innerHTML = "<img id='img' src='images/QGISdefaultNArrow.svg' />";
                
                 map.on("zoom-end", lang.hitch(this, function (evt) {
                     var mapLayer = map.getLayer("1");

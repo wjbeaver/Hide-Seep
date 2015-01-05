@@ -7,6 +7,7 @@ define([
     'dojo/_base/lang',
     'dojo',
     "dojo/dom-style",
+    'formSeepApp/formSeep/nameSingleton',
     "dijit/_WidgetBase",
     "dijit/_TemplatedMixin", 
     'dijit/_WidgetsInTemplateMixin',
@@ -18,7 +19,7 @@ define([
     "dojo/dom",
     "dojo/on",
     "dojo/json"
-], function (Query, QueryTask, declare, parser, ready, lang, dojo, domStyle, 
+], function (Query, QueryTask, declare, parser, ready, lang, dojo, domStyle, NameSingleton,
             _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, template, TableContainer, dom, on, JSON) {
     declare('namer', [_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
 
@@ -55,17 +56,20 @@ define([
              this._set("width", width);
         },
         
-        constructor: function (options) {
-            lang.mixin(this, options);
-
-        },
-        
+        nameSingleton: null,
         names: [],
         featureNames: [],
         attributeBar: null,
         editRemove: [],
         
-        namesList: function () {
+         constructor: function (options) {
+            lang.mixin(this, options);
+            
+            // get the names list
+            this.nameSingleton = NameSingleton.getInstance();
+        },
+
+       namesList: function () {
             var list = "<p>";
             var name;
             
@@ -198,6 +202,59 @@ define([
             }
         },
         
+        addNames: function() {
+            var names = layers[1].objects;
+            var attributes;
+            var nameAttributes;
+            var nameList = [];
+            for (i=0;i<names.length;i++) {
+                attributes = names[i].attributes;
+                
+                nameAttributes = new layer.attributesName();
+                
+                nameAttributes.NAMEID_PK = attributes[0].value;
+                nameAttributes.Honorific = attributes[1].value;
+                nameAttributes.FirstName = attributes[2].value;
+                nameAttributes.MiddleName = attributes[3].value;
+                nameAttributes.LastName = attributes[4].value;
+                nameAttributes.Email = attributes[5].value;
+                
+                var name = {
+                    attributes: nameAttributes
+                };
+                
+                nameList[nameList.length] = name;
+            }
+            tableLayer = map.getLayer("7");
+                     
+            tableLayer.applyEdits(nameList, null, null);
+            
+            var featureNames = layers[2].objects;
+            var featureNameList = [];
+            for (i=0;i<featureNames.length;i++) {
+                attributes = featureNames[i].attributes;
+                
+                nameAttributes = new layer.attributesFeatureName();
+                
+                nameAttributes.NAMEID_FK = attributes[0].value;
+                nameAttributes.UPLOADID_FK = attributes[1].value;
+                nameAttributes.TYPE = attributes[2].value;
+
+                var name = {
+                    attributes: nameAttributes
+                };
+                
+                featureNameList[featureNameList.length] = name;
+            }
+                
+            var tableLayer = map.getLayer("8");
+
+            tableLayer.applyEdits(featureNameList, null, null, lang.hitch(this, function (featureEditResults) {
+                this.nameSingleton.currentNames();
+            }));
+            
+        },
+        
         updateNames: function(id) {
             var nameList = [];
             var tableLayer = map.getLayer("7");
@@ -222,7 +279,9 @@ define([
                 }                   
             }
             
-            tableLayer.applyEdits(null, nameList, null);
+            tableLayer.applyEdits(null, nameList, null, lang.hitch(this, function (featureEditResults) {
+                this.nameSingleton.currentNames();
+            }));
 
             // delete any names removed
             this.deleteNames(id);
@@ -239,7 +298,9 @@ define([
                     }
                 }
                          
-                tableLayer.applyEdits(null, null, nameList);
+                tableLayer.applyEdits(null, null, nameList, lang.hitch(this, function (featureEditResults) {
+                    this.nameSingleton.currentNames();
+                }));
             }
         },
         
@@ -277,38 +338,16 @@ define([
             }              
         },
         
-        deleteAllFeatureNames: function (featureSet) {
-            var layer = map.getLayer("8");
-            
-            var attributes;
-            var indx = featureSet.features.length-1;
-            var nameList = [];
-            var namer;
-            
-            for (i=0;i<featureSet.features.length;i++) {
-                attributes = featureSet.features[i].attributes;
-                namer = {
-                    attributes: attributes
-                };
-            
-                nameList[nameList.length] = namer;                   
-           }
-           
-           layer.applyEdits(null, null, nameList);
-           
-           // delete names
-        },
-        
-        deleteAllNames: function() {
+        deleteAllNames: function(id) {
             var tableLayer = map.getLayer("8");
             
             var query = new Query();
             query.returnGeometry = false;
             query.outFields = ["*"];
-            query.where = "UPLOADID_FK='"+layers[0].objects[0].attributes[0].value+"'";
+            query.where = "UPLOADID_FK='"+id+"'";
 
-            tableLayer.queryFeatures(query, lang.hitch(this, function (featureSet) {
-                this.deleteAllFeatureNames(featureSet);
+            tableLayer.queryIds(query, lang.hitch(this, function (featureIds) {
+                this.nameSingleton.clearAllIds(featureIds, "8");
             }));
         },
         
@@ -397,14 +436,14 @@ define([
             for (i=indx;i>-1;i--) {
         		this.nameListNode.removeOption(this.nameListNode.options[i]);
         	}      	
-
-/*            this.nameListNode.addOption({
-                label: this.newNameListTitle,
+/*
+            this.nameListNode.addOption({
+                label: "Names",
                 value: 0
             });
-            
+*/          
             this.nameListNode.set("value", 0);
-*/
+
             indx = this.newNameListNode.options.length-1;
             
             for (i=indx;i>-1;i--) {
@@ -423,14 +462,16 @@ define([
         
         clearNames: function()  {
             // remove names from layer
+            var i;
             for (i=1;i<this.newNameListNode.options.length;i++) {
                 var value = this.newNameListNode.options[i].value;
                 
+                var indx = this.getIndexOfFeatureNameFromValue(value);
                  // remove name feature layer object
-                 layers[2].objects.splice(this.getIndexOfFeatureNameFromValue(value),1);
+                 layers[2].objects.splice(indx,1);
            
                  // remove name from layer if this is the only nameFeature
-                 if (this.getIndexOfFeatureNameValue(value)==-1) {
+                 if (indx==-1) {
                      // remove from name layer object
                      layers[1].objects.splice(this.getIndexOfNameFromValue(value),1);
                  }    
@@ -456,13 +497,6 @@ define([
         },
         
         updateNameList: function() {
-            // empty nameList
-            var indx = this.nameListNode.options.length-1;
-            
-            for (i=indx;i>=1;i--) {
-        		this.nameListNode.removeOption(this.nameListNode.options[i]);
-        	}
-        	
             var options = [];
             
             var names = layers[1].objects;
@@ -472,6 +506,17 @@ define([
                 options[options.length] = {
                     label: this.createName(this.getHonorific(attributes[1].value), attributes[2].value, attributes[3].value, attributes[4].value),
                     value: attributes[0].value
+                };
+            }
+            
+        	// now add the old names
+            var oldNames = this.nameSingleton.names.features;
+                    	
+            for (i=0;i<oldNames.length;i++) {
+                var attributes = oldNames[i].attributes;
+                options[options.length] = {
+                    label: this.createName(this.getHonorific(attributes.Honorific), attributes.FirstName, attributes.MiddleName, attributes.LastName),
+                    value: attributes.NAMEID_PK
                 };
             }
             
@@ -491,6 +536,15 @@ define([
                 this.newNameListNode.set("value", 0);
             }
                         
+            if (this.nameListNode.options.length==0) {
+                this.nameListNode.addOption({
+                    label: "Names",
+                    value: 0
+                });
+            
+                this.nameListNode.set("value", 0);
+            }
+                        
             var options = [];
             
             var names = layers[1].objects;
@@ -501,6 +555,18 @@ define([
                     value: attributes[0].value
                 };
             }
+            
+        	// now add the old names
+            var oldNames = this.nameSingleton.names.features;
+                    	
+            for (i=0;i<oldNames.length;i++) {
+                var attributes = oldNames[i].attributes;
+                options[options.length] = {
+                    label: this.createName(this.getHonorific(attributes.Honorific), attributes.FirstName, attributes.MiddleName, attributes.LastName),
+                    value: attributes.NAMEID_PK
+                };
+            }
+            
             if (options.length>0) {
                 this.nameListNode.addOption(options);
                 this.nameListNode.set("value", options[0].value);
@@ -508,6 +574,7 @@ define([
         	
         	var featureNames = layers[2].objects;
         	var featureOptions = [];
+        	var i;
         	for (i = 0 ; i<featureNames.length;i++){
         	    var attributesFN = featureNames[i].attributes;
         	    
@@ -580,7 +647,7 @@ define([
         getIndexOfNameFromValue: function(value) {
             var index = -1;
             names = layers[1].objects;
-            for (i;i<names.length;i++) {
+            for (i=0;i<names.length;i++) {
                 var attributes = names[i].attributes;
                 if (attributes[0].value==value) {
                     index = i;
@@ -595,7 +662,7 @@ define([
             var index = -1;
             names = layers[2].objects;
             
-            for (i;i<names.length;i++) {
+            for (i=0;i<names.length;i++) {
                 var attributes = names[i].attributes;
                 if (attributes[0].value==value && attributes[1]==this.featureValue) {
                     index = i;
@@ -665,11 +732,27 @@ define([
             for (i=0;i<names.length;i++) {
                 attributes = names[i].attributes;
                 if (attributes[0].value==value) {
-                    return attributes;
+                    break;
                 } else {
                     attributes = null;
                 }
             }
+            
+            return attributes;
+        },
+
+        getOldAttributes: function(value) {
+            var attributes = null;
+            var oldNames = this.nameSingleton.names.features;
+                    
+            for (i=0;i<oldNames.length;i++) {
+                var oldAttributes = oldNames[i].attributes;
+                if (oldAttributes.NAMEID_PK==value) {
+                    attributes = [oldAttributes.NAMEID_PK, oldAttributes.Honorific, oldAttributes.FirstName, oldAttributes.MiddleName, oldAttributes.LastName, oldAttributes.Email];
+                    break;
+                }
+            }
+        
             return attributes;
         },
 
@@ -728,7 +811,12 @@ define([
                     var attributes = this.getAttributes(value);
                                         
                     // put in name List
-                    this.addNewNameList(value, attributes[1].value, this.getHonorific(attributes[1].value), attributes[2].value, attributes[3].value, attributes[4].value, attributes[5].value);
+                    if (attributes!=null) {
+                        this.addNewNameList(value, attributes[1].value, this.getHonorific(attributes[1].value), attributes[2].value, attributes[3].value, attributes[4].value, attributes[5].value);
+                    } else {
+                        attributes = this.getOldAttributes(value);
+                        this.addNewNameList(value, attributes[1], this.getHonorific(attributes[1]), attributes[2], attributes[3], attributes[4], attributes[5]);
+                    }
                 } else if (this.lastNameNode.get("value")=="") {
                             alert("A last name is required!");
                 } else if (this.emailNode.get("value")=="") {

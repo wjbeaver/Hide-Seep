@@ -399,6 +399,8 @@ define([
 	                var geometry = featureSet.features[i].geometry;
             
                     var layer = map.getLayer("6");
+                    
+                    this.photographerNameNode.deleteAllNames(image.IMAGEID_PK);
             
                     deletes[deletes.length] = new Graphic(geometry, null, image);        
 	            }
@@ -666,8 +668,7 @@ define([
                 
                 // clear names from list and update name list
                this.photographerNameNode.clearNode();
-               this.photographerNameNode.updateNameList();
-               
+                              
                 // continue
                 this.imageFormFill();
             }));

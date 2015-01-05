@@ -394,55 +394,6 @@ define([
             }
         },
         
-        addNames: function () {
-            var names = layers[1].objects;
-            var attributes;
-            var nameList = [];
-            for (i=0;i<names.length;i++) {
-                attributes = names[i].attributes;
-                
-                this.attributes = new layer.attributesName();
-                
-                this.attributes.NAMEID_PK = attributes[0].value;
-                this.attributes.Honorific = attributes[1].value;
-                this.attributes.FirstName = attributes[2].value;
-                this.attributes.MiddleName = attributes[3].value;
-                this.attributes.LastName = attributes[4].value;
-                this.attributes.Email = attributes[5].value;
-                
-                var name = {
-                    attributes: this.attributes
-                };
-                
-                nameList[nameList.length] = name;
-            }
-            tableLayer = map.getLayer("7");
-                     
-            tableLayer.applyEdits(nameList, null, null);
-            
-            var featureNames = layers[2].objects;
-            var featureNameList = [];
-            for (i=0;i<featureNames.length;i++) {
-                attributes = featureNames[i].attributes;
-                
-                this.attributes = new layer.attributesFeatureName();
-                
-                this.attributes.NAMEID_FK = attributes[0].value;
-                this.attributes.UPLOADID_FK = attributes[1].value;
-                this.attributes.FEATUREID_TYPE = attributes[2].value;
-
-                var name = {
-                    attributes: this.attributes
-                };
-                
-                featureNameList[featureNameList.length] = name;
-            }
-                
-            var tableLayer = map.getLayer("8");
-
-            tableLayer.applyEdits(featureNameList, null, null);
-        },
-        
         sendVideoTracks: function () {
             var videos = layers[4].objects;
             
@@ -576,7 +527,7 @@ define([
         	this.selectedTemplate.featureLayer.applyEdits([newGraphic], null, null);
         	
          	// add names
-        	this.addNames();
+        	this.discovererNameNode.addNames();
         	
         	// add image points
         	this.addImages();
@@ -621,7 +572,7 @@ define([
         },
         
         deleteSeepFeatures: function () {
-            this.discovererNameNode.deleteAllNames();
+            this.discovererNameNode.deleteAllNames(layers[0].objects[0].attributes[0].value);
             
             this.deleteImages();
             

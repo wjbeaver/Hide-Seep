@@ -88,9 +88,9 @@ define([
 					method: "POST",
 					headers:{'X-Requested-With': null},
 					data: json
-                }).then(function (resp) {
-                    dialog_imagePan.annotateResultNode.innerHTML = resp.response;
-                    dialog_imagePan.annotations = resp.markup;
+                }).then(lang.hitch(this, function (resp) {
+                    this.annotateResultNode.innerHTML = resp.response;
+                    this.annotations = resp.markup;
                     var options = [];
                     for (i=0;i<resp.markup.length;i++) {
                         var indx = resp.markup[i].objects.length;
@@ -102,12 +102,12 @@ define([
                         }
                     }
                     
-                    dialog_imagePan.annotationListNode.addOption(options);
-                    dialog_imagePan.annotationListNode.set("value", 1);
-                },
-                function (error) {
-                    dialog_imagePan.annotateResultNode.innerHTML = error;
-                });
+                    this.annotationListNode.addOption(options);
+                    this.annotationListNode.set("value", 1);
+                }),
+                lang.hitch(this, function (error) {
+                    this.annotateResultNode.innerHTML = error;
+                }));
             }
         },
         getNextNode: function () {
@@ -190,8 +190,8 @@ define([
             var len = shape.objects.length-1;
             var object = shape.objects[len];
             
-            dialog_imagePan.commentNode.set("value", object.comment);
-            dialog_imagePan.titleNode.set("value", object.title);
+            this.commentNode.set("value", object.comment);
+            this.titleNode.set("value", object.title);
             
             // got to set the pan
             var IframeNode = this.viewerFrameNode.contentWindow;
@@ -258,9 +258,13 @@ define([
         	fabric.Object.prototype.transparentCorners = false;
         	
         	this.editModeNode.on("click", lang.hitch(this, function () {
-                this.annotateImageNode.containerNode.innerHTML = "Update";
-        	    this.annotationOn();
-        	    this.fillEditForm();
+        	    if (this.annotationListNode.get("value")>0) {
+                    this.annotateImageNode.containerNode.innerHTML = "Update";
+                    this.annotationOn();
+                    this.fillEditForm();
+        	    } else {
+        	        alert("No Annotation Selected!");
+        	    }
         	}));
         	
         	this.deleteModeNode.on("click", lang.hitch(this, function () {
@@ -279,22 +283,22 @@ define([
                         method: "POST",
                         headers:{'X-Requested-With': null},
                         data: json
-                    }).then(function (resp) {
-                        dialog_imagePan.editingResultNode.innerHTML = resp.response;
+                    }).then(lang.hitch(this, function (resp) {
+                        this.editingResultNode.innerHTML = resp.response;
                         
                         if (resp.response=="Done!") {
                             // remove from list node
-                            dialog_imagePan.editingListNode.removeOption(resp.markupCounter);
+                            this.editingListNode.removeOption(resp.markupCounter);
                         
-                            dialog_imagePan.getNextNode();
+                            this.getNextNode();
                         
                             // remove from annotation list
-                            dialog_imagePan.sliceAnnotationList(resp.markupCounter);
+                            this.sliceAnnotationList(resp.markupCounter);
                         }
-                    },
-                    function (error) {
-                        dialog_imagePan.annotateResultNode.innerHTML = error;
-                    });
+                    }),
+                    lang.hitch(this, function (error) {
+                        this.annotateResultNode.innerHTML = error;
+                    }));
         	    } else {
         	        alert("No Annotation Selected!");
         	    }
@@ -339,20 +343,20 @@ define([
                     }    
                 }
             
-                rect.toObject = (function(toObject) {
-                        return function() {
+                rect.toObject = (lang.hitch(this, function(toObject) {
+                        return lang.hitch(this, function() {
                             return fabric.util.object.extend(toObject.call(this), {
-                                    comment: dialog_imagePan.commentNode.get("value"),
-                                    title: dialog_imagePan.titleNode.get("value"),
-                                    UPLOADID: dialog_imagePan.UPLOADID,
-                                    IMAGEID: dialog_imagePan.IMAGEID,
-                                    markup_count: dialog_imagePan.markup_count,
-                                    xOffset: dialog_imagePan.xOffset,
-                                    yOffset: dialog_imagePan.yOffset,
-                                    scale: dialog_imagePan.scale  
+                                    comment: this.commentNode.get("value"),
+                                    title: this.titleNode.get("value"),
+                                    UPLOADID: this.UPLOADID,
+                                    IMAGEID: this.IMAGEID,
+                                    markup_count: this.markup_count,
+                                    xOffset: this.xOffset,
+                                    yOffset: this.yOffset,
+                                    scale: this.scale  
                             });
-                        };
-                })(rect.toObject);
+                        });
+                }))(rect.toObject);
             
                 canvas.add(rect);	
          		
@@ -364,34 +368,34 @@ define([
 					method: "POST",
 					headers:{'X-Requested-With': null},
 					data: json
-                }).then(function (resp) {
-                    dialog_imagePan.annotateResultNode.innerHTML = resp.response;
+                }).then(lang.hitch(this, function (resp) {
+                    this.annotateResultNode.innerHTML = resp.response;
                     if (resp.response!="Save Failed!") {
-                        if (dialog_imagePan.mode=="edit") {
-                            if (dialog_imagePan.annotateImageNode.containerNode.innerHTML == "Update") {
+                        if (this.mode=="edit") {
+                            if (this.annotateImageNode.containerNode.innerHTML == "Update") {
                                 // change title in list
-                                dialog_imagePan.annotationListNode.options[dialog_imagePan.indx].label = dialog_imagePan.titleNode.get("value");
+                                this.annotationListNode.options[this.indx].label = this.titleNode.get("value");
                             } else {
                                 // add new title to list
                                 var option = {
-                                    label: dialog_imagePan.titleNode.get("value"),
-                                    value: dialog_imagePan.markup_count
+                                    label: this.titleNode.get("value"),
+                                    value: this.markup_count
                                 };
                                 
-                                dialog_imagePan.annotationListNode.addOption([option]);
-                                dialog_imagePan.annotationListNode.set("value", dialog_imagePan.markup_count);
+                                this.annotationListNode.addOption([option]);
+                                this.annotationListNode.set("value", this.markup_count);
                              }    
                         }
                     
-                        dialog_imagePan.markup_count += 1;
+                        this.markup_count += 1;
                 
                         // clear
                         canvas.clear();
                     }
-                 },
-                function (error) {
-                    dialog_imagePan.annotateResultNode.innerHTML = error;
-                });
+                 }),
+                lang.hitch(this, function (error) {
+                    this.annotateResultNode.innerHTML = error;
+                }));
 		}));
 		
 		if (canvas.freeDrawingBrush) {
