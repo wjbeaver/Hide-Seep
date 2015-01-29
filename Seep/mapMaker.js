@@ -1,9 +1,9 @@
-var map;
-var addSpringFromCoords;
-var editorWidget;
-var springDeleted;
+// var map
+// var addSpringFromCoords;
+// var editorWidget;
+// var springDeleted;
 
-var generateUUID = function () {
+appConfig.generateUUID = function () {
 	var d = Date.now();
 	var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
 		var r = (d + Math.random() * 16) % 16 | 0;
@@ -55,7 +55,7 @@ var imagePan = function () {
 	dialog_image.imagePan();
 };
 
-        require([
+require([
             "esri/map",
             "esri/dijit/Scalebar",
             "esri/dijit/OverviewMap",
@@ -154,13 +154,15 @@ var imagePan = function () {
                     barShow: false
 //                    infoWindow: infoWindow
                 });
+                
+                appConfig.map = map;
 
                 map.infoWindow.resize(300,300);
                 map.infoWindow.set("anchor", "top");
                 
                 domClass.add(map.infoWindow.domNode, "popSeep");
                 
-                springDeleted = function () {
+                appConfig.springDeleted = function () {
                     var bar = dijit.byId('seepAttributes').attributeBarNode;
                     bar.hide();
                 }
@@ -193,12 +195,22 @@ var imagePan = function () {
                         if (layer.layer.name == "DLCC Springs") {
                             return {
                                 layer: layer.layer,
-                                title: "Published Springs"
+                                title: "Desert LCC Published Springs"
                             };
-                        } else if (layer.layer.name == "springsLCC.DBO.DLCC_Boundary") {
+                        } else if (layer.layer.name == "Southern Rockies LCC Springs") {
                             return {
                                 layer: layer.layer,
-                                title: "Published Springs Boundary"
+                                title: "Southern Rockies LCC Published Springs"
+                            };
+                        } else if (layer.layer.name == "springsLCC.DBO.DLCC_US") {
+                            return {
+                                layer: layer.layer,
+                                title: "Desert LCC Published Springs Boundary"
+                            };
+                        } else if (layer.layer.name == "Southern Rockies LCC Boundary") {
+                            return {
+                                layer: layer.layer,
+                                title: "Southern Rockies LCC Published Springs Boundary"
                             };
                         } else if (layer.layer.name == "Pictures" && layer.layer.id==2) {
                             return {
@@ -270,15 +282,15 @@ var imagePan = function () {
 //                   		   drawToolbar.deactivate();
                             var newAttributes = lang.mixin({}, selectedTemplate.template.prototype.attributes);
 
-                            dialog_seepMain.clearLayers();
+                            appConfig.dialog_seepMain.clearLayers();
                             
-                            layers[0] = addSeepObject(layers[0]);
+                            appConfig.layers[0] = addSeepObject(appConfig.layers[0]);
 
-                            layers[0].objects[0].attributes[0].value = generateUUID();
+                            appConfig.layers[0].objects[0].attributes[0].value = appConfig.generateUUID();
 
-                            dialog_seepMain.seepSelected(evt.geometry, newAttributes, selectedTemplate);
+                            appConfig.dialog_seepMain.seepSelected(evt.geometry, newAttributes, selectedTemplate);
 
-                            dialog_seepMain.show();                 		                    		   
+                            appConfig.dialog_seepMain.show();                 		                    		   
                    });
                    
                   domStyle.set(dom.byId("zoomedIn"), "display", "none");
@@ -294,16 +306,35 @@ var imagePan = function () {
                 /* ----------------------------------------------------------------------------- */
                 
                 //load feature layers
-                seepBoundaryMapLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/DLCC/DLCC_Boundary/MapServer/0", {
+                seepBoundaryMapLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/DLCC_SRLCC/DLCC_SRLCC_Boundary/MapServer/0", {
                     id: '3',
                     visible: true,
                     infoTemplate: new InfoTemplate("Boundary", "Desert Landscape Conservation Cooperative Springs Distribution"),
                     outFields: ["area_names"]
                 });
 
+                seepBoundary2MapLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/DLCC_SRLCC/DLCC_SRLCC_Boundary/MapServer/1", {
+                    id: '9',
+                    visible: true,
+                    infoTemplate: new InfoTemplate("Boundary", "Southern Rockies Landscape Conservation Cooperative Springs Distribution"),
+                    outFields: ["area_names"]
+                });
+
                 // get the springs
                 seepExistingSpringsLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/DLCC/DLCC_Springs/MapServer/0", {
                     id: '4',
+                    visible: true,
+                    infoTemplate: new InfoTemplate("${NAME}", "<b>Elevation</b>: ${ElevM} m.<br>" +
+                        "<b>Location</b>: ${County}<br><b>Land Unit</b>: ${LandUnit}<br>" +
+                        "<b>Land Detail</b>: ${LandDetail}<br><b>Latitude</b>: ${Latitude}<br><b>Longitude</b>: ${Longitude}"),
+                    outFields: [
+                    "NAME", "ElevM", "County", "LandUnit", "LandDetail", "Latitude", "Longitude"
+                    ]
+                });
+
+                // get the springs
+                seep2ExistingSpringsLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/SRLCC/SRLCC_Springs/MapServer/0", {
+                    id: '10',
                     visible: true,
                     infoTemplate: new InfoTemplate("${NAME}", "<b>Elevation</b>: ${ElevM} m.<br>" +
                         "<b>Location</b>: ${County}<br><b>Land Unit</b>: ${LandUnit}<br>" +
@@ -425,11 +456,15 @@ var imagePan = function () {
                 
                 seepBoundaryMapLayer.setMaxScale(layerScales[2].max);
                 seepBoundaryMapLayer.setMinScale(layerScales[2].min);
+                seepBoundary2MapLayer.setMaxScale(layerScales[2].max);
+                seepBoundary2MapLayer.setMinScale(layerScales[2].min);
 
                 /////////////////////////////// Existing Springs ////////////////////
                 
                 seepExistingSpringsLayer.setMaxScale(layerScales[0].max);
                 seepExistingSpringsLayer.setMinScale(layerScales[0].min);
+                seep2ExistingSpringsLayer.setMaxScale(layerScales[0].max);
+                seep2ExistingSpringsLayer.setMinScale(layerScales[0].min);
 
                 /////////////////////////////// Seep images ///////////////////////
                 
@@ -554,9 +589,9 @@ var imagePan = function () {
                 seepImagesMapLayer.setRenderer(uniqueImageRenderer);
                 seepImagesFeatureLayer.setRenderer(uniqueImageRenderer);
 
-                map.addLayers([seepBoundaryMapLayer, seepFeatureLayer, seepImagesMapLayer, seepImagesFeatureLayer, seepMapLayer, 
-                    seepNamesFeatureLayer, seepFeatureNameFeatureLayer, 
-                    seepExistingSpringsLayer]);
+                map.addLayers([seepBoundaryMapLayer, seepBoundary2MapLayer, seepFeatureLayer, seepImagesMapLayer, seepImagesFeatureLayer, 
+                    seepMapLayer, seepNamesFeatureLayer, seepFeatureNameFeatureLayer, 
+                    seepExistingSpringsLayer, seep2ExistingSpringsLayer]);
 
                 // scalebar
                 var scalebar = new Scalebar({

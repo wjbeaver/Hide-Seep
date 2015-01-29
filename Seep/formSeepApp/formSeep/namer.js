@@ -105,9 +105,9 @@ define([
         createFromName: function (indx) {
             var name = this.names[indx];
             
-            layers[1] = addNameObject(layers[1]);
+            appConfig.layers[1] = addNameObject(appConfig.layers[1]);
                 
-            nameAttributes = layers[1].objects[layers[1].objects.length-1].attributes;
+            nameAttributes = appConfig.layers[1].objects[appConfig.layers[1].objects.length-1].attributes;
                 
             nameAttributes[0].value = name.NAMEID_PK;
             
@@ -165,7 +165,7 @@ define([
         
         fetchNameIds: function (featureSet) {
             if (featureSet.features.length>0) {
-                var layer = map.getLayer("7");
+                var layer = appConfig.map.getLayer("7");
                 var query = new Query();
                 query.outFields = ["*"];
                 query.returnGeometry = false;
@@ -176,9 +176,9 @@ define([
                 
                 for (i=0;i<featureSet.features.length;i++) {
                     attributes = featureSet.features[i].attributes;
-                    layers[2] = addNameFeatureObject(layers[2]);
+                    appConfig.layers[2] = addNameFeatureObject(appConfig.layers[2]);
                     
-                    featureNameAttributes = layers[2].objects[layers[2].objects.length-1].attributes;
+                    featureNameAttributes = appConfig.layers[2].objects[appConfig.layers[2].objects.length-1].attributes;
                     
                     featureNameAttributes[0].value = attributes.NAMEID_FK;
                     featureNameAttributes[1].value = attributes.UPLOADID_FK;
@@ -203,7 +203,7 @@ define([
         },
         
         addNames: function() {
-            var names = layers[1].objects;
+            var names = appConfig.layers[1].objects;
             var attributes;
             var nameAttributes;
             var nameList = [];
@@ -225,11 +225,11 @@ define([
                 
                 nameList[nameList.length] = name;
             }
-            tableLayer = map.getLayer("7");
+            tableLayer = appConfig.map.getLayer("7");
                      
             tableLayer.applyEdits(nameList, null, null);
             
-            var featureNames = layers[2].objects;
+            var featureNames = appConfig.layers[2].objects;
             var featureNameList = [];
             for (i=0;i<featureNames.length;i++) {
                 attributes = featureNames[i].attributes;
@@ -247,7 +247,7 @@ define([
                 featureNameList[featureNameList.length] = name;
             }
                 
-            var tableLayer = map.getLayer("8");
+            var tableLayer = appConfig.map.getLayer("8");
 
             tableLayer.applyEdits(featureNameList, null, null, lang.hitch(this, function (featureEditResults) {
                 this.nameSingleton.currentNames();
@@ -257,7 +257,7 @@ define([
         
         updateNames: function(id) {
             var nameList = [];
-            var tableLayer = map.getLayer("7");
+            var tableLayer = appConfig.map.getLayer("7");
             var namer;
                      
             for (i=0;i<this.names.length;i++) {
@@ -289,7 +289,7 @@ define([
         
         doDeleteName: function (featureIds, nameId) {
             if (featureIds.length==0) {
-                var tableLayer = map.getLayer("7");
+                var tableLayer = appConfig.map.getLayer("7");
                 for (i=0;i<this.names.length;i++) {
                     if (this.names[i].NAMEID_PK==nameId) {
                         namer = {
@@ -307,7 +307,7 @@ define([
         deleteNames: function(id) {
             if (id!=null) {
                 var nameList = [];
-                var tableLayer = map.getLayer("8");
+                var tableLayer = appConfig.map.getLayer("8");
                 var name;
                 for (i=0;i<this.editRemove.length;i++) {
                     for (j=0;j<this.featureNames.length;j++) {
@@ -339,7 +339,7 @@ define([
         },
         
         deleteAllNames: function(id) {
-            var tableLayer = map.getLayer("8");
+            var tableLayer = appConfig.map.getLayer("8");
             
             var query = new Query();
             query.returnGeometry = false;
@@ -358,7 +358,7 @@ define([
             
             this.attributeBar = attributeBar;
             
-            var layer = map.getLayer("8");
+            var layer = appConfig.map.getLayer("8");
             var query = new Query();
             query.outFields = ["*"];
             query.returnGeometry = false;
@@ -468,12 +468,12 @@ define([
                 
                 var indx = this.getIndexOfFeatureNameFromValue(value);
                  // remove name feature layer object
-                 layers[2].objects.splice(indx,1);
+                 appConfig.layers[2].objects.splice(indx,1);
            
                  // remove name from layer if this is the only nameFeature
                  if (indx==-1) {
                      // remove from name layer object
-                     layers[1].objects.splice(this.getIndexOfNameFromValue(value),1);
+                     appConfig.layers[1].objects.splice(this.getIndexOfNameFromValue(value),1);
                  }    
            }
             
@@ -481,7 +481,7 @@ define([
         },
         
         findNameCreateOption: function(value) {
-            var names = layers[1].objects;
+            var names = appConfig.layers[1].objects;
             for (i=0;i<names.length;i++) {
                 var attributes = names[i].attributes;
                 
@@ -499,7 +499,7 @@ define([
         updateNameList: function() {
             var options = [];
             
-            var names = layers[1].objects;
+            var names = appConfig.layers[1].objects;
             
             for (i=0;i<names.length;i++) {
                 var attributes = names[i].attributes;
@@ -547,7 +547,7 @@ define([
                         
             var options = [];
             
-            var names = layers[1].objects;
+            var names = appConfig.layers[1].objects;
             for (i=0;i<names.length;i++) {
                 var attributes = names[i].attributes;
                 options[options.length] = {
@@ -572,7 +572,7 @@ define([
                 this.nameListNode.set("value", options[0].value);
         	}
         	
-        	var featureNames = layers[2].objects;
+        	var featureNames = appConfig.layers[2].objects;
         	var featureOptions = [];
         	var i;
         	for (i = 0 ; i<featureNames.length;i++){
@@ -600,17 +600,17 @@ define([
                 this.removeNewNameList(this.newNameListNode.options[1].value);
             }
             
-        	layers[2] = addNameFeatureObject(layers[2]);
-    		indxF = layers[2].objects.length-1;
-    		var nfAttributes = layers[2].objects[indxF].attributes;
+        	appConfig.layers[2] = addNameFeatureObject(appConfig.layers[2]);
+    		indxF = appConfig.layers[2].objects.length-1;
+    		var nfAttributes = appConfig.layers[2].objects[indxF].attributes;
 
             if (value==null) {
-    		    layers[1] = addNameObject(layers[1]);
-        	    nameIndx = layers[1].objects.length-1;
-        	    var attributes = layers[1].objects[nameIndx].attributes;
+    		    appConfig.layers[1] = addNameObject(appConfig.layers[1]);
+        	    nameIndx = appConfig.layers[1].objects.length-1;
+        	    var attributes = appConfig.layers[1].objects[nameIndx].attributes;
     		
     		    // generate id for name
-        	    attributes[0].value = generateUUID();
+        	    attributes[0].value = appConfig.generateUUID();
 
         	    attributes[1].value = honorific;
         	    attributes[1].valueLabel = honorificLabel;
@@ -646,7 +646,7 @@ define([
         
         getIndexOfNameFromValue: function(value) {
             var index = -1;
-            names = layers[1].objects;
+            names = appConfig.layers[1].objects;
             for (i=0;i<names.length;i++) {
                 var attributes = names[i].attributes;
                 if (attributes[0].value==value) {
@@ -660,7 +660,7 @@ define([
         
         getIndexOfFeatureNameFromValue: function(value) {
             var index = -1;
-            names = layers[2].objects;
+            names = appConfig.layers[2].objects;
             
             for (i=0;i<names.length;i++) {
                 var attributes = names[i].attributes;
@@ -675,7 +675,7 @@ define([
         
         getIndexOfFeatureNameValue: function(value) {
             var index = -1;
-            names = layers[2].objects;
+            names = appConfig.layers[2].objects;
             
             for (i=0;i<names.length;i++) {
                 var attributes = names[i].attributes;
@@ -690,12 +690,12 @@ define([
         
         removeNewNameList: function (value) {
             // remove name feature layer object
-            layers[2].objects.splice(this.getIndexOfFeatureNameFromValue(value),1);
+            appConfig.layers[2].objects.splice(this.getIndexOfFeatureNameFromValue(value),1);
             
             // remove name from layer if this is the only nameFeature
             if (this.getIndexOfFeatureNameValue(value)==-1) {
                 // remove from name layer object
-                layers[1].objects.splice(this.getIndexOfNameFromValue(value),1);
+                appConfig.layers[1].objects.splice(this.getIndexOfNameFromValue(value),1);
             }
         
             // remove from list and select the first name
@@ -714,7 +714,7 @@ define([
         checkForName: function (value) {
         	var name = false;
         	
-        	var featureNames = layers[2].objects;
+        	var featureNames = appConfig.layers[2].objects;
          	for (i=0;i<featureNames.length;i++) {
          	    var attributes = featureNames[i].attributes;
          	    if (attributes[1].value==value) {
@@ -727,7 +727,7 @@ define([
         },
         
         getAttributes: function(value) {
-            var names = layers[1].objects;
+            var names = appConfig.layers[1].objects;
             var attributes = null;
             for (i=0;i<names.length;i++) {
                 attributes = names[i].attributes;

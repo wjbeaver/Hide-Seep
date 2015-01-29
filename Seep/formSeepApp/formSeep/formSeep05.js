@@ -39,7 +39,7 @@ define([
         getIndexOfVideo: function (value) {
             indx = -1;
             
-            var images = layers[4].objects;
+            var images = appConfig.layers[4].objects;
             for (i=0;i<images.length;i++) {
                 var attributes = images[i].attributes;
                 if (attributes[0].value == value) {
@@ -53,14 +53,14 @@ define([
         
         newNameNode: function() {
             this.videographerNameNode.set("nameType", "Video");
-            this.videographerNameNode.set("featureValue", layers[0].objects[0].attributes[0].value);
+            this.videographerNameNode.set("featureValue", appConfig.layers[0].objects[0].attributes[0].value);
             this.videographerNameNode.set("newNameListTitle", "Videographer");
             this.videographerNameNode.set("unique", true);
          	this.videographerNameNode.fillNameList();
         },
         
         addTracks: function(node) {
-            var tracks = layers[5].objects;
+            var tracks = appConfig.layers[5].objects;
             var attributes;
             var options = [];
             
@@ -82,15 +82,15 @@ define([
         videoSetID: function () {
         	    this.mode = "add";
 
-                var attributes = layers[0].objects[0].attributes;
-                var coordinates = layers[0].objects[0].coordinates;
+                var attributes = appConfig.layers[0].objects[0].attributes;
+                var coordinates = appConfig.layers[0].objects[0].coordinates;
                 
                 // create a video object in layers
-                layers[4] = addVideoObject(layers[4]);
+                appConfig.layers[4] = addVideoObject(appConfig.layers[4]);
                 
-                this.indx = layers[4].objects.length-1;
-                var attributesVideo = layers[4].objects[this.indx].attributes;
-                var coordinatesVideo = layers[4].objects[this.indx].coordinates;
+                this.indx = appConfig.layers[4].objects.length-1;
+                var attributesVideo = appConfig.layers[4].objects[this.indx].attributes;
+                var coordinatesVideo = appConfig.layers[4].objects[this.indx].coordinates;
 
                 // Coordinates
                 coordinatesVideo.latitude = coordinates.latitude;
@@ -102,7 +102,7 @@ define([
                 this.longitudeVideoNode.set("value", coordinates.longitude);
 
                 // VIDEOID
-                attributesVideo[0].value = generateUUID();
+                attributesVideo[0].value = appConfig.generateUUID();
                 attributesVideo[0].node = this.VIDEOIDVideoNode;
                 attributesVideo[0].node.set("value", attributesVideo[0].value);
                 
@@ -142,7 +142,7 @@ define([
         },
         
         clearForm: function (type) {
-            var attributesVideo = layers[4].objects[this.indx].attributes;
+            var attributesVideo = appConfig.layers[4].objects[this.indx].attributes;
             this.indx = 0;
             this.mode="";
             
@@ -197,13 +197,13 @@ define([
         
         cleanup: function () {       
             this.clearForm(0);
-            layers[4].objects.splice(this.index,1);
+            appConfig.layers[4].objects.splice(this.index,1);
             this.hide();
         },
         
         addVideo: function (latitude, longitude, UTC, url) {
-            var attributesVideo = layers[4].objects[this.indx].attributes;
-            var coordinatesVideo = layers[4].objects[this.indx].coordinates;
+            var attributesVideo = appConfig.layers[4].objects[this.indx].attributes;
+            var coordinatesVideo = appConfig.layers[4].objects[this.indx].coordinates;
             
                 // Coordinates
                 coordinatesVideo.latitude = latitude;
@@ -232,7 +232,7 @@ define([
                 
                 this.clearForm(1);
                 
-                dialog_seepMain.discovererNameNode.updateNameList();
+                appConfig.dialog_seepMain.discovererNameNode.updateNameList();
         },
         
         postCreate: function () {
@@ -252,7 +252,7 @@ define([
             this.getVideoTrackNode.on("click", lang.hitch(this, function () {
                 var value = this.videoTrackListNode.get("value");
                 if (value) {
-                    var attributesVideo = layers[4].objects[this.indx].attributes;
+                    var attributesVideo = appConfig.layers[4].objects[this.indx].attributes;
                     attributesVideo[7].value = value;
                     
                     alert("Track added!");

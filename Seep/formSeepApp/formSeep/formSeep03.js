@@ -83,7 +83,7 @@ define([
         		var json = JSON.stringify(data);
         		
         		// save via request
-        		request('/Seep/getImageMarkup.php', {
+        		request(appConfig.baseUrl+'getImageMarkup.php', {
 					handleAs: "json",
 					method: "POST",
 					headers:{'X-Requested-With': null},
@@ -278,7 +278,7 @@ define([
                     var json = JSON.stringify(data);
             
                     // save via request
-                    request('/Seep/deleteImageMarkup.php', {
+                    request(appConfig.baseUrl+'deleteImageMarkup.php', {
                         handleAs: "json",
                         method: "POST",
                         headers:{'X-Requested-With': null},
@@ -363,7 +363,7 @@ define([
         		var json = JSON.stringify(canvas);
         		
         		// save via request
-        		request('/Seep/uploadImageMarkup.php', {
+        		request(appConfig.baseUrl+'uploadImageMarkup.php', {
 					handleAs: "json",
 					method: "POST",
 					headers:{'X-Requested-With': null},

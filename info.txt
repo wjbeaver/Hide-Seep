@@ -1,3 +1,13 @@
+# hpc$Weekdays <- as.factor(weekdays(as.Date(hpc$Dates)))
+# levels(hpc$Weekdays)<- c("Thursday", "Friday", "Saturday")
+# summary(hpc$Weekdays)
+
+Euler
+https://projecteuler.net
+wbeaver
+myiris81
+722404-3dlT42EpLz8eYLHgcEYpJCulnal5Hp3EUESYpsm4
+
 Seep form
 http://goo.gl/forms/Bf8XYK3uxI
 

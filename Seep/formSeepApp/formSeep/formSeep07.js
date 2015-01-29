@@ -40,11 +40,11 @@ define([
             this.tracks = tracks;
             
             // create the tracks
-            var indx = layers[5].objects.length;
+            var indx = appConfig.layers[5].objects.length;
             for (i=0;i<this.count;i++) {
-                layers[5] = addTrackObject(layers[5]);
+                appConfig.layers[5] = addTrackObject(appConfig.layers[5]);
                 var name = this.tracks[i].name;
-                layers[5].objects[indx+i].attributes[0].value = name.split(".")[0];
+                appConfig.layers[5].objects[indx+i].attributes[0].value = name.split(".")[0];
     	    }
     	
             this.trackFormFill();
@@ -54,7 +54,7 @@ define([
         getIndexOfTrack: function (value) {
             indx = -1;
             
-            var tracks = layers[5].objects;
+            var tracks = appConfig.layers[5].objects;
             for (i=0;i<tracks.length;i++) {
                 var attributes = tracks[i].attributes;
                 if (attributes[0].value == value) {
@@ -126,13 +126,13 @@ define([
 
                 this.count--;
                 
-                var attributes = layers[0].objects[0].attributes;
-                var coordinates = layers[0].objects[0].coordinates;
+                var attributes = appConfig.layers[0].objects[0].attributes;
+                var coordinates = appConfig.layers[0].objects[0].coordinates;
                 
                 var name = this.tracks[this.count].name;
                 indx = this.getIndexOfTrack(name.split(".")[0]);
-                var attributesTrack = layers[5].objects[indx].attributes;
-                var coordinatesTrack = layers[5].objects[indx].coordinates;
+                var attributesTrack = appConfig.layers[5].objects[indx].attributes;
+                var coordinatesTrack = appConfig.layers[5].objects[indx].coordinates;
 
                 // UPLOADID
                 attributesTrack[1].value = attributes[0].value;
@@ -165,7 +165,7 @@ define([
         
         addTrack: function () {
                  var indx =  this.getIndexOfTrack(this.TRACKIDTrackNode.get("value"));
-                 var  attributesTrack = layers[5].objects[indx].attributes;
+                 var  attributesTrack = appConfig.layers[5].objects[indx].attributes;
                   
                   // type
                  attributesTrack[2].value = attributesTrack[2].node.get("value");

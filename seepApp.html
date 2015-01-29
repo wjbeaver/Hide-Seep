@@ -18,10 +18,33 @@
      <link rel="stylesheet" href="http://js.arcgis.com/3.10/js/esri/css/esri.css">
     <link rel="stylesheet" href="Seep/formSeepApp/theme/formSeep.css">
     <script>
-        // Configure application.
+        // Configure application, one global variable
         appConfig = {
+            // map
+            map: null,
+            
+            springDeleted: null,
+            generateUUID: null,
+            
+            // forms
+            dialog_image_loader: null,
+            dialog_image: null,
+            dialog: null,
+            dialog_imagePan: null,
+            dialog_seepMain: null,
+            dialog_video: null,
+            dialog_trackSubmit: null,
+            dialog_track: null,
+            map_open_layers: null,
+            
+            // admin flag
+            admin: false,
+            
+            // layers
+            layers: null,
+            
             // Get base url from current url.
-            baseUrl: location.href.substring(0, location.href.lastIndexOf("/") + 1) + '/Seep/'
+            baseUrl: location.href.substring(0, location.href.lastIndexOf("/") + 1) + 'Seep/'
         };
 
         var dojoConfig = (function() {

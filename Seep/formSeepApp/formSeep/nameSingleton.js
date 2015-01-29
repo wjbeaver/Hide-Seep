@@ -20,7 +20,7 @@ define([
         },
 
         clearAllIds: function(featureIds, layerId) {
-            var layer = map.getLayer(layerId);
+            var layer = appConfig.map.getLayer(layerId);
             var attributes;
             var nameList = [];
             var namer;
@@ -42,7 +42,7 @@ define([
         },
         
         clearAllNames: function() {
-            var tableLayer = map.getLayer("7");
+            var tableLayer = appConfig.map.getLayer("7");
             
             var query = new Query();
             query.returnGeometry = false;
@@ -53,7 +53,7 @@ define([
                 this.clearAllIds(featureIds, "7");
             }));
             
-            tableLayer = map.getLayer("8");
+            tableLayer = appConfig.map.getLayer("8");
             
             query = new Query();
             query.returnGeometry = false;
@@ -67,7 +67,7 @@ define([
         },
         
         clearAllImages: function() {
-            var tableLayer = map.getLayer("6");
+            var tableLayer = appConfig.map.getLayer("6");
             
             var query = new Query();
             query.returnGeometry = false;
@@ -84,7 +84,7 @@ define([
         },
 
         currentNames: function() {
-                var layer = map.getLayer("7");
+                var layer = appConfig.map.getLayer("7");
                 var query = new Query();
                 query.outFields = ["*"];
                 query.returnGeometry = true;

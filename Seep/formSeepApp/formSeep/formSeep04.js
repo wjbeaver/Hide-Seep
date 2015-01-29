@@ -34,7 +34,7 @@ define([
         attributes: null,
         mode: "add",
         attributeBar: null,
-        url_base: "http://overtexplorations.com/Seep/data/images/",
+        url_base: appConfig.baseUrl+"data/images/",
         option: {
         		label: "Used Map App",
         		value: "App"
@@ -72,7 +72,7 @@ define([
 
         newNameNode: function() {
             this.discovererNameNode.set("nameType", "Seep");
-            this.discovererNameNode.set("featureValue", layers[0].objects[0].attributes[0].value);
+            this.discovererNameNode.set("featureValue", appConfig.layers[0].objects[0].attributes[0].value);
             this.discovererNameNode.set("newNameListTitle", "Discoverer(s)");
          	this.discovererNameNode.fillNameList();
         },
@@ -104,8 +104,8 @@ define([
         	this.selectedTemplate = selectedTemplate;
         	
         	// set values and nodes
-    		attributes = layers[0].objects[0].attributes;
-    		coordinates = layers[0].objects[0].coordinates;
+    		attributes = appConfig.layers[0].objects[0].attributes;
+    		coordinates = appConfig.layers[0].objects[0].coordinates;
     		
         	attributes[0].node = this.UPLOADIDMainNode;
          	attributes[0].node.set("value", attributes[0].value);
@@ -180,8 +180,8 @@ define([
         	this.setForMode();
         	
         	// set values and nodes
-    		attributes = layers[0].objects[0].attributes;
-    		coordinates = layers[0].objects[0].coordinates;
+    		attributes = appConfig.layers[0].objects[0].attributes;
+    		coordinates = appConfig.layers[0].objects[0].coordinates;
     		
         	attributes[0].node = this.UPLOADIDMainNode;
          	attributes[0].node.set("value", attributes[0].value);
@@ -243,7 +243,7 @@ define([
             this.mode = "edit";
         	this.setForMode();
             
-    		attributes = layers[0].objects[0].attributes;
+    		attributes = appConfig.layers[0].objects[0].attributes;
     		
         	attributes[0].node = this.UPLOADIDMainNode;
          	attributes[0].node.set("value", attributes[0].value);
@@ -330,11 +330,11 @@ define([
         },
         
         deleteImages: function () {
-            dialog_image.deleteAllImages(layers[0].objects[0].attributes[0].value);
+            appConfig.dialog_image.deleteAllImages(appConfig.layers[0].objects[0].attributes[0].value);
         },
         
         addImages: function () {
-            var images = layers[3].objects;
+            var images = appConfig.layers[3].objects;
             var attributes
             for (i=0;i<images.length;i++) {
                 attributes = images[i].attributes;
@@ -367,7 +367,7 @@ define([
                 
                 this.attributes.IMAGE = this.url_base+ this.attributes.UPLOADID_FK+"/"+this.attributes.IMAGEID_PK+".jpg";
 
-                var imageLayer = map.getLayer("6");
+                var imageLayer = appConfig.map.getLayer("6");
 
                 // var type = this.getType(imageLayer.types, this.attributes.TYPE);
                 // var template = type.templates[0];
@@ -395,7 +395,7 @@ define([
         },
         
         sendVideoTracks: function () {
-            var videos = layers[4].objects;
+            var videos = appConfig.layers[4].objects;
             
             var send = {
                 videos: [],
@@ -423,7 +423,7 @@ define([
                 send.videos[send.videos.length] = this.attributes;
             }
 
-            var tracks = layers[5].objects;
+            var tracks = appConfig.layers[5].objects;
 
             for (i=0;i<tracks.length;i++) {
                 attributes = tracks[i].attributes;
@@ -445,7 +445,7 @@ define([
 
         	var json = JSON.stringify(send);
 
-            request.post("/Seep/addVideoTrackFeatures.php", {
+            request.post(appConfig.baseUrl+"addVideoTrackFeatures.php", {
                 handleAs: "json",
                 method: "POST",
                 headers:{'X-Requested-With': null},
@@ -456,8 +456,8 @@ define([
         },
         
         addVideoTracks: function () {
-            videos = layers[4].objects;
-            tracks = layers[5].objects;
+            videos = appConfig.layers[4].objects;
+            tracks = appConfig.layers[5].objects;
             
             if (videos.length>0 || tracks.length>0) {
                 this.sendVideoTracks();
@@ -479,8 +479,8 @@ define([
         },
         
         addSeepFeatures: function () {
-    		attributes = layers[0].objects[0].attributes;
-    		coordinates = layers[0].objects[0].coordinates;
+    		attributes = appConfig.layers[0].objects[0].attributes;
+    		coordinates = appConfig.layers[0].objects[0].coordinates;
     		
     		// nasty little hack
     		if (attributes[4].value==3) {
@@ -494,7 +494,7 @@ define([
         		
         		this.geometry = new Point(coordinates.longNode.value,coordinates.latNode.value);
                 
-                var featureLayer = map.getLayer("5");
+                var featureLayer = appConfig.map.getLayer("5");
                 var type = this.getType(featureLayer.types, attributes[4].value);
                 var template = type.templates[0];
                 
@@ -543,11 +543,11 @@ define([
         },
         
         editSeepFeatures: function () {
-            this.discovererNameNode.updateNames(layers[0].objects[0].attributes[0].value);
+            this.discovererNameNode.updateNames(appConfig.layers[0].objects[0].attributes[0].value);
             
             var feature = this.attributeBar.currentFeature;
             
-    		var attributes = layers[0].objects[0].attributes;
+    		var attributes = appConfig.layers[0].objects[0].attributes;
 
             feature.attributes.UPLOADID_PK = attributes[0].value;
         	feature.attributes.DateFound = locale.format(attributes[1].value, {selector:"date"});
@@ -562,7 +562,7 @@ define([
             
             var newGraphic = new Graphic(feature.geometry, null, feature.attributes);
             
-            var seepLayer = map.getLayer("5");
+            var seepLayer = appConfig.map.getLayer("5");
 
             seepLayer.applyEdits(null,[newGraphic],null);
         	
@@ -572,7 +572,7 @@ define([
         },
         
         deleteSeepFeatures: function () {
-            this.discovererNameNode.deleteAllNames(layers[0].objects[0].attributes[0].value);
+            this.discovererNameNode.deleteAllNames(appConfig.layers[0].objects[0].attributes[0].value);
             
             this.deleteImages();
             
@@ -582,11 +582,11 @@ define([
             
              var newGraphic = new Graphic(feature.geometry, null, feature.attributes);
             
-            var seepLayer = map.getLayer("5");
+            var seepLayer = appConfig.map.getLayer("5");
 
             seepLayer.applyEdits(null,null,[newGraphic]);
             
-            seepLayer = map.getLayer("1");
+            seepLayer = appConfig.map.getLayer("1");
             
             seepLayer.refresh();
         	
@@ -611,8 +611,8 @@ define([
         
         clearLayers: function () {
         	// and all objects
-        	for (i=0;i<layers.length;i++) {
-        		layers[i].objects = [];
+        	for (i=0;i<appConfig.layers.length;i++) {
+        		appConfig.layers[i].objects = [];
         	}
         },
         
@@ -633,7 +633,7 @@ define([
             // check to see if there is a name in the name list;
             if (this.discovererNameNode.checkForName(this.UPLOADIDMainNode.value)) {
                     // check to see if there is a date
-                    var attributes = layers[0].objects[0].attributes;
+                    var attributes = appConfig.layers[0].objects[0].attributes;
                 if (attributes[1].node.get("value")!=null) {
                             
                         // get attributes and clear nodes
@@ -686,32 +686,32 @@ define([
             }));
 
             this.addPhotoNode.on("click", lang.hitch(this, function () {
-                        var attributes = layers[0].objects[0].attributes;
+                        var attributes = appConfig.layers[0].objects[0].attributes;
                         
                         if (attributes[1].node.get("value")!=null) {
                             attributes[1].value = attributes[1].node.get("value");
-                            dialog_image_loader.setID();
-                            dialog_image_loader.show();
+                            appConfig.dialog_image_loader.setID();
+                            appConfig.dialog_image_loader.show();
                         } else {
                             alert("Needs a valid date");
                         }
             }));
 
             this.addVideoNode.on("click", lang.hitch(this, function () {
-                        var attributes = layers[0].objects[0].attributes;
+                        var attributes = appConfig.layers[0].objects[0].attributes;
                         
                         if (attributes[1].node.get("value")!=null) {
                             attributes[1].value = attributes[1].node.get("value");
-                            dialog_video.videoSetID();
-            		        dialog_video.show();
+                            appConfig.dialog_video.videoSetID();
+            		        appConfig.dialog_video.show();
                         } else {
                             alert("Needs a valid date");
                         }
             }));
 
             this.addTrackNode.on("click", lang.hitch(this, function () {
-             		    dialog_trackSubmit.setID();
-             		    dialog_trackSubmit.show();
+             		    appConfig.dialog_trackSubmit.setID();
+             		    appConfig.dialog_trackSubmit.show();
            }));
             
             this.editMainNode.on("click", lang.hitch(this, function () {

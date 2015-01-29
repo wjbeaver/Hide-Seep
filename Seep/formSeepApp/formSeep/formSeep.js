@@ -30,18 +30,18 @@ define([
         templateString: template,
 
         setID: function () {
-        	layers[0].objects[0].attributes[0].node = this.UPLOADIDNode;
-         	layers[0].objects[0].coordinates.latNode = this.latitudeNode;
-        	layers[0].objects[0].coordinates.longNode = this.longitudeNode;
-        	layers[0].objects[0].attributes[2].node = this.deviceNode;
+        	appConfig.layers[0].objects[0].attributes[0].node = this.UPLOADIDNode;
+         	appConfig.layers[0].objects[0].coordinates.latNode = this.latitudeNode;
+        	appConfig.layers[0].objects[0].coordinates.longNode = this.longitudeNode;
+        	appConfig.layers[0].objects[0].attributes[2].node = this.deviceNode;
         	
         	// set ID
-        	layers[0].objects[0].attributes[0].node.set("value", layers[0].objects[0].attributes[0].value);
+        	appConfig.layers[0].objects[0].attributes[0].node.set("value", appConfig.layers[0].objects[0].attributes[0].value);
 
         },
         
         cleanup: function() {
-        	layers[0].objects = [];
+        	appConfig.layers[0].objects = [];
         	
         	this.hide();
         },
@@ -59,16 +59,16 @@ define([
                     console.log("onSubmit false");
                 } else {
                     // collect attributes and open main form
-                    layers[0].objects[0].coordinates.latitude = layers[0].objects[0].coordinates.latNode.get("value");
-                    layers[0].objects[0].coordinates.longitude = layers[0].objects[0].coordinates.longNode.get("value");
-                    layers[0].objects[0].attributes[2].valueLabel = layers[0].objects[0].attributes[2].node.get("label");
-                    layers[0].objects[0].attributes[2].value = layers[0].objects[0].attributes[2].node.get("value");
+                    appConfig.layers[0].objects[0].coordinates.latitude = appConfig.layers[0].objects[0].coordinates.latNode.get("value");
+                    appConfig.layers[0].objects[0].coordinates.longitude = appConfig.layers[0].objects[0].coordinates.longNode.get("value");
+                    appConfig.layers[0].objects[0].attributes[2].valueLabel = appConfig.layers[0].objects[0].attributes[2].node.get("label");
+                    appConfig.layers[0].objects[0].attributes[2].value = appConfig.layers[0].objects[0].attributes[2].node.get("value");
                     
-                    dialog_seepMain.setID();
+                    appConfig.dialog_seepMain.setID();
                     
                     this.hide();
                     
-                    dialog_seepMain.show();
+                    appConfig.dialog_seepMain.show();
                 }
             }));
         },

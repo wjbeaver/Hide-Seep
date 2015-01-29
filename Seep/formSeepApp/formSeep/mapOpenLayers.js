@@ -27,7 +27,7 @@ define([
         },
         
         startMap: function (uploadid) {
-            mapOL = "/Seep/videotracks.html?UPLOADID="+uploadid;        	
+            mapOL = appConfig.baseUrl+"videotracks.html?UPLOADID="+uploadid;        	
         	this.mapOLNode.src = mapOL;
         },
 

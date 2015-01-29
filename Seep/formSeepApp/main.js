@@ -1,17 +1,17 @@
-var dialog_image_loader;
-var dialog_image;
-var dialog;
-var dialog_imagePan;
-var dialog_seepMain;
-var dialog_video;
-var dialog_trackSubmit;
-var dialog_track;
-var map_open_layers;
+// var dialog_image_loader;
+// var dialog_image;
+// var dialog;
+// var dialog_imagePan;
+// var dialog_seepMain;
+// var dialog_video;
+// var dialog_trackSubmit;
+// var dialog_track;
+// var map_open_layers;
+// var admin = false;
+// var layers;
+
 var requestGoogle;
 var currentWidget;
-var admin = false;
-
-var layers;
 
 dojo.declare("layer.seep",null,{
   	name: "",
@@ -156,7 +156,7 @@ var trackLayer = new layer.seep({
 	objects: []
 });
 
-layers = [seepLayer, nameLayer, nameFeatureLayer, imageLayer, videoLayer, trackLayer];
+appConfig.layers = [seepLayer, nameLayer, nameFeatureLayer, imageLayer, videoLayer, trackLayer];
 
 var addTrackObject = function(trackLayer) {
 	trackLayer.objects[trackLayer.objects.length] = new layer.object({
@@ -473,50 +473,50 @@ define([
                 'formSeepApp/formSeep/formSeep06', 'formSeepApp/formSeep/formSeep07', 'formSeepApp/formSeep/mapOpenLayers'], 
         function (Dialog, Dialog_image_loader, Dialog_image, Dialog_imagePan, Dialog_seepMain, Dialog_video, 
                 Dialog_trackSubmit, Dialog_track, mapOpenLayers) {
-            if (typeof dialog === "undefined") {
+            if (appConfig.dialog == null) {
                options.closable = true;
-               dialog = new Dialog(options);
+               appConfig.dialog = new Dialog(options);
             }
 
-            if (typeof dialog_seepMain === "undefined") {
+            if (appConfig.dialog_seepMain == null) {
                options.closable = true;
                
-                dialog_seepMain = new Dialog_seepMain(options);
+                appConfig.dialog_seepMain = new Dialog_seepMain(options);
             }
 
-            if (typeof dialog_image_loader === "undefined") {
+            if (appConfig.dialog_image_loader == null) {
                 options.closable = true;
-                dialog_image_loader = new Dialog_image_loader(options);
+                appConfig.dialog_image_loader = new Dialog_image_loader(options);
             }
 
-            if (typeof dialog_image === "undefined") {
+            if (appConfig.dialog_image == null) {
                 options.closable = false;
-                dialog_image = new Dialog_image(options);
-                dialog_image_loader.setDialog_image(dialog_image);
+                appConfig.dialog_image = new Dialog_image(options);
+                appConfig.dialog_image_loader.setDialog_image(appConfig.dialog_image);
             }
-             if (typeof dialog_imagePan === "undefined") {
+             if (appConfig.dialog_imagePan == null) {
                options.closable = true;
-                dialog_imagePan = new Dialog_imagePan(options);
+                appConfig.dialog_imagePan = new Dialog_imagePan(options);
             }
                        
-            if (typeof dialog_video === "undefined") {
+            if (appConfig.dialog_video == null) {
                options.closable = true;
-                dialog_video = new Dialog_video(options);
+                appConfig.dialog_video = new Dialog_video(options);
             }
 
-            if (typeof dialog_trackSubmit === "undefined") {
+            if (appConfig.dialog_trackSubmit == null) {
                options.closable = true;
-                dialog_trackSubmit = new Dialog_trackSubmit(options);
+                appConfig.dialog_trackSubmit = new Dialog_trackSubmit(options);
             }
 
-            if (typeof dialog_track === "undefined") {
+            if (appConfig.dialog_track == null) {
                options.closable = false;
-                dialog_track = new Dialog_track(options);
+                appConfig.dialog_track = new Dialog_track(options);
             } 
 
-            if (typeof map_open_layers === "undefined") {
+            if (appConfig.map_open_layers == null) {
                 options.closable = true;
-                map_open_layers = new mapOpenLayers(options);
+                appConfig.map_open_layers = new mapOpenLayers(options);
             } 
        });
     };
@@ -539,14 +539,14 @@ define([
      * Button click action.
      */
     app.onButtonClick = function () {
-        dialog_seepMain.clearLayers();
+        appConfig.dialog_seepMain.clearLayers();
                             
-    	layers[0] = addSeepObject(layers[0]);
+    	appConfig.layers[0] = addSeepObject(appConfig.layers[0]);
     	
-    	layers[0].objects[0].attributes[0].value = generateUUID();
+    	appConfig.layers[0].objects[0].attributes[0].value = appConfig.generateUUID();
     	
-    	dialog.setID();
-        dialog.show();
+    	appConfig.dialog.setID();
+        appConfig.dialog.show();
     };
     
     app.onSubmitClick = function () {
@@ -563,7 +563,7 @@ define([
 				
 		}).then(function (result) {
 		    if (result=="pass") {
-		        admin = true;
+		        appConfig.admin = true;
 
 			    resultNode.innerHTML = "Welcome Admin!";
 			    
@@ -584,7 +584,7 @@ define([
     };
     
     app.logoutClick = function () {
-		        admin = false;
+		        appConfig.admin = false;
 			    
 			    var login = dom.byId("login");
 			    var logout = dom.byId("logout");

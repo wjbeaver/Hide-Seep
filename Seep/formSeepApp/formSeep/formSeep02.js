@@ -39,7 +39,7 @@ define([
         geometries: null,
         count: 0,
         mode: "",
-        baseAddress: "http://overtexplorations.com/Seep/data/images/",
+        baseAddress: appConfig.baseUrl+"data/images/",
         keyGoogle: "AIzaSyAJeXarCpe7QTjf_XIrVbaAWnaoBDASGXA",
         timeZoneRequest: "https://maps.googleapis.com/maps/api/timezone/json",
         ignoreSet: false,
@@ -50,14 +50,14 @@ define([
             this.images = images;
             
             // create the images
-            var indx = layers[3].objects.length;
+            var indx = appConfig.layers[3].objects.length;
             
             for (i=0;i<this.count;i++) {               
-                layers[3] = addImageObject(layers[3]);
+                appConfig.layers[3] = addImageObject(appConfig.layers[3]);
                 
                 var name = this.images.exif[i].FileName;
                 
-                layers[3].objects[indx+i].attributes[0].value = name.split(".")[0];
+                appConfig.layers[3].objects[indx+i].attributes[0].value = name.split(".")[0];
     	    }
     	
             this.imageFormFill();
@@ -75,7 +75,7 @@ define([
         getIndexOfImage: function (value) {
             indx = -1;
             
-            var images = layers[3].objects;
+            var images = appConfig.layers[3].objects;
             for (i=0;i<images.length;i++) {
                 var attributes = images[i].attributes;
                 if (attributes[0].value == value) {
@@ -89,7 +89,7 @@ define([
         
         getUTCSuccess: function (data, widget) {
         	var count = widget.count+1;
-            var attributesImage = layers[3].objects[widget.getIndexOfImage(widget.IMAGEIDImageNode.value)].attributes;
+            var attributesImage = appConfig.layers[3].objects[widget.getIndexOfImage(widget.IMAGEIDImageNode.value)].attributes;
             
 	        widget.DSToffsetImageNode.value = data.dstOffset;
             widget.UTCoffsetImageNode.value = data.rawOffset;
@@ -184,37 +184,37 @@ define([
                 imageid: attributesImage[0].value
             };
             
-            request.post("/Seep/getWidthHeight.php", {
+            request.post(appConfig.baseUrl+"getWidthHeight.php", {
                 data: send
             }).then(function(response){
                 var response = JSON.parse(response);
 
-                var pan = "/Seep/includes/panojs/apps/panoView.html?UPLOADID=" + response.uploadid + 
+                var pan = appConfig.baseUrl+"includes/panojs/apps/panoView.html?UPLOADID=" + response.uploadid + 
                     "&IMAGEID=" + response.imageid + "&width=" + response.width + "&height=" + response.height;
  
-                dialog_imagePan.viewerFrameNode.src = pan;
+                appConfig.dialog_imagePan.viewerFrameNode.src = pan;
 
-                dialog_imagePan.setForMode("edit");
+                appConfig.dialog_imagePan.setForMode("edit");
                 
-                dialog_imagePan.show();
+                appConfig.dialog_imagePan.show();
             });
         },
         
         imagePan: function () {
-        	dialog_imagePan.set("UPLOADID", this.UPLOADIDImageNode.get("value"));
-        	dialog_imagePan.set("IMAGEID", this.IMAGEIDImageNode.get("value"));
+        	appConfig.dialog_imagePan.set("UPLOADID", this.UPLOADIDImageNode.get("value"));
+        	appConfig.dialog_imagePan.set("IMAGEID", this.IMAGEIDImageNode.get("value"));
         	
-            var attributesImage = layers[3].objects[this.getIndexOfImage(this.IMAGEIDImageNode.value)].attributes;
+            var attributesImage = appConfig.layers[3].objects[this.getIndexOfImage(this.IMAGEIDImageNode.value)].attributes;
             
             if (this.mode=="add") {
-                pan = "/Seep/includes/panojs/apps/panoView.html?UPLOADID=" + attributesImage[1].value + 
+                pan = appConfig.baseUrl+"includes/panojs/apps/panoView.html?UPLOADID=" + attributesImage[1].value + 
                     "&IMAGEID=" + attributesImage[0].value + "&width=" + this.images[this.count].width + "&height=" + this.images[this.count].height;
             
-                dialog_imagePan.viewerFrameNode.src = pan;
+                appConfig.dialog_imagePan.viewerFrameNode.src = pan;
                 
-                dialog_imagePan.setForMode("add");
+                appConfig.dialog_imagePan.setForMode("add");
                 
-                dialog_imagePan.show();
+                appConfig.dialog_imagePan.show();
         	} else {
         	    this.getWidthHeight(attributesImage);
         	}
@@ -288,7 +288,7 @@ define([
  	       
  	       this.count = indx;
  	       
- 	       var attributes = layers[3].objects[indx].attributes
+ 	       var attributes = appConfig.layers[3].objects[indx].attributes
 	        
            this.imageNumberNode.innerHTML= "#"+indx+1;
             
@@ -360,7 +360,7 @@ define([
 	            for (i=0;i<featureSet.features.length;i++) {
 	                this.images[i] = featureSet.features[i].attributes;
 	                this.geometries[i] = featureSet.features[i].geometry;
-	                layers[3] = addImageObject(layers[3]);
+	                appConfig.layers[3] = addImageObject(appConfig.layers[3]);
 	            }
 	            
 	            // clear the form
@@ -380,7 +380,7 @@ define([
             this.setForMode();
             
             // query for images
-            var layer = map.getLayer("6");
+            var layer = appConfig.map.getLayer("6");
             var query = new Query();
             query.returnGeometry = true;
             query.outFields = ["*"];
@@ -398,7 +398,7 @@ define([
 	                var image = featureSet.features[i].attributes;
 	                var geometry = featureSet.features[i].geometry;
             
-                    var layer = map.getLayer("6");
+                    var layer = appConfig.map.getLayer("6");
                     
                     this.photographerNameNode.deleteAllNames(image.IMAGEID_PK);
             
@@ -407,7 +407,7 @@ define([
 	            
 	            layer.applyEdits(null,null,deletes);
             
-                imageLayer = map.getLayer("2");
+                imageLayer = appConfig.map.getLayer("2");
             
                 imageLayer.refresh();
 	        }
@@ -415,7 +415,7 @@ define([
 	    
 	    deleteAllImages: function (UPLOADID) {
             // query for images
-            var layer = map.getLayer("2");
+            var layer = appConfig.map.getLayer("2");
             var query = new Query();
             query.returnGeometry = true;
             query.outFields = ["*"];
@@ -436,15 +436,15 @@ define([
 
                 this.imageNumberNode.innerHTML= "#"+count;
 
-                var attributes = layers[0].objects[0].attributes;
-                var coordinates = layers[0].objects[0].coordinates;
+                var attributes = appConfig.layers[0].objects[0].attributes;
+                var coordinates = appConfig.layers[0].objects[0].coordinates;
 
                 var name = this.images.exif[this.count].FileName;
                 
                 var indx = this.getIndexOfImage(name.split(".")[0]);
                 
-                var attributesImage = layers[3].objects[indx].attributes;
-                var coordinatesImage = layers[3].objects[indx].coordinates;
+                var attributesImage = appConfig.layers[3].objects[indx].attributes;
+                var coordinatesImage = appConfig.layers[3].objects[indx].coordinates;
 
                 // UPLOADID
                 attributesImage[1].value = attributes[0].value;
@@ -528,7 +528,7 @@ define([
            } else {
                 // going back to the main form, name fix
                 this.photographerNameNode.clearNode();
-                dialog_seepMain.discovererNameNode.updateNameList();
+                appConfig.dialog_seepMain.discovererNameNode.updateNameList();
                 
                 this.hide();
             }
@@ -572,7 +572,7 @@ define([
             this.photographerNameNode.updateNames(null);
             
             // update title and description
-            var attributesImage = layers[3].objects[this.getIndexOfImage(this.IMAGEIDImageNode.value)].attributes;
+            var attributesImage = appConfig.layers[3].objects[this.getIndexOfImage(this.IMAGEIDImageNode.value)].attributes;
 
             attributesImage[2].value = attributesImage[2].node.get("value");
             attributesImage[3].value = attributesImage[3].node.get("value");
@@ -584,7 +584,7 @@ define([
             image.Title = attributesImage[2].value;
             image.Description = attributesImage[3].value;
             
-            var layer = map.getLayer("6");
+            var layer = appConfig.map.getLayer("6");
             
             var newGraphic = new Graphic(geometry, null, image);
             
@@ -598,13 +598,13 @@ define([
  	        var image = this.images[indx];
  	        var geometry = this.geometries[indx];
             
-            var layer = map.getLayer("6");
+            var layer = appConfig.map.getLayer("6");
             
             var newGraphic = new Graphic(geometry, null, image);
             
             layer.applyEdits(null,null,[newGraphic]);
             
-            imageLayer = map.getLayer("2");
+            imageLayer = appConfig.map.getLayer("2");
             
             imageLayer.refresh();
 
@@ -616,7 +616,7 @@ define([
             this.images.splice(indx,1);
            
             // delete from layers
-            layers[3].objects.splice(this.getIndexOfImage(image.IMAGEID_PK),1);
+            appConfig.layers[3].objects.splice(this.getIndexOfImage(image.IMAGEID_PK),1);
             
             // delete from list
             this.photoListNode.removeOption(this.photoListNode.get("value"));
@@ -646,7 +646,7 @@ define([
            this.seepSubmitImage.on("click", lang.hitch(this, function () {
                 // get and clear all the values
         	    count = this.count+1;
-                var attributesImage = layers[3].objects[this.getIndexOfImage(this.IMAGEIDImageNode.value)].attributes;
+                var attributesImage = appConfig.layers[3].objects[this.getIndexOfImage(this.IMAGEIDImageNode.value)].attributes;
 
                 attributesImage[2].value = attributesImage[2].node.get("value");
                 attributesImage[3].value = attributesImage[3].node.get("value");

@@ -85,7 +85,7 @@ define([
         },
         
         resetAttributes: function () {
-     		attributes = layers[0].objects[0].attributes;
+     		attributes = appConfig.layers[0].objects[0].attributes;
 
             this.TYPE = this.getTYPE(attributes[4].value);
             this.TYPENode.innerHTML = this.TYPE;
@@ -117,13 +117,13 @@ define([
             this.describeNode.innerHTML = this.describe;
             
             // find the names
-            this.namesNode.innerHTML = dialog_seepMain.namesList();
+            this.namesNode.innerHTML = appConfig.dialog_seepMain.namesList();
         },
         
         setAttributes: function () {
-            dialog_seepMain.clearLayers();
-            layers[0] = addSeepObject(layers[0]);
-     		attributes = layers[0].objects[0].attributes;
+            appConfig.dialog_seepMain.clearLayers();
+            appConfig.layers[0] = addSeepObject(appConfig.layers[0]);
+     		attributes = appConfig.layers[0].objects[0].attributes;
 
             // get attributes
             this.UPLOADID = this.currentFeature.attributes.UPLOADID_PK;
@@ -167,7 +167,7 @@ define([
             attributes[8].value = this.describe;        
             
             // find the names
-            dialog_seepMain.setEdit(this);            
+            appConfig.dialog_seepMain.setEdit(this);            
         },
 
        setID: function (features) {
@@ -194,31 +194,31 @@ define([
 
             this.attributeCloseNode.on("click", lang.hitch(this, function () {
                 this.attributeBarNode.hide();
-                map.barShow = false;     
+                appConfig.map.barShow = false;     
             }));
 
             this.editNode.on("click", lang.hitch(this, function () {
-                dialog_seepMain.show();         
+                appConfig.dialog_seepMain.show();         
             }));
 
             this.deleteNode.on("click", lang.hitch(this, function () {
                 if (confirm("Deleting will remove all photos, videos and tracks associated with this spring. OK?")) {
-                    dialog_seepMain.deleteSeepFeatures();
-                    springDeleted();
+                    appConfig.dialog_seepMain.deleteSeepFeatures();
+                    appConfig.springDeleted();
                 }
             }));
 
             this.zoomImageNode.on("click", lang.hitch(this, function () {
-                map.setZoom(15);
+                appConfig.map.setZoom(15);
             }));
 
             this.viewImageNode.on("click", lang.hitch(this, function () {
-                dialog_image.imageSetEdit(this.UPLOADID);
+                appConfig.dialog_image.imageSetEdit(this.UPLOADID);
             }));
 
             this.viewVTNode.on("click", lang.hitch(this, function () {
-                map_open_layers.show();          
-                map_open_layers.startMap(this.UPLOADID);
+                appConfig.map_open_layers.show();          
+                appConfig.map_open_layers.startMap(this.UPLOADID);
             }));
             
             this.viewFirstNode.on("click", lang.hitch(this, function () {

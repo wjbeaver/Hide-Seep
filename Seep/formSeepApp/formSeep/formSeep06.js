@@ -32,8 +32,8 @@ define([
         setID: function () {
         
         	// set values and nodes
-    		var attributes = layers[0].objects[0].attributes;
-    		var coordinates = layers[0].objects[0].coordinates;
+    		var attributes = appConfig.layers[0].objects[0].attributes;
+    		var coordinates = appConfig.layers[0].objects[0].coordinates;
     		
          	this.UPLOADIDTrackUploadNode.set("value", attributes[0].value);
         },
@@ -76,7 +76,7 @@ define([
                     this.hide();
 
                     // send to dialog.image
-                    dialog_track.meta(response);
+                    appConfig.dialog_track.meta(response);
                 } else {
                     alert(response.Message);
                 }
