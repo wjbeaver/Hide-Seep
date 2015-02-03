@@ -52,7 +52,7 @@ var createViewer = function ( viewer, dom_id, url, prefix, w, h ) {
 };
 
 var imagePan = function () {
-	dialog_image.imagePan();
+	appConfig.dialog_image.imagePan();
 };
 
 require([
@@ -165,8 +165,123 @@ require([
                 appConfig.springDeleted = function () {
                     var bar = dijit.byId('seepAttributes').attributeBarNode;
                     bar.hide();
-                }
+                };
                 
+                appConfig.switchToAdminLayers = function() {
+                    if (appConfig.adminLayers.length==0) {
+                            newLayer = {
+                                layer: null,
+                                id: "",
+                                position: 0
+                            }
+                        
+                        var layer = null;
+                        
+                        // load admin layers
+                        newLayer.layer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/FeatureServer/1", {
+                            id: '5',
+                            mode: FeatureLayer.MODE_SNAPSHOT,
+                            editable: true,
+                            visible: true,
+                            outFields: [ "*" ]
+                        });
+                        
+                        newLayer.id = "5";
+                        newLayer.position = 3;
+                        
+                        layer = appConfig.map.getLayer(newLayer.id);
+                        
+                        // max and min
+                        newLayer.layer.setMaxScale(layer.maxScale)
+                        newLayer.layer.setMinScale(layer.minScale)
+                        
+                        // renderer
+                        newLayer.layer.setRenderer(layer.renderer);
+                        
+                        appConfig.adminLayers[0] = newLayer;
+                        
+                        newLayer.layer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/MapServer/0", {
+                            id: '2',
+                            visible: true
+                        });
+                        
+                        newLayer.id = "2";
+                        newLayer.position = 4;
+                        
+                        layer = appConfig.map.getLayer(newLayer.id);
+                        
+                        // max and min
+                        newLayer.layer.setMaxScale(layer.maxScale)
+                        newLayer.layer.setMinScale(layer.minScale)
+                        
+                        // renderer
+                        newLayer.layer.setRenderer(layer.renderer);
+                        
+                        appConfig.adminLayers[1] = newLayer;
+             
+                        newLayer.layer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/FeatureServer/0", {
+                            id: '6',
+                            mode: FeatureLayer.MODE_SNAPSHOT,
+                            editable: true,
+                            visible: true,
+                            infoTemplate: infoTemplate,
+                            outFields: [ "*" ]
+                        });
+                        
+                        newLayer.id = "6";
+                        newLayer.position = 5;
+                        
+                        layer = appConfig.map.getLayer(newLayer.id);
+                        
+                        // max and min
+                        newLayer.layer.setMaxScale(layer.maxScale)
+                        newLayer.layer.setMinScale(layer.minScale)
+                        
+                        // renderer
+                        newLayer.layer.setRenderer(layer.renderer);
+                        
+                        // infoTemplate
+                        newLayer.layer.setInfoTemplate(layer.infoTemplate);
+                        
+                        appConfig.adminLayers[2] = newLayer;
+                        
+                        newLayer.layer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/MapServer/1", {
+                            id: '1',
+                            editable: true,
+                            visible: true,
+                            outFields: [ "*" ]
+                        });
+                        
+                        newLayer.id = "1";
+                        newLayer.position = 6;
+                         
+                        layer = appConfig.map.getLayer(newLayer.id);
+                        
+                        // max and min
+                        newLayer.layer.setMaxScale(layer.maxScale)
+                        newLayer.layer.setMinScale(layer.minScale)
+                        
+                        // renderer
+                        newLayer.layer.setRenderer(layer.renderer);
+                        
+                        appConfig.adminLayers[3] = newLayer;
+                    }
+                    
+                    // remove each user layer and add a admin layer
+                    for (n=0;n<appConfig.adminLayers.length;n++) {
+                        appConfig.map.removeLayer(map.getLayer(appConfig.adminLayers[n].id));
+                        appConfig.map.addLayer(appConfig.adminLayers[n].layer, appConfig.adminLayers[n].position);
+                    }
+                };
+                
+                appConfig.switchToUserLayers = function() {
+                    // remove each admin layer and add a user layer
+                    for (n=0;n<appConfig.userLayers.length;n++) {
+                        appConfig.map.removeLayer(map.getLayer(appConfig.userLayers[n].id));
+                        appConfig.map.addLayer(appConfig.userLayers[n].layer, appConfig.userLayers[n].position);
+                    }
+                };
+
                 var overviewMap = new OverviewMap({
                     map: map,
                     attachTo: "bottom-left",
@@ -328,7 +443,7 @@ require([
                         "<b>Location</b>: ${County}<br><b>Land Unit</b>: ${LandUnit}<br>" +
                         "<b>Land Detail</b>: ${LandDetail}<br><b>Latitude</b>: ${Latitude}<br><b>Longitude</b>: ${Longitude}"),
                     outFields: [
-                    "NAME", "ElevM", "County", "LandUnit", "LandDetail", "Latitude", "Longitude"
+                    "NAME", "ElevM", "County", "LandUnit", "Latitude", "Longitude"
                     ]
                 });
 
@@ -340,27 +455,21 @@ require([
                         "<b>Location</b>: ${County}<br><b>Land Unit</b>: ${LandUnit}<br>" +
                         "<b>Land Detail</b>: ${LandDetail}<br><b>Latitude</b>: ${Latitude}<br><b>Longitude</b>: ${Longitude}"),
                     outFields: [
-                    "NAME", "ElevM", "County", "LandUnit", "LandDetail", "Latitude", "Longitude"
+                    "NAME", "ElevM", "County", "LandUnit", "Latitude", "Longitude"
                     ]
                 });
 
                 urlUtils.addProxyRule({
-                    urlPrefix: "arcgis.springsdata.org/arcgis/rest/services/Global/HideAndSeepWB",
+                    urlPrefix: "arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep",
                     proxyUrl: "http://overtexplorations.com/proxy/proxy.php"
                 });
-
-                seepMapLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/MapServer/1", {
-                    id: '1',
-                    editable: true,
-                    visible: true,
-                    outFields: [ "*" ]
-                });
- 
-                 seepImagesMapLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/MapServer/0", {
-                    id: '2',
-                    visible: true
-                });
-                 
+                
+                newLayer = {
+                    layer: null,
+                    id: "",
+                    position: 0
+                }
+                
                 seepFeatureLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/FeatureServer/1", {
                     id: '5',
                     mode: FeatureLayer.MODE_SNAPSHOT,
@@ -369,12 +478,61 @@ require([
                     outFields: [ "*" ]
                 });
                 
+                seepFeatureLayer.setDefinitionExpression("UPLOADID_PK='X'");
+                
+                newLayer.layer = seepFeatureLayer;
+                newLayer.id = "5";
+                newLayer.position = 3;
+                appConfig.userLayers[0] = newLayer;
+                
+                seepImagesMapLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/MapServer/0", {
+                    id: '2',
+                    visible: true
+                });
+                
+                seepImagesMapLayer.setDefinitionExpression("UPLOADID_FK='X'");
+                
+                newLayer.layer = seepImagesMapLayer;
+                newLayer.id = "2";
+                newLayer.position = 4;
+                appConfig.userLayers[1] = newLayer;
+             
                 infoTemplate = new InfoTemplate();
                 infoTemplate.setTitle("${Title}");
                 infoTemplate.setContent("<b>Description</b>: ${Description}<br>" +
                         '<a href="${IMAGE}" target="_blank"><img src="${IMAGE:small}" /></a><br>' +
                         "<b>Time Zone</b>: ${TimeZoneName}<br><b>UTC</b>: ${UTC}<br>" + 
                         "${Altitude:fill}${Orientation:fill}");
+
+                seepImagesFeatureLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/FeatureServer/0", {
+                    id: '6',
+                    mode: FeatureLayer.MODE_SNAPSHOT,
+                    editable: true,
+                    visible: true,
+                    infoTemplate: infoTemplate,
+                    outFields: [ "*" ]
+                });
+                
+                seepImagesFeatureLayer.setDefinitionExpression("UPLOADID_FK='X'");
+                
+                newLayer.layer = seepImagesFeatureLayer;
+                newLayer.id = "6";
+                newLayer.position = 5;
+                appConfig.userLayers[2] = newLayer;
+
+                seepMapLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/MapServer/1", {
+                    id: '1',
+                    editable: true,
+                    visible: true,
+                    outFields: [ "*" ]
+                });
+                
+                seepMapLayer.setDefinitionExpression("UPLOADID_PK='X'");
+                
+                newLayer.layer = seepMapLayer;
+                newLayer.id = "1";
+                newLayer.position = 6;
+                appConfig.userLayers[3] = newLayer;
 
                 fill = function (value, key, data) {
                   var results = "";
@@ -409,15 +567,6 @@ require([
                   return results;
                 };
 
-                seepImagesFeatureLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/FeatureServer/0", {
-                    id: '6',
-                    mode: FeatureLayer.MODE_SNAPSHOT,
-                    editable: true,
-                    visible: true,
-                    infoTemplate: infoTemplate,
-                    outFields: [ "*" ]
-                });
- 
                 seepNamesFeatureLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/FeatureServer/2", {
                     id: '7',
                     mode: FeatureLayer.MODE_SNAPSHOT,
@@ -425,7 +574,7 @@ require([
                     visible: false,
                     outFields: [ "*" ]
                 });
- 
+
                 seepFeatureNameFeatureLayer = new FeatureLayer("https://arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep/FeatureServer/3", {
                     id: '8',
                     mode: FeatureLayer.MODE_SNAPSHOT,
@@ -433,7 +582,7 @@ require([
                     visible: false,
                     outFields: [ "*" ]
                 });
- 
+                
                 var layerScales = [
                     {
                         min: 288895.2884,
@@ -588,10 +737,12 @@ require([
             	seepFeatureLayer.setRenderer(uniqueSpringsRenderer);
                 seepImagesMapLayer.setRenderer(uniqueImageRenderer);
                 seepImagesFeatureLayer.setRenderer(uniqueImageRenderer);
-
-                map.addLayers([seepBoundaryMapLayer, seepBoundary2MapLayer, seepFeatureLayer, seepImagesMapLayer, seepImagesFeatureLayer, 
+                
+                userLayers = [seepBoundary2MapLayer, seepBoundaryMapLayer, seepFeatureLayer, seepImagesMapLayer, seepImagesFeatureLayer, 
                     seepMapLayer, seepNamesFeatureLayer, seepFeatureNameFeatureLayer, 
-                    seepExistingSpringsLayer, seep2ExistingSpringsLayer]);
+                    seepExistingSpringsLayer, seep2ExistingSpringsLayer];
+
+                map.addLayers(userLayers);
 
                 // scalebar
                 var scalebar = new Scalebar({

@@ -50,6 +50,10 @@
 	background-image: url("/Seep/formSeepApp/images/frenchstucco.png");
 }
 
+.extraButtons {
+    display: none;
+}
+
 #editButtons {
     display: hidden;
 	background-image: url("/Seep/formSeepApp/images/frenchstucco.png");

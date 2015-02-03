@@ -520,7 +520,13 @@ define([
         	this.attributes.Accuracy = attributes[6].value;
         	this.attributes.Comment = attributes[7].value;
         	this.attributes.Describe = attributes[8].value;
-        	this.attributes.Example = 0;
+        	
+        	// example is for admin testing as of now
+        	if (appConfig.admin) {
+        	    this.attributes.Example = 1;
+        	} else {
+        	    this.attributes.Example = 0;
+        	}
         	
         	// add point to feature layer
             var newGraphic = new Graphic(this.geometry, null, this.attributes);
@@ -558,7 +564,7 @@ define([
         	feature.attributes.Accuracy = attributes[6].value;
         	feature.attributes.Comment = attributes[7].value;
         	feature.attributes.Describe = attributes[8].value;
-        	feature.attributes.Example = 0;
+        	// feature.attributes.Example = 0;
             
             var newGraphic = new Graphic(feature.geometry, null, feature.attributes);
             

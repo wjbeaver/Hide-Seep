@@ -23,8 +23,11 @@
             // map
             map: null,
             
+            // functions
             springDeleted: null,
             generateUUID: null,
+            switchToAdminLayers: null,
+            switchToUserLayers: null,
             
             // forms
             dialog_image_loader: null,
@@ -42,6 +45,8 @@
             
             // layers
             layers: null,
+            userLayers: [],
+            adminLayers: [],
             
             // Get base url from current url.
             baseUrl: location.href.substring(0, location.href.lastIndexOf("/") + 1) + 'Seep/'
@@ -107,6 +112,9 @@
                     </div>
                     <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="title:'About'">
                         <div class="accordian">
+                            <div style="margin-bottom: 15px;">This application allows the user to annotate existing springs and to add new found springs to the regions defined by the 
+                            Desert Landscape Conservation Cooperative and the Southern Rockies Landscape Conservation Cooperative.
+                            </div>
                             <div style="font-weight:bold; margin-left:20px;">Developed by Bill Beaver and Jeri Ledbetter</div>
                             <div style="font-style:italic; margin-left:5px;">Springs Stewardship Institute
                                 <span>&#0169;</span>

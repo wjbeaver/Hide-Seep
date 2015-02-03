@@ -53,10 +53,12 @@
                         <div data-dojo-type="dijit/form/TextBox" name="longitudeMain" value="" data-dojo-attach-point="longitudeMainNode" class="hidden"></div>
                     </div>
                     <div data-dojo-type="dojox/layout/TableContainer" id="addButtons" data-dojo-props="cols:1, showLabels:false">
-                        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:3, showLabels:false" class="buttons">
+                        <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2, showLabels:false" class="buttons">
                             <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="addPhotoNode" type="button" role="button">Add Photo(s)</div>
-                            <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="addTrackNode" type="button" role="button">Add Track</div>
-                            <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="addVideoNode" type="button" role="button">Add Video</div>
+                            <div data-dojo-type="dojox/layout/TableContainer" class="extraButtons" data-dojo-props="cols:2, showLabels:false" class="buttons">
+                                <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="addTrackNode" type="button" role="button">Add Track</div>
+                                <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="addVideoNode" type="button" role="button">Add Video</div>
+                            </div>
                          </div>
                         <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false" class="buttons">
                             <div data-dojo-type="dijit/form/Button" data-dojo-attach-point="submitMainNode" id="submitMain" type="button" role="button">Add Springs Attributes</div>

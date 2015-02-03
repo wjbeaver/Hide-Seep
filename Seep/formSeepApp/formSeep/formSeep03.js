@@ -343,20 +343,20 @@ define([
                     }    
                 }
             
-                rect.toObject = (lang.hitch(this, function(toObject) {
-                        return lang.hitch(this, function() {
-                            return fabric.util.object.extend(toObject.call(this), {
-                                    comment: this.commentNode.get("value"),
-                                    title: this.titleNode.get("value"),
-                                    UPLOADID: this.UPLOADID,
-                                    IMAGEID: this.IMAGEID,
-                                    markup_count: this.markup_count,
-                                    xOffset: this.xOffset,
-                                    yOffset: this.yOffset,
-                                    scale: this.scale  
-                            });
+                rect.toObject = (function(toObject) {
+                    return function() {
+                        return fabric.util.object.extend(toObject.call(this), {
+                            comment: appConfig.dialog_imagePan.commentNode.get("value"),
+                            title: appConfig.dialog_imagePan.titleNode.get("value"),
+                            UPLOADID: appConfig.dialog_imagePan.UPLOADID,
+                            IMAGEID: appConfig.dialog_imagePan.IMAGEID,
+                            markup_count: appConfig.dialog_imagePan.markup_count,
+                            xOffset: appConfig.dialog_imagePan.xOffset,
+                            yOffset: appConfig.dialog_imagePan.yOffset,
+                            scale: appConfig.dialog_imagePan.scale
                         });
-                }))(rect.toObject);
+                    };
+                })(rect.toObject);
             
                 canvas.add(rect);	
          		

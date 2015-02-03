@@ -58,12 +58,16 @@ define([
             });
             
             this.uploadNode.on("change", function () {
-                fileList = this.getFileList();
+                var fileList = this.getFileList();
                 console.log("Change");
 
                 for (n = 0; n < fileList.length; n++) {
-                    if (this.getFileType(this.getFileList()[n].name) != 'JPG') {
+                    if (this.getFileType(fileList[n].name) != 'JPG') {
                         alert('A file in the list is not a ".jpg" file!');
+                        this.reset();
+                        break;
+                    } else if (fileList[n].size>8388608) {
+                        alert('A file size is limited to 8mb!');
                         this.reset();
                         break;
                     }

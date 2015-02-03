@@ -573,7 +573,9 @@ define([
 			    domStyle.set(login, "display", "none");
 			    domStyle.set(logout, "display", "block");
 
-		        // do something to the map 
+		        // add admin layers to the map
+		        appConfig.switchToAdminLayers();
+		        
 		    } else {
 			    resultNode.innerHTML = "Wrong Username and Password";
 		    }
@@ -586,13 +588,17 @@ define([
     app.logoutClick = function () {
 		        appConfig.admin = false;
 			    
+		        var resultNode = dom.byId('loginResult');
+			    resultNode.innerHTML = "Logout!";
+			    
 			    var login = dom.byId("login");
 			    var logout = dom.byId("logout");
 			    
 			    domStyle.set(login, "display", "block");
 			    domStyle.set(logout, "display", "none");
 
-		        // do something to the map 
+		        // add user layers to the map 
+		        appConfig.switchToUserLayers();
     };
     return app; 
 });
