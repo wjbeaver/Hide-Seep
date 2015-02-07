@@ -81,8 +81,6 @@ define([
                     alert(response.Message);
                 }
             }));
-        },
-        
-        
+        }
     });
 });

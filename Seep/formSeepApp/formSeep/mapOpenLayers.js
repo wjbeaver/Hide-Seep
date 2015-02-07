@@ -38,6 +38,6 @@ define([
         postCreate: function () {
             //make sure any parent widget's postCreate functions get called.
             this.inherited(arguments);
-        },
+        }
     });
 });

@@ -71,6 +71,6 @@ define([
                     appConfig.dialog_seepMain.show();
                 }
             }));
-        },
+        }
     });
 });

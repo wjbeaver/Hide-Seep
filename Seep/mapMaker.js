@@ -461,7 +461,7 @@ require([
 
                 urlUtils.addProxyRule({
                     urlPrefix: "arcgis.springsdata.org/arcgis/rest/services/Global/HideSeep",
-                    proxyUrl: "http://overtexplorations.com/proxy/proxy.php"
+                    proxyUrl: appConfig.siteUrl + "proxy/proxy.php"
                 });
                 
                 newLayer = {

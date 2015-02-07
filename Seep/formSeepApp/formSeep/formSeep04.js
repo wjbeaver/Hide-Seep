@@ -22,7 +22,7 @@ define([
     'dojox/layout/TableContainer',
     "dijit/form/Select",
     'dijit/form/Textarea',
-    "dijit/form/DateTextBox",
+    "dijit/form/DateTextBox"
 ], function (declare, lang, dojo, dom, on, JSON, request, domStyle, domAttr, namer, Dialog, _WidgetsInTemplateMixin, template, Point, Graphic, locale, SpatialReference) {
     return declare('formSeep.templates.formSeep04', [Dialog, _WidgetsInTemplateMixin], {
 
@@ -390,8 +390,8 @@ define([
             }
             
             // zoom in?
-            if (images.length>0) {
-            }
+//            if (images.length>0) {
+//            }
         },
         
         sendVideoTracks: function () {
@@ -727,8 +727,6 @@ define([
             this.submitMainNode.on("click", lang.hitch(this, function () {
                 this.leaveWithAction();
             }));
-        },
-        
-        
+        }
     });
 });

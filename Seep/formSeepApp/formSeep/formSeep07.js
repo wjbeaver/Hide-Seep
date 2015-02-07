@@ -195,6 +195,6 @@ define([
                     alert("Needs a Title!");
                 }
             }));
-        },
+        }
     });
 });

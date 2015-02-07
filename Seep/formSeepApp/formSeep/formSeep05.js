@@ -355,6 +355,6 @@ define([
                     this.videoUTCNode.getUTC(taken);
                 }           		    
            }));
-        },     
+        }
     });
 });

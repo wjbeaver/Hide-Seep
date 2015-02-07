@@ -176,8 +176,8 @@ define([
             this.currentFeature = features[0];
             
             // turn on multiple
-            if (features>1) {
-            }
+//            if (features>1) {
+//            }
             
             this.setAttributes();
         },
@@ -236,6 +236,6 @@ define([
             this.viewLastNode.on("click", lang.hitch(this, function () {
             
             }));
-        },
+        }
     });
 });

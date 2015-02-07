@@ -97,6 +97,6 @@ define([
                     alert(response.Message);
                 }
             }));
-        },
+        }
     });
 });
